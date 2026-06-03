@@ -12,12 +12,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    /* --- THEME: Electric Cyan & Deep Space Blue --- */
+    /* --- THEME: Electric Cyan, Deep Space Blue & Admin Red --- */
     :root {
-      --bg-dark: #030712;       /* Deep space black/blue */
-      --primary: #00f2fe;       /* Electric Cyan */
+      --bg-dark: #030712;
+      --primary: #00f2fe;
       --primary-dim: rgba(0, 242, 254, 0.4); 
+      --admin-red: #ff4757;
+      --admin-red-dim: rgba(255, 71, 87, 0.4);
       --text-main: #ffffff;
+      --glass-bg: rgba(13, 25, 41, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
     }
 
     * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
@@ -32,201 +36,238 @@
 
     /* --- FLOATING HEADER --- */
     .header-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 20px;
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
+      position: fixed; top: 0; left: 0; right: 0; padding: 20px;
+      z-index: 1000; display: flex; justify-content: center;
     }
 
     header {
-      width: 100%;
-      max-width: 1200px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px 10px 30px;
-      background: rgba(3, 7, 18, 0.6);
-      border: 1px solid rgba(0, 242, 254, 0.2);
-      border-radius: 100px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      width: 100%; max-width: 1200px; display: flex; align-items: center;
+      justify-content: space-between; padding: 10px 20px 10px 30px;
+      background: rgba(3, 7, 18, 0.6); border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 100px; backdrop-filter: blur(16px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
-    /* Logo Image */
-    .logo img {
-      height: 40px;
-      vertical-align: middle;
-    }
+    .logo img { height: 40px; vertical-align: middle; }
 
-    /* --- AUTH CONTAINER (Inside Header) --- */
-    .header-auth-box {
-      display: flex;
-      align-items: center;
-    }
+    /* --- AUTH CONTAINER --- */
+    .header-auth-box { display: flex; align-items: center; }
 
     .cyber-btn {
-      background: rgba(0, 242, 254, 0.05);
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      padding: 8px 20px;
-      font-family: 'Oswald', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 50px; /* Pill shape for buttons */
+      background: rgba(0, 242, 254, 0.05); border: 1px solid var(--primary);
+      color: var(--primary); padding: 8px 20px; font-family: 'Oswald', sans-serif;
+      font-size: 14px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease;
+      display: flex; align-items: center; gap: 8px; border-radius: 50px;
     }
 
-    .cyber-btn:hover {
-      background: var(--primary);
-      color: #000;
-      box-shadow: 0 0 15px var(--primary);
-    }
+    .cyber-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
 
-    .logout-btn {
-      border-color: #ff4757;
-      color: #ff4757;
-      background: transparent;
-    }
+    .logout-btn { border-color: var(--admin-red); color: var(--admin-red); background: transparent; }
+    .logout-btn:hover { background: var(--admin-red); color: #fff; box-shadow: 0 0 15px var(--admin-red-dim); }
 
-    .logout-btn:hover {
-      background: #ff4757;
-      color: #fff;
-      box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
-    }
+    .user-profile-ui { display: none; align-items: center; gap: 15px; }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); box-shadow: 0 0 10px var(--primary-dim); object-fit: cover; }
 
-    .user-profile-ui {
-      display: none; /* Hidden by default, shown via JS when logged in */
-      align-items: center;
-      gap: 15px;
-    }
-
-    .user-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 2px solid var(--primary);
-      box-shadow: 0 0 10px var(--primary-dim);
-      object-fit: cover;
-    }
-
-    /* --- GLOBAL BACKGROUND (3D GRID & NEBULA) --- */
+    /* --- GLOBAL BACKGROUND --- */
     .cyber-page-section {
-        position: relative;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center; /* Center everything perfectly */
-        overflow: hidden;
+        position: relative; min-height: 100vh; display: flex; flex-direction: column;
+        align-items: center; justify-content: flex-start; padding-top: 120px; overflow: hidden;
     }
 
     .bg-grid-engine {
-        position: absolute;
-        width: 200%; height: 200%;
-        top: -50%; left: -50%;
-        background-image: 
-            linear-gradient(rgba(0, 242, 254, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 242, 254, 0.1) 1px, transparent 1px);
-        background-size: 60px 60px;
-        transform: perspective(600px) rotateX(55deg);
+        position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+        background-image: linear-gradient(rgba(0, 242, 254, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.1) 1px, transparent 1px);
+        background-size: 60px 60px; transform: perspective(600px) rotateX(55deg);
         animation: gridSlowScroll 20s linear infinite;
         mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
-        -webkit-mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
-        z-index: 0;
-        pointer-events: none;
+        z-index: 0; pointer-events: none;
     }
 
     .bg-nebula {
-        position: absolute;
-        inset: 0;
+        position: absolute; inset: 0;
         background: radial-gradient(circle at 50% 50%, rgba(0, 119, 255, 0.15) 0%, transparent 60%);
-        filter: blur(80px);
-        z-index: 0;
-        pointer-events: none;
+        filter: blur(80px); z-index: 0; pointer-events: none;
     }
 
-    @keyframes gridSlowScroll {
-        from { background-position: 0 0; }
-        to { background-position: 0 60px; }
-    }
+    @keyframes gridSlowScroll { from { background-position: 0 0; } to { background-position: 0 60px; } }
 
     /* --- CONTENT CONTAINER --- */
-    .container {
-        position: relative;
-        z-index: 5;
-        max-width: 1200px;
-        width: 100%;
-        padding: 20px;
-        margin: 0 auto;
-        text-align: center; /* Center the text inside */
-    }
+    .container { position: relative; z-index: 5; max-width: 1200px; width: 100%; padding: 20px; margin: 0 auto; text-align: center; }
 
-    /* --- TITLE STYLING (Solid Gradient + Glow) --- */
     .page-main-title {
-        font-weight: 700;
-        font-size: clamp(40px, 8vw, 85px);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-bottom: 10px; /* Reduced to pull welcome text closer */
-        
+        font-weight: 700; font-size: clamp(40px, 8vw, 85px); text-transform: uppercase;
+        letter-spacing: 2px; margin-bottom: 10px;
         background: linear-gradient(180deg, #ffffff 0%, var(--primary) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         filter: drop-shadow(0 0 25px var(--primary-dim));
     }
 
-.welcome-container {
-        opacity: 0; 
-        transition: opacity 0.5s ease;
-        font-size: clamp(18px, 3vw, 24px);
-        font-weight: 600; /* Makes all the text bold and equal */
-        letter-spacing: 1px;
-        color: #ffffff; /* Makes 'BINE AI VENIT' solid white instead of grey */
-        text-transform: uppercase; /* Makes everything match perfectly */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
+    /* --- WELCOME TEXT & BADGES --- */
+    .welcome-container {
+        opacity: 0; transition: opacity 0.5s ease; font-size: clamp(18px, 3vw, 24px);
+        font-weight: 600; letter-spacing: 1px; color: #ffffff; text-transform: uppercase;
+        display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
     }
 
-    .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 12px;
-        border-radius: 50px;
-        font-size: 12px;
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .badge-admin { background: rgba(255, 71, 87, 0.1); border: 1px solid var(--admin-red); color: var(--admin-red); box-shadow: 0 0 15px var(--admin-red-dim); }
+    .badge-user { background: rgba(0, 242, 254, 0.1); border: 1px solid var(--primary); color: var(--primary); box-shadow: 0 0 15px var(--primary-dim); }
+
+    /* --- ADMIN ACTION BAR --- */
+    .admin-action-bar {
+        display: none; /* Shown only to admins via JS */
+        margin-top: 30px;
+        justify-content: center;
+    }
+
+    .btn-admin-add {
+        background: rgba(255, 71, 87, 0.1);
+        border: 2px solid var(--admin-red);
+        color: #fff;
+        padding: 12px 30px;
+        font-family: 'Oswald', sans-serif;
+        font-size: 16px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
+        border-radius: 50px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 20px var(--admin-red-dim);
+    }
+    .btn-admin-add:hover {
+        background: var(--admin-red);
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 0 30px var(--admin-red);
     }
 
-    .badge-admin {
-        background: rgba(255, 71, 87, 0.1);
-        border: 1px solid #ff4757;
-        color: #ff4757;
-        box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
+    /* --- ORDERS GRID --- */
+    .orders-grid {
+        display: none; /* Shown only to admins */
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+        padding-bottom: 50px;
     }
 
-    .badge-user {
-        background: rgba(0, 242, 254, 0.1);
-        border: 1px solid var(--primary);
-        color: var(--primary);
-        box-shadow: 0 0 15px var(--primary-dim);
+    .order-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        backdrop-filter: blur(10px);
     }
+
+    .order-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 30px var(--primary-dim);
+    }
+
+    .order-img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-bottom: 2px solid var(--primary);
+    }
+
+    .order-price-tag {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.8);
+        border: 1px solid #00ff88;
+        color: #00ff88;
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+    }
+
+    /* --- MODALS (POPUPS) --- */
+    .custom-modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+        display: none; justify-content: center; align-items: center; z-index: 2000;
+        padding: 20px;
+    }
+    .custom-modal-overlay.active { display: flex; }
+
+    .custom-modal-card {
+        background: #08101b;
+        border: 2px solid var(--primary);
+        width: 100%; max-width: 800px;
+        max-height: 90vh; overflow-y: auto;
+        border-radius: 20px; padding: 30px;
+        position: relative; box-shadow: 0 0 50px var(--primary-dim);
+    }
+
+    /* Scrollbar for modal */
+    .custom-modal-card::-webkit-scrollbar { width: 6px; }
+    .custom-modal-card::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+    .close-modal-btn {
+        position: absolute; top: 20px; right: 20px;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        color: #fff; width: 35px; height: 35px; border-radius: 50%;
+        font-size: 16px; cursor: pointer; transition: 0.3s;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .close-modal-btn:hover { background: var(--admin-red); border-color: var(--admin-red); transform: rotate(90deg); }
+
+    .modal-title {
+        font-size: 24px; color: #fff; text-transform: uppercase; letter-spacing: 2px;
+        margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
+    }
+    .modal-title i { color: var(--primary); margin-right: 10px; }
+
+    /* Form Grid */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .form-section-title {
+        grid-column: 1 / -1;
+        font-size: 16px; color: #aaa; text-transform: uppercase;
+        letter-spacing: 1px; margin-top: 15px; border-left: 3px solid var(--primary); padding-left: 10px;
+    }
+
+    .input-group { position: relative; display: flex; flex-direction: column; text-align: left; }
+    .input-group label { font-size: 12px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .input-wrapper { position: relative; }
+    .input-wrapper i {
+        position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+        color: #888; font-size: 16px; transition: 0.3s;
+    }
+    .styled-input {
+        width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+        color: #fff; font-family: 'Oswald', sans-serif; font-size: 14px;
+        padding: 12px 12px 12px 45px; border-radius: 8px; transition: 0.3s;
+    }
+    .styled-input:focus { border-color: var(--primary); background: rgba(0, 242, 254, 0.05); }
+    .styled-input:focus + i { color: var(--primary); }
+
+    .btn-submit-order {
+        grid-column: 1 / -1;
+        background: var(--primary); color: #000; border: none; padding: 15px;
+        font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 2px; border-radius: 8px;
+        cursor: pointer; transition: 0.3s; margin-top: 20px; box-shadow: 0 0 20px var(--primary-dim);
+    }
+    .btn-submit-order:hover { background: #fff; box-shadow: 0 0 30px var(--primary); transform: translateY(-3px); }
+
+    /* Order Details Modal specific styling */
+    .details-value { background: rgba(255,255,255,0.05); padding: 12px 12px 12px 45px; border-radius: 8px; color: #fff; font-size: 14px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word;}
+    .proof-link { color: #00ff88; text-decoration: none; font-weight: bold; }
+    .proof-link:hover { text-decoration: underline; }
 
   </style>
 </head>
@@ -235,24 +276,12 @@
     <!-- HEADER (Logo + Auth) -->
     <div class="header-container">
         <header>
-            <!-- KSDA Logo -->
-            <a href="#" class="logo">
-                <img src="https://iili.io/fXvBEiB.png" alt="KSDA Logo">
-            </a>
-
-            <!-- Auth UI -->
+            <a href="#" class="logo"><img src="https://iili.io/fXvBEiB.png" alt="KSDA Logo"></a>
             <div class="header-auth-box">
-                <!-- Login Button -->
-                <button id="googleLoginBtn" class="cyber-btn">
-                    <i class="fab fa-google"></i> LOGIN
-                </button>
-
-                <!-- Logged In UI (Hidden initially) -->
+                <button id="googleLoginBtn" class="cyber-btn"><i class="fab fa-google"></i> ADMIN LOGIN</button>
                 <div id="userProfileUI" class="user-profile-ui">
                     <img id="userAvatarImg" src="" alt="Avatar" class="user-avatar">
-                    <button id="logoutBtn" class="cyber-btn logout-btn">
-                        LOGOUT
-                    </button>
+                    <button id="logoutBtn" class="cyber-btn logout-btn">LOGOUT</button>
                 </div>
             </div>
         </header>
@@ -260,34 +289,178 @@
 
     <!-- MAIN PAGE -->
     <main class="cyber-page-section">
-        
-        <!-- Animated Background Engine -->
         <div class="bg-grid-engine"></div>
         <div class="bg-nebula"></div>
 
         <div class="container">
-            <!-- Title -->
             <h1 class="page-main-title">Comenzi Portrete</h1>
-            
-            <!-- Dynamic Welcome Text (Shows up when logged in) -->
-            <div id="welcomeContainer" class="welcome-container">
-                <!-- Javascript will inject "BINE AI VENIT, [NUME] [BADGE]" here -->
+            <div id="welcomeContainer" class="welcome-container"></div>
+
+            <!-- ADMIN ACTION BAR (Hidden for normal users) -->
+            <div id="adminActionBar" class="admin-action-bar">
+                <button id="openAddModalBtn" class="btn-admin-add">
+                    <i class="fas fa-plus-circle"></i> Adaugă Comandă
+                </button>
             </div>
 
-            <!-- ADD YOUR NEW CONTENT / PORTRAIT SYSTEM HERE LATER -->
+            <!-- ORDERS GRID (Hidden for normal users) -->
+            <div id="ordersGrid" class="orders-grid">
+                <!-- Javascript will inject cards here -->
+            </div>
         </div>
-
     </main>
 
     <!-- ==========================================
-         FIREBASE INITIALIZATION & AUTH LOGIC
+         MODALS
+    ========================================== -->
+
+    <!-- 1. ADD ORDER MODAL -->
+    <div id="addOrderModal" class="custom-modal-overlay">
+        <div class="custom-modal-card">
+            <button class="close-modal-btn" onclick="document.getElementById('addOrderModal').classList.remove('active')">✕</button>
+            
+            <h2 class="modal-title"><i class="fas fa-pencil-ruler"></i> Adaugă Comandă Nouă</h2>
+            
+            <form id="addOrderForm" class="form-grid">
+                
+                <!-- DATE COMENZII -->
+                <div class="form-section-title">Date Comandă</div>
+                
+                <div class="input-group">
+                    <label>Imagine Portret (URL)</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oImage" class="styled-input" placeholder="https://link-imagine.com/img.jpg" required>
+                        <i class="fas fa-image"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Preț (LEI)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="oPrice" class="styled-input" placeholder="Ex: 150" required>
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+
+                <div class="input-group" style="grid-column: 1 / -1;">
+                    <label>Dovadă Plată (URL Link)</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oProof" class="styled-input" placeholder="https://link-dovada.com/plata.png" required>
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                </div>
+
+                <!-- DETALII LIVRARE -->
+                <div class="form-section-title">Detalii de Livrare</div>
+
+                <div class="input-group">
+                    <label>Nume și Prenume</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oName" class="styled-input" required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Nr. Telefon</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oPhone" class="styled-input" required>
+                        <i class="fas fa-phone"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Cod Poștal</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oZip" class="styled-input" required>
+                        <i class="fas fa-mail-bulk"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Localitate</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oCity" class="styled-input" required>
+                        <i class="fas fa-city"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Județ / Sector</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oCounty" class="styled-input" required>
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Stradă și nr.</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oStreet" class="styled-input" required>
+                        <i class="fas fa-road"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Bl., Sc., Interfon, Et., Ap.</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oBuilding" class="styled-input" required>
+                        <i class="fas fa-building"></i>
+                    </div>
+                </div>
+
+                <div class="input-group" style="grid-column: 1 / -1;">
+                    <label>Repere sau alte informații</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="oNotes" class="styled-input" placeholder="Ex: Lăsați la recepție...">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-order"><i class="fas fa-save"></i> ADAUGĂ COMANDĂ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. ORDER DETAILS MODAL -->
+    <div id="orderDetailsModal" class="custom-modal-overlay">
+        <div class="custom-modal-card">
+            <button class="close-modal-btn" onclick="document.getElementById('orderDetailsModal').classList.remove('active')">✕</button>
+            
+            <h2 class="modal-title"><i class="fas fa-box-open"></i> Fișă Comandă</h2>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img id="dImage" src="" style="max-width: 100%; max-height: 300px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 0 20px var(--primary-dim);">
+            </div>
+
+            <div class="form-grid" style="pointer-events: none;"> <!-- Disable editing -->
+                
+                <div class="form-section-title">Date Comandă</div>
+                <div class="input-group"><label>Preț (LEI)</label><div class="input-wrapper"><div class="details-value" id="dPrice"></div><i class="fas fa-money-bill-wave"></i></div></div>
+                <div class="input-group" style="pointer-events: auto;"><label>Dovadă Plată</label><div class="input-wrapper"><div class="details-value"><a href="#" id="dProof" target="_blank" class="proof-link">Vezi Dovada</a></div><i class="fas fa-file-invoice-dollar"></i></div></div>
+
+                <div class="form-section-title">Detalii de Livrare</div>
+                <div class="input-group"><label>Nume și Prenume</label><div class="input-wrapper"><div class="details-value" id="dName"></div><i class="fas fa-user"></i></div></div>
+                <div class="input-group"><label>Nr. Telefon</label><div class="input-wrapper"><div class="details-value" id="dPhone"></div><i class="fas fa-phone"></i></div></div>
+                <div class="input-group"><label>Cod Poștal</label><div class="input-wrapper"><div class="details-value" id="dZip"></div><i class="fas fa-mail-bulk"></i></div></div>
+                <div class="input-group"><label>Localitate</label><div class="input-wrapper"><div class="details-value" id="dCity"></div><i class="fas fa-city"></i></div></div>
+                <div class="input-group"><label>Județ / Sector</label><div class="input-wrapper"><div class="details-value" id="dCounty"></div><i class="fas fa-map-marker-alt"></i></div></div>
+                <div class="input-group"><label>Stradă și nr.</label><div class="input-wrapper"><div class="details-value" id="dStreet"></div><i class="fas fa-road"></i></div></div>
+                <div class="input-group"><label>Bl., Sc., Interfon, Et., Ap.</label><div class="input-wrapper"><div class="details-value" id="dBuilding"></div><i class="fas fa-building"></i></div></div>
+                <div class="input-group" style="grid-column: 1 / -1;"><label>Repere / Informații</label><div class="input-wrapper"><div class="details-value" id="dNotes"></div><i class="fas fa-info-circle"></i></div></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         FIREBASE INITIALIZATION & LOGIC
     ========================================== -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
       import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-      import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-      // Firebase Config
       const firebaseConfig = {
         apiKey: "AIzaSyDoH80kffNrzFAcyRqsTVdifs-whUhwH9A",
         authDomain: "ksda-7546f.firebaseapp.com",
@@ -297,82 +470,176 @@
         appId: "1:306437513808:web:28479810e3fdf71b32e755"
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
       const provider = new GoogleAuthProvider();
 
-      // Expose globally
-      window.auth = auth;
-      window.db = db;
-
-      // DOM Elements
+      // UI Elements
       const loginBtn = document.getElementById('googleLoginBtn');
       const logoutBtn = document.getElementById('logoutBtn');
       const userProfileUI = document.getElementById('userProfileUI');
       const userAvatarImg = document.getElementById('userAvatarImg');
       const welcomeContainer = document.getElementById('welcomeContainer');
+      const adminActionBar = document.getElementById('adminActionBar');
+      const ordersGrid = document.getElementById('ordersGrid');
+      
+      let globalIsAdmin = false; // Track if current user is admin
 
-      // 1. Google Login
-      loginBtn.addEventListener('click', async () => {
-          try {
-              await signInWithPopup(auth, provider);
-          } catch (error) {
-              console.error("Login Error:", error);
-          }
-      });
+      // Auth Logic
+      loginBtn.addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }});
+      logoutBtn.addEventListener('click', () => { signOut(auth); });
 
-      // 2. Logout
-      logoutBtn.addEventListener('click', () => {
-          signOut(auth);
-      });
-
-      // 3. Monitor Auth State & Check Admin Collection
       onAuthStateChanged(auth, async (user) => {
           if (user) {
-              
-              // Show Logged-In UI in header
               loginBtn.style.display = 'none';
               userProfileUI.style.display = 'flex';
               userAvatarImg.src = user.photoURL || 'https://i.ibb.co/4pGm9S2/user-placeholder.png';
 
-              // --- CHECK ADMIN STATUS ---
-              // Search the "admin_emails" collection for this user's email
-              const adminQuery = query(collection(db, "admin_emails"), where("email", "==", user.email));
-              const adminSnapshot = await getDocs(adminQuery);
+              // Admin Check
+              globalIsAdmin = false;
+              try {
+                  const adminQuery = query(collection(db, "admin_emails"), where("email", "==", user.email));
+                  const adminSnapshot = await getDocs(adminQuery);
+                  globalIsAdmin = !adminSnapshot.empty;
+              } catch (error) { console.warn("Blocked by rules or error.", error); }
 
-              // If snapshot is NOT empty, they are an admin
-              const isAdmin = !adminSnapshot.empty;
-
-// Build the Badge HTML and Username Color based on role
               let badgeHtml = "";
               let nameStyle = "";
 
-              if (isAdmin) {
-                  // Red badge and red glowing text for Admin
+              if (globalIsAdmin) {
                   badgeHtml = `<span class="badge badge-admin"><i class="fas fa-hammer"></i> ADMIN</span>`;
                   nameStyle = "color: #ff4757; text-shadow: 0 0 15px rgba(255, 71, 87, 0.4);";
+                  
+                  // Show Admin Panels
+                  adminActionBar.style.display = 'flex';
+                  ordersGrid.style.display = 'grid';
+                  loadOrdersRealtime(); // Load the database items
               } else {
-                  // Cyan badge and cyan glowing text for regular Member
                   badgeHtml = `<span class="badge badge-user"><i class="fas fa-user"></i> MEMBRU</span>`;
                   nameStyle = "color: var(--primary); text-shadow: 0 0 15px var(--primary-dim);";
+                  
+                  // Hide Admin Panels to protect privacy
+                  adminActionBar.style.display = 'none';
+                  ordersGrid.style.display = 'none';
               }
 
-              // Update the welcome container below the title
               welcomeContainer.innerHTML = `BINE AI VENIT, <span style="${nameStyle}">${user.displayName}</span> ${badgeHtml}`;              
               welcomeContainer.style.opacity = '1';
 
           } else {
-              // User is signed out
               loginBtn.style.display = 'flex';
               userProfileUI.style.display = 'none';
-              
-              // Hide the welcome text
+              adminActionBar.style.display = 'none';
+              ordersGrid.style.display = 'none';
               welcomeContainer.style.opacity = '0';
-              setTimeout(() => { welcomeContainer.innerHTML = ''; }, 500); // Clear after fade out
+              setTimeout(() => { welcomeContainer.innerHTML = ''; }, 500);
           }
       });
+
+      // --- ADD ORDER LOGIC ---
+      document.getElementById('openAddModalBtn').onclick = () => {
+          document.getElementById('addOrderModal').classList.add('active');
+      };
+
+      document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!globalIsAdmin) return alert("Eroare de securitate.");
+
+          const submitBtn = e.target.querySelector('.btn-submit-order');
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE ADAUGĂ...';
+          submitBtn.disabled = true;
+
+          try {
+              await addDoc(collection(db, "comenzi"), {
+                  imageUrl: document.getElementById('oImage').value.trim(),
+                  price: parseFloat(document.getElementById('oPrice').value),
+                  paymentProof: document.getElementById('oProof').value.trim(),
+                  name: document.getElementById('oName').value.trim(),
+                  phone: document.getElementById('oPhone').value.trim(),
+                  zipCode: document.getElementById('oZip').value.trim(),
+                  city: document.getElementById('oCity').value.trim(),
+                  county: document.getElementById('oCounty').value.trim(),
+                  street: document.getElementById('oStreet').value.trim(),
+                  building: document.getElementById('oBuilding').value.trim(),
+                  notes: document.getElementById('oNotes').value.trim(),
+                  createdAt: serverTimestamp(),
+                  createdBy: auth.currentUser.email
+              });
+
+              document.getElementById('addOrderForm').reset();
+              document.getElementById('addOrderModal').classList.remove('active');
+              alert("Comanda a fost adăugată cu succes!");
+
+          } catch(err) {
+              console.error(err);
+              alert("Eroare la adăugare: " + err.message);
+          } finally {
+              submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
+              submitBtn.disabled = false;
+          }
+      });
+
+      // --- RENDER ORDERS REALTIME ---
+      let currentOrders = [];
+      
+      function loadOrdersRealtime() {
+          const q = query(collection(db, "comenzi"), orderBy("createdAt", "desc"));
+          
+          onSnapshot(q, (snapshot) => {
+              ordersGrid.innerHTML = ""; // Clear grid
+              currentOrders = []; // Reset local array
+              
+              if(snapshot.empty) {
+                  ordersGrid.innerHTML = "<p style='grid-column:1/-1; color:#aaa;'>Nu există comenzi momentan.</p>";
+                  return;
+              }
+
+              snapshot.forEach((doc) => {
+                  const data = doc.data();
+                  data.id = doc.id;
+                  currentOrders.push(data); // Save in memory for details modal
+
+                  // Build Card (Only shows Image and Price)
+                  const card = document.createElement('div');
+                  card.className = 'order-card';
+                  // Store ID in dataset to retrieve later
+                  card.dataset.id = data.id; 
+                  
+                  card.innerHTML = `
+                      <img src="${data.imageUrl}" alt="Portret" class="order-img" onerror="this.src='https://i.ibb.co/4pGm9S2/user-placeholder.png'">
+                      <div class="order-price-tag">${data.price} LEI</div>
+                  `;
+
+                  // Click Event to open details
+                  card.onclick = () => openOrderDetails(data.id);
+                  
+                  ordersGrid.appendChild(card);
+              });
+          });
+      }
+
+      // --- OPEN DETAILS MODAL ---
+      window.openOrderDetails = function(orderId) {
+          const order = currentOrders.find(o => o.id === orderId);
+          if(!order) return;
+
+          document.getElementById('dImage').src = order.imageUrl;
+          document.getElementById('dPrice').innerText = order.price;
+          document.getElementById('dProof').href = order.paymentProof;
+          
+          document.getElementById('dName').innerText = order.name;
+          document.getElementById('dPhone').innerText = order.phone;
+          document.getElementById('dZip').innerText = order.zipCode;
+          document.getElementById('dCity').innerText = order.city;
+          document.getElementById('dCounty').innerText = order.county;
+          document.getElementById('dStreet').innerText = order.street;
+          document.getElementById('dBuilding').innerText = order.building;
+          document.getElementById('dNotes').innerText = order.notes || "Nicio notiță";
+
+          document.getElementById('orderDetailsModal').classList.add('active');
+      };
+
     </script>
 </body>
 </html>
