@@ -536,6 +536,45 @@
     .opt-livrat i { color: #00ff88; }
     .opt-anulat i { color: #ff4757; }
 
+
+/* Culori specifice pentru butoanele de status (Mici) */
+    .btn-st-curs { 
+        color: #ffeb3b !important; 
+        border: 1px solid rgba(255, 235, 59, 0.4) !important; 
+        background: rgba(255, 235, 59, 0.05) !important;
+        text-shadow: 0 0 8px rgba(255, 235, 59, 0.4);
+    }
+    .btn-st-livrat { 
+        color: #00ff88 !important; 
+        border: 1px solid rgba(0, 255, 136, 0.4) !important; 
+        background: rgba(0, 255, 136, 0.05) !important;
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+    }
+    .btn-st-anulat { 
+        color: #ff4757 !important; 
+        border: 1px solid rgba(255, 71, 87, 0.4) !important; 
+        background: rgba(255, 71, 87, 0.05) !important;
+        text-shadow: 0 0 8px rgba(255, 71, 87, 0.4);
+    }
+
+    /* Aranjament Footer: Nume + Pret la stânga */
+    .footer-left-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        flex: 1;
+    }
+    .footer-price-text {
+        color: #00ff88;
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+    
+    /* Scoatem vechea bulă de preț de pe imagine */
+    .order-price-tag { display: none !important; }
+
   </style>
 </head>
 <body>
@@ -1012,36 +1051,44 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
 function loadOrdersRealtime() {
           const q = query(collection(db, "comenzi"), orderBy("createdAt", "desc"));
           onSnapshot(q, (snapshot) => {
-              ordersGrid.innerHTML = ""; 
-              currentOrders = []; 
+              ordersGrid.innerHTML = "";
+              currentOrders = [];
               snapshot.forEach((docSnap) => {
                   const data = docSnap.data();
                   data.id = docSnap.id;
-                  currentOrders.push(data); 
+                  currentOrders.push(data);
 
                   const status = data.status || "In Curs";
-                  let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs";
-                  if(status === "Livrat") { sClass = "status-livrat"; sIcon = "fa-check-circle"; sText = "Livrat"; }
-                  else if(status === "Anulat") { sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; }
+                  let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
+                  
+                  if(status === "Livrat") { 
+                      sClass = "status-livrat"; sIcon = "fa-check-circle"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
+                  } else if(status === "Anulat") { 
+                      sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
+                  }
 
                   const card = document.createElement('div');
                   card.className = `order-card ${sClass}`;
                   card.innerHTML = `
                       <div class="card-controls">
-                          <button class="control-btn edit-btn" onclick="openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
-                          <button class="control-btn delete-btn" onclick="deleteOrder('${data.id}')"><i class="fas fa-trash"></i></button>
+                          <button class="control-btn edit-btn" onclick="event.stopPropagation(); openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
+                          <button class="control-btn delete-btn" onclick="event.stopPropagation(); deleteOrder('${data.id}')"><i class="fas fa-trash"></i></button>
                       </div>
-                      <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
-                      <div class="order-price-tag">${data.price} LEI</div>
+                      <div class="order-img-container">
+                          <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
+                      </div>
                       <div class="card-footer">
-                          <div style="font-weight:bold; font-size: 14px;">${data.name}</div>
-                          <div class="footer-status" onclick="toggleStatusMenu('${data.id}')">
-                              <i class="fas ${sIcon}"></i> ${sText}
+                          <div class="footer-left-info">
+                              <div class="footer-name">${data.name}</div>
+                              <div class="footer-price-text">${data.price} LEI</div>
                           </div>
+                          <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); toggleStatusMenu('${data.id}')">
+                              <i class="fas ${sIcon}"></i> ${sText}
+                          </button>
                           <div class="status-menu" id="menu-${data.id}">
-                              <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> În Curs</div>
-                              <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-check-circle"></i> Livrat</div>
-                              <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> Anulat</div>
+                              <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
+                              <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-check-circle"></i> LIVRAT</div>
+                              <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
                           </div>
                       </div>
                   `;
