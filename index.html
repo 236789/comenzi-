@@ -3,33 +3,77 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Blank Canvas</title>
+  <title>Comenzi Portrete</title>
   
-  <!-- New Font: Oswald -->
+  <!-- Font: Oswald & FontAwesome for Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    /* --- NEW THEME: Electric Cyan & Deep Space Blue --- */
+    /* --- THEME: Electric Cyan & Deep Space Blue --- */
     :root {
       --bg-dark: #030712;       /* Deep space black/blue */
       --primary: #00f2fe;       /* Electric Cyan */
-      --primary-dim: rgba(0, 242, 254, 0.15);
-      --accent: #4facfe;        /* Deep Blue Accent */
+      --primary-dim: rgba(0, 242, 254, 0.4); /* Stronger glow */
       --text-main: #ffffff;
-      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
     
     body {
       background-color: var(--bg-dark);
-      /* Applied Oswald globally */
       font-family: 'Oswald', sans-serif; 
       color: var(--text-main);
       overflow-x: hidden;
       min-height: 100vh;
+    }
+
+    /* --- AUTH CONTAINER (Top Right) --- */
+    .admin-auth-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    .cyber-btn {
+      background: rgba(0, 242, 254, 0.05);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 8px 16px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 4px;
+    }
+
+    .cyber-btn:hover {
+      background: var(--primary);
+      color: #000;
+      box-shadow: 0 0 15px var(--primary);
+    }
+
+    .user-profile-ui {
+      display: none; /* Hidden by default, shown via JS when logged in */
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 10px var(--primary-dim);
+      object-fit: cover;
     }
 
     /* --- GLOBAL BACKGROUND (3D GRID & NEBULA) --- */
@@ -39,7 +83,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start; /* Keeps content near the top */
+        padding-top: 120px; 
         overflow: hidden;
     }
 
@@ -49,8 +94,8 @@
         width: 200%; height: 200%;
         top: -50%; left: -50%;
         background-image: 
-            linear-gradient(var(--primary-dim) 1px, transparent 1px),
-            linear-gradient(90deg, var(--primary-dim) 1px, transparent 1px);
+            linear-gradient(rgba(0, 242, 254, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 242, 254, 0.1) 1px, transparent 1px);
         background-size: 60px 60px;
         transform: perspective(600px) rotateX(55deg);
         animation: gridSlowScroll 20s linear infinite;
@@ -85,31 +130,43 @@
         margin: 0 auto;
     }
 
-    /* --- TITLE STYLING (With the new Oswald font) --- */
+    /* --- TITLE STYLING (Solid Gradient + Glow) --- */
     .page-main-title {
-        font-family: 'Oswald', sans-serif;
         font-weight: 700;
-        font-size: clamp(40px, 8vw, 90px);
+        font-size: clamp(40px, 8vw, 85px);
         text-transform: uppercase;
         text-align: center;
         letter-spacing: 2px;
+        margin-bottom: 40px;
         
-        /* Hollow text effect */
-        color: transparent;
-        -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.3);
-    }
-    
-    .page-main-title span {
-        color: var(--primary);
-        -webkit-text-stroke: 0px;
-        text-shadow: 0 0 35px var(--primary);
+        background: linear-gradient(180deg, #ffffff 0%, var(--primary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        
+        filter: drop-shadow(0 0 25px var(--primary-dim));
     }
 
   </style>
 </head>
 <body>
 
-    <!-- EMPTY PAGE WITH ANIMATED BACKGROUND -->
+    <!-- AUTHENTICATION UI (TOP RIGHT) -->
+    <div class="admin-auth-box">
+        <!-- Login Button -->
+        <button id="googleLoginBtn" class="cyber-btn">
+            <i class="fab fa-google"></i> ADMIN LOGIN
+        </button>
+
+        <!-- Logged In UI (Hidden initially) -->
+        <div id="userProfileUI" class="user-profile-ui">
+            <img id="userAvatarImg" src="" alt="Admin" class="user-avatar">
+            <button id="logoutBtn" class="cyber-btn" style="border-color: #ff4757; color: #ff4757;">
+                LOGOUT
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN PAGE -->
     <main class="cyber-page-section">
         
         <!-- Animated Background Engine -->
@@ -117,14 +174,81 @@
         <div class="bg-nebula"></div>
 
         <div class="container">
-            <!-- Example of the Oswald font & New Colors. You can delete this text! -->
-            <h1 class="page-main-title"><span>BLANK</span> CANVAS</h1>
+            <!-- The solid, glowing title -->
+            <h1 class="page-main-title">Comenzi Portrete</h1>
             
-            <!-- ADD YOUR NEW CONTENT HERE -->
+            <!-- ADD YOUR NEW CONTENT HERE LATER -->
 
         </div>
 
     </main>
 
+    <!-- ==========================================
+         FIREBASE INITIALIZATION & AUTH LOGIC
+    ========================================== -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+      import { getFirestore, doc, updateDoc, getDoc, setDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      // Firebase Config
+      const firebaseConfig = {
+        apiKey: "AIzaSyDoH80kffNrzFAcyRqsTVdifs-whUhwH9A",
+        authDomain: "ksda-7546f.firebaseapp.com",
+        projectId: "ksda-7546f",
+        storageBucket: "ksda-7546f.firebasestorage.app",
+        messagingSenderId: "306437513808",
+        appId: "1:306437513808:web:28479810e3fdf71b32e755"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const provider = new GoogleAuthProvider();
+
+      // Expose globally
+      window.auth = auth;
+      window.db = db;
+
+      // DOM Elements
+      const loginBtn = document.getElementById('googleLoginBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const userProfileUI = document.getElementById('userProfileUI');
+      const userAvatarImg = document.getElementById('userAvatarImg');
+
+      // 1. Google Login
+      loginBtn.addEventListener('click', async () => {
+          try {
+              await signInWithPopup(auth, provider);
+          } catch (error) {
+              console.error("Login Error:", error);
+          }
+      });
+
+      // 2. Logout
+      logoutBtn.addEventListener('click', () => {
+          signOut(auth);
+      });
+
+      // 3. Monitor Auth State
+      onAuthStateChanged(auth, (user) => {
+          if (user) {
+              // User is signed in
+              loginBtn.style.display = 'none';
+              userProfileUI.style.display = 'flex';
+              userAvatarImg.src = user.photoURL || 'https://i.ibb.co/4pGm9S2/user-placeholder.png';
+              
+              // Optional: You can check if the user is the admin here
+              // if(user.email === 'nicaemmanuel433qe@gmail.com') { console.log("Admin logged in"); }
+
+          } else {
+              // User is signed out
+              loginBtn.style.display = 'flex';
+              userProfileUI.style.display = 'none';
+          }
+      });
+
+    </script>
 </body>
 </html>
