@@ -693,6 +693,10 @@
         background: var(--primary) !important;
         color: #000 !important;
     }
+
+#dDate, #dPrice {
+    padding-right: 15px !important;
+}
   </style>
 </head>
 <body>
@@ -914,11 +918,26 @@
                     <img id="dImage" src="" style="max-width: 100%; max-height: 350px; border-radius: 16px; border: 2px solid var(--primary); box-shadow: 0 0 30px var(--primary-dim);">
                 </div>
 
-                <div class="form-grid">
-                    <div class="form-section-title">Date Comandă</div>
-                    <div class="input-group"><label>Data Plasării</label><div class="input-wrapper"><div class="details-value" id="dDate"></div><i class="fas fa-calendar-alt"></i><div class="copy-btn" onclick="copyValue('dDate')"><i class="far fa-copy"></i></div></div></div>
-                    <div class="input-group"><label>Preț (LEI)</label><div class="input-wrapper"><div class="details-value" id="dPrice"></div><i class="fas fa-money-bill-wave"></i><div class="copy-btn" onclick="copyValue('dPrice')"><i class="far fa-copy"></i></div></div></div>
-                    
+<div class="form-grid">
+    <div class="form-section-title">Date Comandă</div>
+    
+    <!-- Rândul pentru Dată - Fără buton copy -->
+    <div class="input-group">
+        <label>Data Plasării</label>
+        <div class="input-wrapper">
+            <div class="details-value" id="dDate"></div>
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+    </div>
+
+    <!-- Rândul pentru Preț - Fără buton copy -->
+    <div class="input-group">
+        <label>Preț</label>
+        <div class="input-wrapper">
+            <div class="details-value" id="dPrice"></div>
+            <i class="fas fa-money-bill-wave"></i>
+        </div>
+    </div>             
                     <div class="form-section-title">Detalii de Livrare</div>
                     <div class="input-group"><label>Nume și Prenume</label><div class="input-wrapper"><div class="details-value" id="dName"></div><i class="fas fa-user"></i><div class="copy-btn" onclick="copyValue('dName')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group"><label>Nr. Telefon</label><div class="input-wrapper"><div class="details-value" id="dPhone"></div><i class="fas fa-phone"></i><div class="copy-btn" onclick="copyValue('dPhone')"><i class="far fa-copy"></i></div></div></div>
