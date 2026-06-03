@@ -193,7 +193,7 @@
         box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
     }
 
-    /* --- MODALS (POPUPS) --- */
+    /* --- MODALS (POPUPS) - NOU DESIGN --- */
     .custom-modal-overlay {
         position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
         display: none; justify-content: center; align-items: center; z-index: 2000;
@@ -202,12 +202,14 @@
     .custom-modal-overlay.active { display: flex; }
 
     .custom-modal-card {
-        background: #08101b;
-        border: 2px solid var(--primary);
+        background: rgba(8, 16, 27, 0.95);
+        backdrop-filter: blur(25px);
+        border: 1px solid rgba(0, 242, 254, 0.3);
         width: 100%; max-width: 800px;
         max-height: 90vh; overflow-y: auto;
-        border-radius: 20px; padding: 30px;
-        position: relative; box-shadow: 0 0 50px var(--primary-dim);
+        border-radius: 24px; padding: 40px;
+        position: relative; 
+        box-shadow: 0 0 40px rgba(0, 242, 254, 0.15), inset 0 0 20px rgba(0, 242, 254, 0.05);
     }
 
     /* Scrollbar for modal */
@@ -223,9 +225,12 @@
     }
     .close-modal-btn:hover { background: var(--admin-red); border-color: var(--admin-red); transform: rotate(90deg); }
 
+    /* Titluri Modal Centrate */
     .modal-title {
-        font-size: 24px; color: #fff; text-transform: uppercase; letter-spacing: 2px;
-        margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
+        font-size: 28px; color: #fff; text-transform: uppercase; letter-spacing: 3px;
+        margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;
+        text-align: center; 
+        text-shadow: 0 0 15px var(--primary-dim);
     }
     .modal-title i { color: var(--primary); margin-right: 10px; }
 
@@ -243,29 +248,56 @@
     .input-group label { font-size: 12px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
     
     .input-wrapper { position: relative; }
+    
+    /* Iconițe în input */
     .input-wrapper i {
-        position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-        color: #888; font-size: 16px; transition: 0.3s;
+        position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+        color: #555; font-size: 16px; transition: all 0.3s ease;
     }
-    .styled-input {
-        width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-        color: #fff; font-family: 'Oswald', sans-serif; font-size: 14px;
-        padding: 12px 12px 12px 45px; border-radius: 8px; transition: 0.3s;
-    }
-    .styled-input:focus { border-color: var(--primary); background: rgba(0, 242, 254, 0.05); }
-    .styled-input:focus + i { color: var(--primary); }
 
+    /* Input-uri rotunjite */
+    .styled-input {
+        width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1);
+        color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px;
+        padding: 14px 14px 14px 45px; border-radius: 50px; 
+        transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+    }
+    .styled-input:focus { 
+        border-color: var(--primary); 
+        background: rgba(0, 242, 254, 0.05);
+        box-shadow: 0 0 20px var(--primary-dim), inset 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    /* Strălucire la iconițe când e activ */
+    .styled-input:focus + i, .styled-input:valid:not([type="file"]) + i { 
+        color: var(--primary); text-shadow: 0 0 15px var(--primary); 
+    }
+
+    /* CSS Pentru File Upload Input */
+    input[type="file"] { padding: 10px 14px 10px 45px; cursor: pointer; }
+    input[type="file"]::file-selector-button {
+        background: var(--primary); color: #000; border: none; padding: 6px 16px;
+        border-radius: 50px; font-family: 'Oswald', sans-serif; font-weight: bold;
+        cursor: pointer; margin-right: 15px; transition: 0.3s;
+    }
+    input[type="file"]::file-selector-button:hover { background: #fff; box-shadow: 0 0 15px var(--primary); }
+
+    /* Buton Salvare */
     .btn-submit-order {
         grid-column: 1 / -1;
         background: var(--primary); color: #000; border: none; padding: 15px;
         font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 2px; border-radius: 8px;
+        text-transform: uppercase; letter-spacing: 2px; border-radius: 50px;
         cursor: pointer; transition: 0.3s; margin-top: 20px; box-shadow: 0 0 20px var(--primary-dim);
     }
     .btn-submit-order:hover { background: #fff; box-shadow: 0 0 30px var(--primary); transform: translateY(-3px); }
+    .btn-submit-order:disabled { background: #555; box-shadow: none; cursor: not-allowed; transform: none; }
 
     /* Order Details Modal specific styling */
-    .details-value { background: rgba(255,255,255,0.05); padding: 12px 12px 12px 45px; border-radius: 8px; color: #fff; font-size: 14px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word;}
+    .details-value { 
+        background: rgba(0,0,0,0.4); padding: 14px 14px 14px 45px; border-radius: 50px; 
+        color: #fff; font-size: 15px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word;
+    }
     .proof-link { color: #00ff88; text-decoration: none; font-weight: bold; }
     .proof-link:hover { text-decoration: underline; }
 
@@ -327,9 +359,17 @@
                 <div class="form-section-title">Date Comandă</div>
                 
                 <div class="input-group">
-                    <label>Imagine Portret (URL)</label>
+                    <label>Data Plasării Comenzii</label>
                     <div class="input-wrapper">
-                        <input type="text" id="oImage" class="styled-input" placeholder="https://link-imagine.com/img.jpg" required>
+                        <input type="date" id="oDate" class="styled-input" required>
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Imagine Portret (Încarcă Fișier)</label>
+                    <div class="input-wrapper">
+                        <input type="file" id="oImageFile" class="styled-input" accept="image/*" required>
                         <i class="fas fa-image"></i>
                     </div>
                 </div>
@@ -343,9 +383,9 @@
                 </div>
 
                 <div class="input-group" style="grid-column: 1 / -1;">
-                    <label>Dovadă Plată (URL Link)</label>
+                    <label>Dovadă Plată (Încarcă PDF sau Imagine)</label>
                     <div class="input-wrapper">
-                        <input type="text" id="oProof" class="styled-input" placeholder="https://link-dovada.com/plata.png" required>
+                        <input type="file" id="oProofFile" class="styled-input" accept=".pdf, image/*" required>
                         <i class="fas fa-file-invoice-dollar"></i>
                     </div>
                 </div>
@@ -436,8 +476,10 @@
             <div class="form-grid" style="pointer-events: none;"> <!-- Disable editing -->
                 
                 <div class="form-section-title">Date Comandă</div>
+                
+                <div class="input-group"><label>Data Plasării</label><div class="input-wrapper"><div class="details-value" id="dDate"></div><i class="fas fa-calendar-alt"></i></div></div>
                 <div class="input-group"><label>Preț (LEI)</label><div class="input-wrapper"><div class="details-value" id="dPrice"></div><i class="fas fa-money-bill-wave"></i></div></div>
-                <div class="input-group" style="pointer-events: auto;"><label>Dovadă Plată</label><div class="input-wrapper"><div class="details-value"><a href="#" id="dProof" target="_blank" class="proof-link">Vezi Dovada</a></div><i class="fas fa-file-invoice-dollar"></i></div></div>
+                <div class="input-group" style="pointer-events: auto;"><label>Dovadă Plată</label><div class="input-wrapper"><div class="details-value"><a href="#" id="dProof" target="_blank" class="proof-link">Deschide Fișierul</a></div><i class="fas fa-file-invoice-dollar"></i></div></div>
 
                 <div class="form-section-title">Detalii de Livrare</div>
                 <div class="input-group"><label>Nume și Prenume</label><div class="input-wrapper"><div class="details-value" id="dName"></div><i class="fas fa-user"></i></div></div>
@@ -460,6 +502,8 @@
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics.js";
       import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
       import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+      // Am importat Firebase Storage
+      import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBFU90_W3kOJGcWsz30SnJrFHTePmQIW4I",
@@ -475,6 +519,7 @@
       const analytics = getAnalytics(app);
       const auth = getAuth(app);
       const db = getFirestore(app);
+      const storage = getStorage(app); // Am initializat storage-ul
       const provider = new GoogleAuthProvider();
 
       // UI Elements
@@ -513,15 +558,13 @@
                   badgeHtml = `<span class="badge badge-admin"><i class="fas fa-hammer"></i> ADMIN</span>`;
                   nameStyle = "color: #ff4757; text-shadow: 0 0 15px rgba(255, 71, 87, 0.4);";
                   
-                  // Show Admin Panels
                   adminActionBar.style.display = 'flex';
                   ordersGrid.style.display = 'grid';
-                  loadOrdersRealtime(); // Load the database items
+                  loadOrdersRealtime(); 
               } else {
                   badgeHtml = `<span class="badge badge-user"><i class="fas fa-user"></i> MEMBRU</span>`;
                   nameStyle = "color: var(--primary); text-shadow: 0 0 15px var(--primary-dim);";
                   
-                  // Hide Admin Panels to protect privacy
                   adminActionBar.style.display = 'none';
                   ordersGrid.style.display = 'none';
               }
@@ -539,7 +582,7 @@
           }
       });
 
-      // --- ADD ORDER LOGIC ---
+      // --- ADD ORDER LOGIC (File Upload Version) ---
       document.getElementById('openAddModalBtn').onclick = () => {
           document.getElementById('addOrderModal').classList.add('active');
       };
@@ -549,14 +592,37 @@
           if (!globalIsAdmin) return alert("Eroare de securitate.");
 
           const submitBtn = e.target.querySelector('.btn-submit-order');
-          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE ADAUGĂ...';
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE ÎNCARCĂ FIȘIERELE...';
           submitBtn.disabled = true;
 
           try {
+              // 1. Preluăm valorile și fișierele
+              const imageFile = document.getElementById('oImageFile').files[0];
+              const proofFile = document.getElementById('oProofFile').files[0];
+              const orderDate = document.getElementById('oDate').value;
+
+              if (!imageFile || !proofFile) {
+                  throw new Error("Te rog să asiguri ambele fișiere (poză și dovadă plată).");
+              }
+
+              // 2. Upload Imagine Portret
+              const imageRef = ref(storage, `comenzi_imagini/${Date.now()}_${imageFile.name}`);
+              await uploadBytes(imageRef, imageFile);
+              const imageUrlUploaded = await getDownloadURL(imageRef);
+
+              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE SALVEAZĂ COMANDA...';
+
+              // 3. Upload Dovadă Plată (PDF / Imagine)
+              const proofRef = ref(storage, `comenzi_dovezi/${Date.now()}_${proofFile.name}`);
+              await uploadBytes(proofRef, proofFile);
+              const proofUrlUploaded = await getDownloadURL(proofRef);
+
+              // 4. Salvare Document în Firestore
               await addDoc(collection(db, "comenzi"), {
-                  imageUrl: document.getElementById('oImage').value.trim(),
+                  imageUrl: imageUrlUploaded,
+                  paymentProof: proofUrlUploaded,
+                  orderDate: orderDate,
                   price: parseFloat(document.getElementById('oPrice').value),
-                  paymentProof: document.getElementById('oProof').value.trim(),
                   name: document.getElementById('oName').value.trim(),
                   phone: document.getElementById('oPhone').value.trim(),
                   zipCode: document.getElementById('oZip').value.trim(),
@@ -589,8 +655,8 @@
           const q = query(collection(db, "comenzi"), orderBy("createdAt", "desc"));
           
           onSnapshot(q, (snapshot) => {
-              ordersGrid.innerHTML = ""; // Clear grid
-              currentOrders = []; // Reset local array
+              ordersGrid.innerHTML = ""; 
+              currentOrders = []; 
               
               if(snapshot.empty) {
                   ordersGrid.innerHTML = "<p style='grid-column:1/-1; color:#aaa;'>Nu există comenzi momentan.</p>";
@@ -600,12 +666,10 @@
               snapshot.forEach((doc) => {
                   const data = doc.data();
                   data.id = doc.id;
-                  currentOrders.push(data); // Save in memory for details modal
+                  currentOrders.push(data); 
 
-                  // Build Card (Only shows Image and Price)
                   const card = document.createElement('div');
                   card.className = 'order-card';
-                  // Store ID in dataset to retrieve later
                   card.dataset.id = data.id; 
                   
                   card.innerHTML = `
@@ -613,7 +677,6 @@
                       <div class="order-price-tag">${data.price} LEI</div>
                   `;
 
-                  // Click Event to open details
                   card.onclick = () => openOrderDetails(data.id);
                   
                   ordersGrid.appendChild(card);
@@ -627,6 +690,10 @@
           if(!order) return;
 
           document.getElementById('dImage').src = order.imageUrl;
+          
+          // Formatare dată dacă există (dacă a fost creată pe varianta veche fara dată, va scrie "Nesetată")
+          document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
+          
           document.getElementById('dPrice').innerText = order.price;
           document.getElementById('dProof').href = order.paymentProof;
           
