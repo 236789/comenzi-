@@ -461,117 +461,81 @@
     .bg-anulat { background: #ff4757; box-shadow: 0 -5px 15px rgba(255, 71, 87, 0.4); }
 
 
-
-/* --- SLEEK CARD DESIGN --- */
+/* --- CARD OVERRIDES --- */
     .order-card {
-        background: #0b1120;
-        border-radius: 20px;
-        overflow: hidden;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        transition: all 0.3s ease;
-        border: 2px solid transparent; /* Neon border remains */
+        background: #0b1120 !important;
+        border-radius: 20px !important;
+        overflow: visible !important; /* Allow status menu to pop out */
+        border: 2px solid transparent !important;
     }
 
-    /* Keep Neon Outlines based on Status */
-    .status-in-curs { border-color: #ffeb3b; box-shadow: 0 0 20px rgba(255, 235, 59, 0.2); }
-    .status-livrat { border-color: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.2); }
-    .status-anulat { border-color: #ff4757; box-shadow: 0 0 20px rgba(255, 71, 87, 0.2); }
+    /* Neon Outlines */
+    .status-in-curs { border-color: #ffeb3b !important; box-shadow: 0 0 15px rgba(255, 235, 59, 0.2) !important; }
+    .status-livrat { border-color: #00ff88 !important; box-shadow: 0 0 15px rgba(0, 255, 136, 0.2) !important; }
+    .status-anulat { border-color: #ff4757 !important; box-shadow: 0 0 15px rgba(255, 71, 87, 0.2) !important; }
 
-    .order-img {
-        width: 100%;
-        height: 280px;
-        object-fit: cover;
-        display: block;
-        cursor: pointer;
-    }
-
-    /* THE GREEN PRICE BUBBLE IS BACK */
+    /* Moving Price back into the image area */
+    .order-img { height: 280px !important; border-bottom: none !important; }
+    
     .order-price-tag {
-        position: absolute;
-        bottom: 75px;
-        left: 15px;
-        background: rgba(0, 0, 0, 0.85);
-        border: 1px solid #00ff88;
-        color: #00ff88;
-        padding: 4px 12px;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 16px;
-        box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-        z-index: 6;
+        top: auto !important;
+        bottom: 70px !important;
+        left: 15px !important;
+        right: auto !important;
+        z-index: 10 !important;
     }
 
-    /* DARK SLEEK FOOTER */
+    /* Dark Sleek Footer */
     .card-footer {
-        background: #0b1120;
-        padding: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top: 1px solid rgba(255,255,255,0.05);
-        position: relative;
-        z-index: 5;
+        background: #0b1120 !important;
+        margin-top: 0 !important;
+        padding: 15px !important;
+        border-radius: 0 0 20px 20px !important;
+        border-top: 1px solid rgba(255,255,255,0.05) !important;
+        color: #fff !important;
     }
 
-    .footer-name {
-        font-size: 16px;
-        color: #fff;
-        font-weight: 500;
-        text-transform: uppercase;
-        max-width: 140px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* STATUS SELECTOR BUTTON */
-    .status-picker-trigger {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #fff;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 12px;
+    .footer-status {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        padding: 5px 12px !important;
+        border-radius: 10px !important;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: 0.3s;
+        font-size: 13px !important;
+        color: #fff !important;
     }
-    .status-picker-trigger:hover { background: rgba(255,255,255,0.15); border-color: var(--primary); }
 
     /* THE PICKER MENU */
     .status-menu {
         position: absolute;
         bottom: 60px;
-        right: 10px;
+        right: 15px;
         background: #16213e;
         border: 1px solid var(--primary);
         border-radius: 12px;
         display: none;
         flex-direction: column;
-        overflow: hidden;
         z-index: 100;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        min-width: 130px;
+        overflow: hidden;
     }
     .status-menu.active { display: flex; }
     
     .status-option {
-        padding: 10px 20px;
-        font-size: 12px;
+        padding: 10px 15px;
+        font-size: 13px;
         color: #fff;
         cursor: pointer;
         display: flex;
         align-items: center;
         gap: 10px;
-        transition: 0.2s;
     }
-    .status-option:hover { background: rgba(0, 242, 254, 0.1); color: var(--primary); }
-    .opt-livrat i { color: #00ff88; }
+    .status-option:hover { background: rgba(0, 242, 254, 0.1); }
     .opt-curs i { color: #ffeb3b; }
+    .opt-livrat i { color: #00ff88; }
     .opt-anulat i { color: #ff4757; }
+
   </style>
 </head>
 <body>
@@ -859,7 +823,7 @@ async function uploadToImgBB(file) {
       const ordersGrid = document.getElementById('ordersGrid');
       
       let globalIsAdmin = false; 
-
+let editingOrderId = null;
       // Auth Logic
       loginBtn.addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }});
       logoutBtn.addEventListener('click', () => { signOut(auth); });
@@ -946,142 +910,145 @@ const adminQuery = query(collection(db, "admin_emails"), where("email", "==", us
       };
 
 document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
-          e.preventDefault();
-if (!globalIsAdmin) return notify("Acces restricționat!", true);
+    e.preventDefault();
+    if (!globalIsAdmin) return notify("Acces restricționat!", true);
 
-          const submitBtn = e.target.querySelector('.btn-submit-order');
-          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE GENEREAZĂ LINK-URILE...';
-          submitBtn.disabled = true;
+    const submitBtn = e.target.querySelector('.btn-submit-order');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE PROCESEAZĂ...';
+    submitBtn.disabled = true;
 
-          try {
-              const imageFile = document.getElementById('oImageFile').files[0];
-              const proofFile = document.getElementById('oProofFile').files[0];
-              const orderDate = document.getElementById('oDate').value;
+    try {
+        let finalImageUrl = null;
+        let finalProofUrl = null;
 
-              if (!imageFile || !proofFile) {
-                  throw new Error("Te rog să asiguri ambele fișiere (poză și dovadă plată).");
-              }
+        // Dacă suntem în modul EDITARE, luăm link-urile vechi ca bază
+        if (editingOrderId) {
+            const oldOrder = currentOrders.find(o => o.id === editingOrderId);
+            finalImageUrl = oldOrder.imageUrl;
+            finalProofUrl = oldOrder.paymentProof;
+        }
 
-              // 1. Transform Portrait into a link via ImgBB
-              const imageUrlUploaded = await uploadToImgBB(imageFile);
+        const imageFile = document.getElementById('oImageFile').files[0];
+        const proofFile = document.getElementById('oProofFile').files[0];
 
-              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE ÎNCARCĂ DOVADA...';
+        // Încărcăm poze noi DOAR dacă au fost selectate fișiere
+        if (imageFile) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE PORTRET...';
+            finalImageUrl = await uploadToImgBB(imageFile);
+        }
+        if (proofFile) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
+            finalProofUrl = await uploadToImgBB(proofFile);
+        }
 
-              // 2. Transform Payment Proof into a link via ImgBB
-              const proofUrlUploaded = await uploadToImgBB(proofFile);
+        // Construim string-ul pentru bloc/adresă
+        const bl = document.getElementById('oBl').value.trim();
+        const sc = document.getElementById('oSc').value.trim();
+        const inter = document.getElementById('oInterfon').value.trim();
+        const et = document.getElementById('oEt').value.trim();
+        const ap = document.getElementById('oAp').value.trim();
+        let bParts = [];
+        if(bl) bParts.push(`Bl. ${bl}`);
+        if(sc) bParts.push(`Sc. ${sc}`);
+        if(inter) bParts.push(`Int. ${inter}`);
+        if(et) bParts.push(`Et. ${et}`);
+        if(ap) bParts.push(`Ap. ${ap}`);
+        const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
 
-              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE SALVEAZĂ ÎN FIRESTORE...';
+        // Obiectul cu toate datele din formular
+        const orderData = {
+            imageUrl: finalImageUrl,
+            paymentProof: finalProofUrl,
+            orderDate: document.getElementById('oDate').value,
+            price: parseFloat(document.getElementById('oPrice').value),
+            name: document.getElementById('oName').value.trim(),
+            phone: document.getElementById('oPhone').value.trim(),
+            zipCode: document.getElementById('oZip').value.trim(),
+            city: document.getElementById('oCity').value.trim(),
+            county: document.getElementById('oCounty').value.trim(),
+            street: document.getElementById('oStreet').value.trim(),
+            building: finalBuilding,
+            notes: document.getElementById('oNotes').value.trim()
+        };
 
-              // Concatenate building details properly
-              const bl = document.getElementById('oBl').value.trim();
-              const sc = document.getElementById('oSc').value.trim();
-              const inter = document.getElementById('oInterfon').value.trim();
-              const et = document.getElementById('oEt').value.trim();
-              const ap = document.getElementById('oAp').value.trim();
-              
-              let bParts = [];
-              if(bl) bParts.push(`Bl. ${bl}`);
-              if(sc) bParts.push(`Sc. ${sc}`);
-              if(inter) bParts.push(`Int. ${inter}`);
-              if(et) bParts.push(`Et. ${et}`);
-              if(ap) bParts.push(`Ap. ${ap}`);
-              const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă (fără bloc)";
+        if (editingOrderId) {
+            // MOD EDITARE: Actualizăm documentul existent
+            await updateDoc(doc(db, "comenzi", editingOrderId), orderData);
+            notify("Comanda a fost actualizată cu succes!");
+        } else {
+            // MOD ADĂUGARE: Creăm un document nou
+            orderData.status = "In Curs"; // Status default doar la comenzi noi
+            orderData.createdAt = serverTimestamp();
+            orderData.createdBy = auth.currentUser.email;
+            await addDoc(collection(db, "comenzi"), orderData);
+            notify("Comanda a fost adăugată!");
+        }
 
-              // 3. Salvare in Firestore (Now using the ImgBB links)
-              await addDoc(collection(db, "comenzi"), {
-                  imageUrl: imageUrlUploaded,
-                  paymentProof: proofUrlUploaded,
-                  orderDate: orderDate,
-                  price: parseFloat(document.getElementById('oPrice').value),
-                  name: document.getElementById('oName').value.trim(),
-                  phone: document.getElementById('oPhone').value.trim(),
-                  zipCode: document.getElementById('oZip').value.trim(),
-                  city: document.getElementById('oCity').value.trim(),
-                  county: document.getElementById('oCounty').value.trim(),
-                  street: document.getElementById('oStreet').value.trim(),
-                  building: finalBuilding,
-                  notes: document.getElementById('oNotes').value.trim(),
-                  createdAt: serverTimestamp(),
-                  createdBy: auth.currentUser.email
-              });
+        // RESETARE FORMULAR ȘI MODAL
+        editingOrderId = null; // Resetăm starea de editare
+        document.getElementById('addOrderForm').reset();
+        document.getElementById('addOrderModal').classList.remove('active');
+        
+        // Resetăm UI-ul la starea de "Adăugare"
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
+        document.getElementById('oImageFile').required = true;
+        document.getElementById('oProofFile').required = true;
+        imageDropPreview.style.display = 'none';
+        imageDropPlaceholder.style.display = 'block';
 
-              document.getElementById('addOrderForm').reset();
-              document.getElementById('addOrderModal').classList.remove('active');
-              
-              // Reset Image Preview box UI manually
-              imageDropPreview.src = '';
-              imageDropPreview.style.display = 'none';
-              imageRemoveBtn.style.display = 'none';
-              imageDropPlaceholder.style.display = 'block';
-
-              notify("Comanda a fost adăugată!"); 
-
-          } catch(err) {
-              console.error(err);
-              notify("Eroare: " + err.message, true); 
-          } finally {
-              submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
-              submitBtn.disabled = false;
-          }
-      });
+    } catch (err) {
+        console.error(err);
+        notify("Eroare: " + err.message, true);
+    } finally {
+        submitBtn.disabled = false;
+        if (!editingOrderId) submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
+    }
+});
 
       // --- RENDER ORDERS REALTIME ---
       let currentOrders = [];
       
 function loadOrdersRealtime() {
-    const q = query(collection(db, "comenzi"), orderBy("createdAt", "desc"));
-    
-    onSnapshot(q, (snapshot) => {
-        ordersGrid.innerHTML = ""; 
-        currentOrders = []; 
-        
-        snapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            data.id = docSnap.id;
-            currentOrders.push(data); 
+          const q = query(collection(db, "comenzi"), orderBy("createdAt", "desc"));
+          onSnapshot(q, (snapshot) => {
+              ordersGrid.innerHTML = ""; 
+              currentOrders = []; 
+              snapshot.forEach((docSnap) => {
+                  const data = docSnap.data();
+                  data.id = docSnap.id;
+                  currentOrders.push(data); 
 
-            const status = data.status || "In Curs";
-            let sClass = "status-in-curs";
-            let sIcon = "fa-spinner fa-spin";
-            let sText = "În Curs";
+                  const status = data.status || "In Curs";
+                  let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs";
+                  if(status === "Livrat") { sClass = "status-livrat"; sIcon = "fa-check-circle"; sText = "Livrat"; }
+                  else if(status === "Anulat") { sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; }
 
-            if(status === "Livrat") { sClass = "status-livrat"; sIcon = "fa-check-circle"; sText = "Livrat"; }
-            else if(status === "Anulat") { sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; }
-
-            const card = document.createElement('div');
-            card.className = `order-card ${sClass}`;
-            card.id = `card-${data.id}`;
-            
-            card.innerHTML = `
-                <div class="card-controls">
-                    <button class="control-btn edit-btn" onclick="event.stopPropagation(); openEditModal('${data.id}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="control-btn delete-btn" onclick="event.stopPropagation(); deleteOrder('${data.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-                
-                <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
-                <div class="order-price-tag">${data.price} LEI</div>
-
-                <div class="card-footer">
-                    <div class="footer-name">${data.name}</div>
-                    <button class="status-picker-trigger" onclick="event.stopPropagation(); toggleStatusMenu('${data.id}')">
-                        <i class="fas ${sIcon}"></i> ${sText}
-                    </button>
-
-                    <div class="status-menu" id="menu-${data.id}">
-                        <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
-                        <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-check-circle"></i> LIVRAT</div>
-                        <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
-                    </div>
-                </div>
-            `;
-            ordersGrid.appendChild(card);
-        });
-    });
-}
+                  const card = document.createElement('div');
+                  card.className = `order-card ${sClass}`;
+                  card.innerHTML = `
+                      <div class="card-controls">
+                          <button class="control-btn edit-btn" onclick="openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
+                          <button class="control-btn delete-btn" onclick="deleteOrder('${data.id}')"><i class="fas fa-trash"></i></button>
+                      </div>
+                      <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
+                      <div class="order-price-tag">${data.price} LEI</div>
+                      <div class="card-footer">
+                          <div style="font-weight:bold; font-size: 14px;">${data.name}</div>
+                          <div class="footer-status" onclick="toggleStatusMenu('${data.id}')">
+                              <i class="fas ${sIcon}"></i> ${sText}
+                          </div>
+                          <div class="status-menu" id="menu-${data.id}">
+                              <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> În Curs</div>
+                              <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-check-circle"></i> Livrat</div>
+                              <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> Anulat</div>
+                          </div>
+                      </div>
+                  `;
+                  ordersGrid.appendChild(card);
+              });
+          });
+      }
 
       // --- FUNCȚIE ȘTERGERE ---
       window.deleteOrder = async function(id) {
@@ -1108,139 +1075,17 @@ function loadOrdersRealtime() {
           } catch (e) { console.error(e); }
       }
 
-// Toggle the selection menu
-window.toggleStatusMenu = function(id) {
-    const menu = document.getElementById(`menu-${id}`);
-    const allMenus = document.querySelectorAll('.status-menu');
-    allMenus.forEach(m => { if(m !== menu) m.classList.remove('active'); }); // close others
-    menu.classList.toggle('active');
-};
-
-// Update status in Firestore
-window.updateStatus = async function(id, newStatus) {
-    try {
-        await updateDoc(doc(db, "comenzi", id), { status: newStatus });
-        document.getElementById(`menu-${id}`).classList.remove('active');
-    } catch (e) { console.error(e); }
-};
-
-// OPEN EDIT MODAL (Fills the entire form)
-window.openEditModal = function(id) {
-    const order = currentOrders.find(o => o.id === id);
-    if (!order) return;
-
-    editingOrderId = id; // Set global ID
-    
-    // Fill the form fields
-    document.getElementById('oDate').value = order.orderDate;
-    document.getElementById('oPrice').value = order.price;
-    document.getElementById('oName').value = order.name;
-    document.getElementById('oPhone').value = order.phone;
-    document.getElementById('oZip').value = order.zipCode;
-    document.getElementById('oCity').value = order.city;
-    document.getElementById('oCounty').value = order.county;
-    document.getElementById('oStreet').value = order.street;
-    document.getElementById('oNotes').value = order.notes;
-
-    // Split building back to small inputs
-    const b = order.building || "";
-    document.getElementById('oBl').value = b.match(/Bl\. ([^,]+)/)?.[1] || "";
-    document.getElementById('oSc').value = b.match(/Sc\. ([^,]+)/)?.[1] || "";
-    document.getElementById('oInterfon').value = b.match(/Int\. ([^,]+)/)?.[1] || "";
-    document.getElementById('oEt').value = b.match(/Et\. ([^,]+)/)?.[1] || "";
-    document.getElementById('oAp').value = b.match(/Ap\. ([^,]+)/)?.[1] || "";
-
-    // Image previews
-    imageDropPreview.src = order.imageUrl;
-    imageDropPreview.style.display = 'block';
-    imageDropPlaceholder.style.display = 'none';
-
-    // Change Button Text
-    const submitBtn = document.querySelector('.btn-submit-order');
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> SALVEAZĂ MODIFICĂRILE';
-
-    // Make Image/Proof NOT required for editing (unless you want to replace them)
-    document.getElementById('oImageFile').required = false;
-    document.getElementById('oProofFile').required = false;
-
-    document.getElementById('addOrderModal').classList.add('active');
-};
-
-// Update the Form Submit Handler to handle BOTH Add and Update
-document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const submitBtn = e.target.querySelector('.btn-submit-order');
-    submitBtn.disabled = true;
-
-    try {
-        let finalImageUrl = null;
-        let finalProofUrl = null;
-        
-        // If editing, use old URL unless a new file is chosen
-        if(editingOrderId) {
-            const oldOrder = currentOrders.find(o => o.id === editingOrderId);
-            finalImageUrl = oldOrder.imageUrl;
-            finalProofUrl = oldOrder.paymentProof;
-        }
-
-        const imageFile = document.getElementById('oImageFile').files[0];
-        const proofFile = document.getElementById('oProofFile').files[0];
-
-        if (imageFile) finalImageUrl = await uploadToImgBB(imageFile);
-        if (proofFile) finalProofUrl = await uploadToImgBB(proofFile);
-
-        const bl = document.getElementById('oBl').value.trim();
-        const sc = document.getElementById('oSc').value.trim();
-        const inter = document.getElementById('oInterfon').value.trim();
-        const et = document.getElementById('oEt').value.trim();
-        const ap = document.getElementById('oAp').value.trim();
-        let bParts = [];
-        if(bl) bParts.push(`Bl. ${bl}`);
-        if(sc) bParts.push(`Sc. ${sc}`);
-        if(inter) bParts.push(`Int. ${inter}`);
-        if(et) bParts.push(`Et. ${et}`);
-        if(ap) bParts.push(`Ap. ${ap}`);
-        const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
-
-        const orderData = {
-            imageUrl: finalImageUrl,
-            paymentProof: finalProofUrl,
-            orderDate: document.getElementById('oDate').value,
-            price: parseFloat(document.getElementById('oPrice').value),
-            name: document.getElementById('oName').value.trim(),
-            phone: document.getElementById('oPhone').value.trim(),
-            zipCode: document.getElementById('oZip').value.trim(),
-            city: document.getElementById('oCity').value.trim(),
-            county: document.getElementById('oCounty').value.trim(),
-            street: document.getElementById('oStreet').value.trim(),
-            building: finalBuilding,
-            notes: document.getElementById('oNotes').value.trim()
-        };
-
-        if (editingOrderId) {
-            await updateDoc(doc(db, "comenzi", editingOrderId), orderData);
-            notify("Comandă actualizată!");
-        } else {
-            orderData.status = "In Curs";
-            orderData.createdAt = serverTimestamp();
-            await addDoc(collection(db, "comenzi"), orderData);
-            notify("Comandă adăugată!");
-        }
-
-        // Reset
-        editingOrderId = null;
-        document.getElementById('addOrderForm').reset();
-        document.getElementById('addOrderModal').classList.remove('active');
-        submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
-        document.getElementById('oImageFile').required = true;
-        document.getElementById('oProofFile').required = true;
-
-    } catch(err) {
-        notify("Eroare: " + err.message, true);
-    } finally {
-        submitBtn.disabled = false;
-    }
-});
+      // --- FUNCȚIE EDITARE (Simplificată) ---
+      window.editOrderPrompt = function(id) {
+          const order = currentOrders.find(o => o.id === id);
+          const newPrice = prompt("Introdu prețul nou:", order.price);
+          if (newPrice !== null) {
+              const orderRef = doc(db, "comenzi", id);
+              updateDoc(orderRef, { price: parseFloat(newPrice) })
+                  .then(() => notify("Preț actualizat!"))
+                  .catch(() => notify("Eroare", true));
+          }
+      }
 
 window.openOrderDetails = function(orderId) {
           const order = currentOrders.find(o => o.id === orderId);
@@ -1305,6 +1150,67 @@ function notify(message, isError = false) {
               setTimeout(() => toast.remove(), 500);
           }, 3000);
       }
+
+
+// --- PICKER LOGIC ---
+      window.toggleStatusMenu = (id) => {
+          const menu = document.getElementById(`menu-${id}`);
+          document.querySelectorAll('.status-menu').forEach(m => { if(m !== menu) m.classList.remove('active'); });
+          menu.classList.toggle('active');
+      };
+
+      window.updateStatus = async (id, newStatus) => {
+          await updateDoc(doc(db, "comenzi", id), { status: newStatus });
+      };
+
+      // --- FULL EDIT MODAL LOGIC ---
+      window.openEditModal = (id) => {
+          const order = currentOrders.find(o => o.id === id);
+          if(!order) return;
+          editingOrderId = id;
+
+          // Fill all fields
+          document.getElementById('oDate').value = order.orderDate;
+          document.getElementById('oPrice').value = order.price;
+          document.getElementById('oName').value = order.name;
+          document.getElementById('oPhone').value = order.phone;
+          document.getElementById('oZip').value = order.zipCode;
+          document.getElementById('oCity').value = order.city;
+          document.getElementById('oCounty').value = order.county;
+          document.getElementById('oStreet').value = order.street;
+          document.getElementById('oNotes').value = order.notes;
+
+          // Show Preview
+          imageDropPreview.src = order.imageUrl;
+          imageDropPreview.style.display = 'block';
+          imageDropPlaceholder.style.display = 'none';
+
+          // Update Button UI
+          document.querySelector('.btn-submit-order').innerText = "SALVEAZĂ MODIFICĂRILE";
+          document.getElementById('oImageFile').required = false;
+          document.getElementById('oProofFile').required = false;
+          document.getElementById('addOrderModal').classList.add('active');
+      };
+
+      // --- UPDATE THE SUBMIT HANDLER ---
+      // Re-map the open modal button to reset the "Edit Mode"
+      document.getElementById('openAddModalBtn').addEventListener('click', () => {
+          editingOrderId = null;
+          document.getElementById('addOrderForm').reset();
+          document.querySelector('.btn-submit-order').innerText = "ADAUGĂ COMANDĂ";
+          document.getElementById('oImageFile').required = true;
+          document.getElementById('oProofFile').required = true;
+      });
+
+      // Modify the existing 'addOrderForm' submit listener to use editingOrderId
+      // Find your 'addOrderForm' listener and wrap the Firestore call in an IF/ELSE:
+      /* 
+         if (editingOrderId) {
+             await updateDoc(doc(db, "comenzi", editingOrderId), { ...yourData... });
+         } else {
+             await addDoc(collection(db, "comenzi"), { ...yourData..., status: "In Curs" });
+         }
+      */
     </script>
 </body>
 </html>
