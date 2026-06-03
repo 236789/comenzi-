@@ -16,7 +16,7 @@
     :root {
       --bg-dark: #030712;       /* Deep space black/blue */
       --primary: #00f2fe;       /* Electric Cyan */
-      --primary-dim: rgba(0, 242, 254, 0.4); /* Stronger glow */
+      --primary-dim: rgba(0, 242, 254, 0.4); 
       --text-main: #ffffff;
     }
 
@@ -30,21 +30,53 @@
       min-height: 100vh;
     }
 
-    /* --- AUTH CONTAINER (Top Right) --- */
-    .admin-auth-box {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 100;
+    /* --- FLOATING HEADER --- */
+    .header-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px 10px 30px;
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 100px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Logo Image */
+    .logo img {
+      height: 40px;
+      vertical-align: middle;
+    }
+
+    /* --- AUTH CONTAINER (Inside Header) --- */
+    .header-auth-box {
+      display: flex;
+      align-items: center;
     }
 
     .cyber-btn {
       background: rgba(0, 242, 254, 0.05);
       border: 1px solid var(--primary);
       color: var(--primary);
-      padding: 8px 16px;
+      padding: 8px 20px;
       font-family: 'Oswald', sans-serif;
       font-size: 14px;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 1px;
       cursor: pointer;
@@ -52,13 +84,25 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      border-radius: 4px;
+      border-radius: 50px; /* Pill shape for buttons */
     }
 
     .cyber-btn:hover {
       background: var(--primary);
       color: #000;
       box-shadow: 0 0 15px var(--primary);
+    }
+
+    .logout-btn {
+      border-color: #ff4757;
+      color: #ff4757;
+      background: transparent;
+    }
+
+    .logout-btn:hover {
+      background: #ff4757;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
     }
 
     .user-profile-ui {
@@ -68,8 +112,8 @@
     }
 
     .user-avatar {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: 2px solid var(--primary);
       box-shadow: 0 0 10px var(--primary-dim);
@@ -83,12 +127,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start; /* Keeps content near the top */
-        padding-top: 120px; 
+        justify-content: center; /* Center everything perfectly */
         overflow: hidden;
     }
 
-    /* The moving 3D Floor */
     .bg-grid-engine {
         position: absolute;
         width: 200%; height: 200%;
@@ -105,7 +147,6 @@
         pointer-events: none;
     }
 
-    /* The glowing atmosphere */
     .bg-nebula {
         position: absolute;
         inset: 0;
@@ -128,6 +169,7 @@
         width: 100%;
         padding: 20px;
         margin: 0 auto;
+        text-align: center; /* Center the text inside */
     }
 
     /* --- TITLE STYLING (Solid Gradient + Glow) --- */
@@ -135,9 +177,8 @@
         font-weight: 700;
         font-size: clamp(40px, 8vw, 85px);
         text-transform: uppercase;
-        text-align: center;
         letter-spacing: 2px;
-        margin-bottom: 40px;
+        margin-bottom: 10px; /* Reduced to pull welcome text closer */
         
         background: linear-gradient(180deg, #ffffff 0%, var(--primary) 100%);
         -webkit-background-clip: text;
@@ -146,24 +187,75 @@
         filter: drop-shadow(0 0 25px var(--primary-dim));
     }
 
+    /* --- WELCOME TEXT & BADGES --- */
+    .welcome-container {
+        opacity: 0; /* Hidden until login */
+        transition: opacity 0.5s ease;
+        font-size: clamp(16px, 3vw, 24px);
+        font-weight: 300;
+        letter-spacing: 1px;
+        color: #888;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .badge-admin {
+        background: rgba(255, 71, 87, 0.1);
+        border: 1px solid #ff4757;
+        color: #ff4757;
+        box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
+    }
+
+    .badge-user {
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        box-shadow: 0 0 15px var(--primary-dim);
+    }
+
   </style>
 </head>
 <body>
 
-    <!-- AUTHENTICATION UI (TOP RIGHT) -->
-    <div class="admin-auth-box">
-        <!-- Login Button -->
-        <button id="googleLoginBtn" class="cyber-btn">
-            <i class="fab fa-google"></i> ADMIN LOGIN
-        </button>
+    <!-- HEADER (Logo + Auth) -->
+    <div class="header-container">
+        <header>
+            <!-- KSDA Logo -->
+            <a href="#" class="logo">
+                <img src="https://iili.io/fXvBEiB.png" alt="KSDA Logo">
+            </a>
 
-        <!-- Logged In UI (Hidden initially) -->
-        <div id="userProfileUI" class="user-profile-ui">
-            <img id="userAvatarImg" src="" alt="Admin" class="user-avatar">
-            <button id="logoutBtn" class="cyber-btn" style="border-color: #ff4757; color: #ff4757;">
-                LOGOUT
-            </button>
-        </div>
+            <!-- Auth UI -->
+            <div class="header-auth-box">
+                <!-- Login Button -->
+                <button id="googleLoginBtn" class="cyber-btn">
+                    <i class="fab fa-google"></i> LOGIN
+                </button>
+
+                <!-- Logged In UI (Hidden initially) -->
+                <div id="userProfileUI" class="user-profile-ui">
+                    <img id="userAvatarImg" src="" alt="Avatar" class="user-avatar">
+                    <button id="logoutBtn" class="cyber-btn logout-btn">
+                        LOGOUT
+                    </button>
+                </div>
+            </div>
+        </header>
     </div>
 
     <!-- MAIN PAGE -->
@@ -174,11 +266,15 @@
         <div class="bg-nebula"></div>
 
         <div class="container">
-            <!-- The solid, glowing title -->
+            <!-- Title -->
             <h1 class="page-main-title">Comenzi Portrete</h1>
             
-            <!-- ADD YOUR NEW CONTENT HERE LATER -->
+            <!-- Dynamic Welcome Text (Shows up when logged in) -->
+            <div id="welcomeContainer" class="welcome-container">
+                <!-- Javascript will inject "BINE AI VENIT, [NUME] [BADGE]" here -->
+            </div>
 
+            <!-- ADD YOUR NEW CONTENT / PORTRAIT SYSTEM HERE LATER -->
         </div>
 
     </main>
@@ -189,7 +285,7 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
       import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-      import { getFirestore, doc, updateDoc, getDoc, setDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
       // Firebase Config
       const firebaseConfig = {
@@ -216,6 +312,7 @@
       const logoutBtn = document.getElementById('logoutBtn');
       const userProfileUI = document.getElementById('userProfileUI');
       const userAvatarImg = document.getElementById('userAvatarImg');
+      const welcomeContainer = document.getElementById('welcomeContainer');
 
       // 1. Google Login
       loginBtn.addEventListener('click', async () => {
@@ -231,21 +328,43 @@
           signOut(auth);
       });
 
-      // 3. Monitor Auth State
-      onAuthStateChanged(auth, (user) => {
+      // 3. Monitor Auth State & Check Admin Collection
+      onAuthStateChanged(auth, async (user) => {
           if (user) {
-              // User is signed in
+              
+              // Show Logged-In UI in header
               loginBtn.style.display = 'none';
               userProfileUI.style.display = 'flex';
               userAvatarImg.src = user.photoURL || 'https://i.ibb.co/4pGm9S2/user-placeholder.png';
-              
-              // Optional: You can check if the user is the admin here
-              // if(user.email === 'nicaemmanuel433qe@gmail.com') { console.log("Admin logged in"); }
+
+              // --- CHECK ADMIN STATUS ---
+              // Search the "admin_emails" collection for this user's email
+              const adminQuery = query(collection(db, "admin_emails"), where("email", "==", user.email));
+              const adminSnapshot = await getDocs(adminQuery);
+
+              // If snapshot is NOT empty, they are an admin
+              const isAdmin = !adminSnapshot.empty;
+
+              // Build the Badge HTML based on role
+              let badgeHtml = "";
+              if (isAdmin) {
+                  badgeHtml = `<span class="badge badge-admin"><i class="fas fa-hammer"></i> ADMIN</span>`;
+              } else {
+                  badgeHtml = `<span class="badge badge-user"><i class="fas fa-user"></i> MEMBRU</span>`;
+              }
+
+              // Update the welcome container below the title
+              welcomeContainer.innerHTML = `BINE AI VENIT, <span style="color: #fff; font-weight: 700;">${user.displayName}</span> ${badgeHtml}`;
+              welcomeContainer.style.opacity = '1';
 
           } else {
               // User is signed out
               loginBtn.style.display = 'flex';
               userProfileUI.style.display = 'none';
+              
+              // Hide the welcome text
+              welcomeContainer.style.opacity = '0';
+              setTimeout(() => { welcomeContainer.innerHTML = ''; }, 500); // Clear after fade out
           }
       });
 
