@@ -375,6 +375,90 @@
         pointer-events: none; display: flex; align-items: center; gap: 10px;
     }
     @keyframes toastIn { from { opacity: 0; bottom: 0; } to { opacity: 1; bottom: 30px; } }
+
+
+/* --- STILURI NOI PENTRU CARDURI --- */
+    .order-card {
+        background: #000;
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    /* Glow-uri în funcție de status */
+    .status-in-curs { border-color: #ffeb3b; box-shadow: 0 0 20px rgba(255, 235, 59, 0.3); }
+    .status-livrat { border-color: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+    .status-anulat { border-color: #ff4757; box-shadow: 0 0 20px rgba(255, 71, 87, 0.3); }
+
+    .order-img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Butoane de control (Top Right) */
+    .card-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+    }
+
+    .control-btn {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.3s;
+        backdrop-filter: blur(5px);
+    }
+
+    .edit-btn { background: rgba(0, 242, 254, 0.2); color: var(--primary); border: 1px solid var(--primary); }
+    .edit-btn:hover { background: var(--primary); color: #000; }
+
+    .delete-btn { background: rgba(255, 71, 87, 0.2); color: var(--admin-red); border: 1px solid var(--admin-red); }
+    .delete-btn:hover { background: var(--admin-red); color: #fff; }
+
+    /* Bara de jos (Price & Status) */
+    .card-footer {
+        background: var(--primary); /* Default cyan */
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 20px 20px 0 0; /* Curbat sus conform imaginii */
+        margin-top: -20px; /* Suprapunere peste imagine */
+        position: relative;
+        z-index: 5;
+        color: #000;
+        font-weight: 700;
+    }
+
+    .footer-price { font-size: 22px; }
+    .footer-status { 
+        font-size: 18px; 
+        display: flex; 
+        align-items: center; 
+        gap: 5px; 
+        text-transform: uppercase;
+    }
+
+    /* Culori footer bazate pe status */
+    .bg-in-curs { background: #ffeb3b; box-shadow: 0 -5px 15px rgba(255, 235, 59, 0.4); }
+    .bg-livrat { background: #00ff88; box-shadow: 0 -5px 15px rgba(0, 255, 136, 0.4); }
+    .bg-anulat { background: #ff4757; box-shadow: 0 -5px 15px rgba(255, 71, 87, 0.4); }
   </style>
 </head>
 <body>
@@ -620,7 +704,7 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics.js";
       import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-      import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+      import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, serverTimestamp, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBFU90_W3kOJGcWsz30SnJrFHTePmQIW4I",
@@ -831,6 +915,7 @@ if (!globalIsAdmin) return notify("Acces restricționat!", true);
       // --- RENDER ORDERS REALTIME ---
       let currentOrders = [];
       
+  // --- RENDER ORDERS REALTIME ---
       function loadOrdersRealtime() {
           const q = query(collection(db, "comenzi"), orderBy("createdAt", "desc"));
           
@@ -838,30 +923,87 @@ if (!globalIsAdmin) return notify("Acces restricționat!", true);
               ordersGrid.innerHTML = ""; 
               currentOrders = []; 
               
-              if(snapshot.empty) {
-                  ordersGrid.innerHTML = "<p style='grid-column:1/-1; color:#aaa;'>Nu există comenzi momentan.</p>";
-                  return;
-              }
-
-              snapshot.forEach((doc) => {
-                  const data = doc.data();
-                  data.id = doc.id;
+              snapshot.forEach((docSnap) => {
+                  const data = docSnap.data();
+                  data.id = docSnap.id;
                   currentOrders.push(data); 
 
+                  // Definire status
+                  const status = data.status || "In Curs";
+                  let statusClass = "status-in-curs";
+                  let bgClass = "bg-in-curs";
+                  let statusIcon = "fa-spinner fa-spin";
+                  let statusText = "În Curs";
+
+                  if(status === "Livrat") {
+                      statusClass = "status-livrat"; bgClass = "bg-livrat"; 
+                      statusIcon = "fa-check-circle"; statusText = "Livrat";
+                  } else if(status === "Anulat") {
+                      statusClass = "status-anulat"; bgClass = "bg-anulat"; 
+                      statusIcon = "fa-times-circle"; statusText = "Anulat";
+                  }
+
                   const card = document.createElement('div');
-                  card.className = 'order-card';
-                  card.dataset.id = data.id; 
+                  card.className = `order-card ${statusClass}`;
                   
                   card.innerHTML = `
-                      <img src="${data.imageUrl}" alt="Portret" class="order-img" onerror="this.src='https://i.ibb.co/4pGm9S2/user-placeholder.png'">
-                      <div class="order-price-tag">${data.price} LEI</div>
+                      <div class="card-controls">
+                          <button class="control-btn edit-btn" onclick="event.stopPropagation(); editOrderPrompt('${data.id}')">
+                              <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="control-btn delete-btn" onclick="event.stopPropagation(); deleteOrder('${data.id}')">
+                              <i class="fas fa-trash"></i>
+                          </button>
+                      </div>
+                      <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
+                      <div class="card-footer ${bgClass}" onclick="event.stopPropagation(); cycleStatus('${data.id}', '${status}')">
+                          <div class="footer-price">${data.price} LEI</div>
+                          <div class="footer-status">
+                              <i class="fas ${statusIcon}"></i> ${statusText}
+                          </div>
+                      </div>
                   `;
-
-                  card.onclick = () => openOrderDetails(data.id);
                   
                   ordersGrid.appendChild(card);
               });
           });
+      }
+
+      // --- FUNCȚIE ȘTERGERE ---
+      window.deleteOrder = async function(id) {
+          if(confirm("Ești sigur că vrei să ștergi această comandă?")) {
+              try {
+                  await deleteDoc(doc(db, "comenzi", id));
+                  notify("Comandă ștearsă!");
+              } catch (e) { notify("Eroare la ștergere", true); }
+          }
+      }
+
+      // --- FUNCȚIE SCHIMBARE STATUS (La click pe bara de jos) ---
+      window.cycleStatus = async function(id, currentStatus) {
+          if(!globalIsAdmin) return;
+          
+          let nextStatus = "In Curs";
+          if(currentStatus === "In Curs") nextStatus = "Livrat";
+          else if(currentStatus === "Livrat") nextStatus = "Anulat";
+          else if(currentStatus === "Anulat") nextStatus = "In Curs";
+
+          try {
+              const orderRef = doc(db, "comenzi", id);
+              await updateDoc(orderRef, { status: nextStatus });
+          } catch (e) { console.error(e); }
+      }
+
+      // --- FUNCȚIE EDITARE (Simplificată) ---
+      window.editOrderPrompt = function(id) {
+          const order = currentOrders.find(o => o.id === id);
+          const newPrice = prompt("Introdu prețul nou:", order.price);
+          if (newPrice !== null) {
+              const orderRef = doc(db, "comenzi", id);
+              updateDoc(orderRef, { price: parseFloat(newPrice) })
+                  .then(() => notify("Preț actualizat!"))
+                  .catch(() => notify("Eroare", true));
+          }
       }
 
 window.openOrderDetails = function(orderId) {
