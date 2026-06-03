@@ -345,16 +345,23 @@
               // If snapshot is NOT empty, they are an admin
               const isAdmin = !adminSnapshot.empty;
 
-              // Build the Badge HTML based on role
+// Build the Badge HTML and Username Color based on role
               let badgeHtml = "";
+              let nameStyle = "";
+
               if (isAdmin) {
+                  // Red badge and red glowing text for Admin
                   badgeHtml = `<span class="badge badge-admin"><i class="fas fa-hammer"></i> ADMIN</span>`;
+                  nameStyle = "color: #ff4757; text-shadow: 0 0 15px rgba(255, 71, 87, 0.4);";
               } else {
+                  // Cyan badge and cyan glowing text for regular Member
                   badgeHtml = `<span class="badge badge-user"><i class="fas fa-user"></i> MEMBRU</span>`;
+                  nameStyle = "color: var(--primary); text-shadow: 0 0 15px var(--primary-dim);";
               }
 
               // Update the welcome container below the title
-welcomeContainer.innerHTML = `BINE AI VENIT, <span style="color: var(--primary);">${user.displayName}</span> ${badgeHtml}`;              welcomeContainer.style.opacity = '1';
+              welcomeContainer.innerHTML = `BINE AI VENIT, <span style="${nameStyle}">${user.displayName}</span> ${badgeHtml}`;              
+              welcomeContainer.style.opacity = '1';
 
           } else {
               // User is signed out
@@ -366,7 +373,6 @@ welcomeContainer.innerHTML = `BINE AI VENIT, <span style="color: var(--primary);
               setTimeout(() => { welcomeContainer.innerHTML = ''; }, 500); // Clear after fade out
           }
       });
-
     </script>
 </body>
 </html>
