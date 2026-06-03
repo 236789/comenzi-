@@ -1212,7 +1212,7 @@ function loadOrdersRealtime() {
             let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
             
             if(status === "Livrat") { 
-                sClass = "status-livrat"; sIcon = "fa-check-circle"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
+                sClass = "status-livrat"; sIcon = "fa-truck-fast"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
             } else if(status === "Anulat") { 
                 sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
             }
@@ -1237,7 +1237,7 @@ function loadOrdersRealtime() {
                     </button>
                     <div class="status-menu" id="menu-${data.id}">
                         <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
-                        <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-check-circle"></i> LIVRAT</div>
+                        <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
                         <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
                     </div>
                 </div>
