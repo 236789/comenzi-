@@ -1269,73 +1269,71 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
 
       // --- RENDER ORDERS REALTIME ---
       let currentOrders = [];
-
-// La începutul scriptului, lângă celelalte variabile
+// 1. Variabila globală pentru filtru (asigură-te că e definită o singură dată la început)
 let activeFilter = "In Curs"; 
 
-// Funcția de schimbare a filtrului
+// 2. Funcția de schimbare a filtrului
 window.setFilter = (status) => {
     activeFilter = status;
     
-    // Update vizual butoane
+    // Update vizual butoane: scoatem 'active' de la toate și punem pe cel apăsat
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    event.currentTarget.classList.add('active'); 
     
-    // Reîncarcă grila (se va declanșa automat din loadOrdersRealtime dacă folosim Snapshot)
+    // Căutăm butonul apăsat și îi dăm clasa active (folosind event.currentTarget sau ID)
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
+    
+    // Reîncărcăm grila
     loadOrdersRealtime();
 };
-      
+
+// 3. Funcția principală (Snapshot în timp real)
 function loadOrdersRealtime() {
     const q = query(collection(db, "comenzi"), orderBy("createdAt", "desc"));
+    
     onSnapshot(q, (snapshot) => {
-        ordersGrid.innerHTML = "";
-        currentOrders = [];
+        ordersGrid.innerHTML = ""; // Curățăm grila
+        currentOrders = []; // Resetăm lista locală
+        
+        // Obiect pentru numărare
+        let counts = { "In Curs": 0, "Livrat": 0, "Anulat": 0 };
+
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
             data.id = docSnap.id;
             currentOrders.push(data);
 
             const status = data.status || "In Curs";
-            let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
-            
-            if(status === "Livrat") { 
-                sClass = "status-livrat"; sIcon = "fa-truck-fast"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
-            } else if(status === "Anulat") { 
-                sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
+
+            // Pasul A: Numărăm comanda indiferent de filtru pentru a actualiza etichetele (0)
+            if (counts.hasOwnProperty(status)) {
+                counts[status]++;
             }
 
-            const card = document.createElement('div');
-            card.className = `order-card ${sClass}`;
-            card.innerHTML = `
-                <div class="card-controls">
-                    <button class="control-btn edit-btn" onclick="event.stopPropagation(); openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="control-btn delete-btn" onclick="event.stopPropagation(); deleteOrder('${data.id}')"><i class="fas fa-trash"></i></button>
-                </div>
-                <div class="order-img-container">
-                    <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
-                </div>
-                <div class="card-footer">
-                    <div class="footer-left-side">
-                        <span class="footer-name">${data.name}</span>
-<span class="footer-price-text">${formatPrice(data.price, data.currency || 'RON')}</span>
-                    </div>
-                    <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); toggleStatusMenu('${data.id}')">
-                        <i class="fas ${sIcon}"></i> ${sText}
-                    </button>
-                    <div class="status-menu" id="menu-${data.id}">
-                        <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
-                        <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
-                        <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
-                    </div>
-                </div>
-            `;
-            ordersGrid.appendChild(card);
+            // Pasul B: AFIȘĂM cardul DOAR dacă se potrivește cu filtrul de sus
+            if (status === activeFilter) {
+                renderCard(data);
+            }
         });
+
+        // Pasul C: Actualizăm textul de pe butoane cu cifrele reale
+        updateFilterLabels(counts);
     });
 }
 
+// 4. Funcție pentru actualizarea numerelor de pe butoane (Ex: In Curs (5))
+function updateFilterLabels(counts) {
+    const cursEl = document.getElementById('count-curs');
+    const livratEl = document.getElementById('count-livrat');
+    const anulatEl = document.getElementById('count-anulat');
 
-// Mutăm generarea HTML-ului cardului într-o funcție separată pentru curățenie
+    if (cursEl) cursEl.innerText = `(${counts["In Curs"]})`;
+    if (livratEl) livratEl.innerText = `(${counts["Livrat"]})`;
+    if (anulatEl) anulatEl.innerText = `(${counts["Anulat"]})`;
+}
+
+// 5. Funcția care generează HTML-ul pentru un singur card
 function renderCard(data) {
     const status = data.status || "In Curs";
     let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
@@ -1346,6 +1344,7 @@ function renderCard(data) {
         sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
     }
 
+    // Butoanele de admin apar doar dacă ești logat ca admin
     const adminControls = globalIsAdmin ? `
         <div class="card-controls">
             <button class="control-btn edit-btn" onclick="event.stopPropagation(); openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
@@ -1360,13 +1359,13 @@ function renderCard(data) {
             <img src="${data.imageUrl}" class="order-img" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">
         </div>
         <div class="card-footer">
-            <div class="footer-left-side">
+            <div class="footer-left-side" style="flex:1; display:flex; justify-content:flex-start;">
                 <span class="footer-name">${data.name}</span>
             </div>
-            <div class="footer-center-side">
+            <div class="footer-center-side" style="flex:1; display:flex; justify-content:center;">
                 <span class="footer-price-text">${formatPrice(data.price, data.currency || 'RON')}</span>
             </div>
-            <div class="footer-right-side">
+            <div class="footer-right-side" style="flex:1; display:flex; justify-content:flex-end; position:relative;">
                 <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); ${globalIsAdmin ? `toggleStatusMenu('${data.id}')` : ''}">
                     <i class="fas ${sIcon}"></i> ${sText}
                 </button>
@@ -1380,7 +1379,6 @@ function renderCard(data) {
     `;
     ordersGrid.appendChild(card);
 }
-
       // --- FUNCȚIE ȘTERGERE ---
       window.deleteOrder = async function(id) {
           if(confirm("Ești sigur că vrei să ștergi această comandă?")) {
