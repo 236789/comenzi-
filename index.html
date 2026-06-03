@@ -187,14 +187,14 @@
         filter: drop-shadow(0 0 25px var(--primary-dim));
     }
 
-    /* --- WELCOME TEXT & BADGES --- */
-    .welcome-container {
-        opacity: 0; /* Hidden until login */
+.welcome-container {
+        opacity: 0; 
         transition: opacity 0.5s ease;
-        font-size: clamp(16px, 3vw, 24px);
-        font-weight: 300;
+        font-size: clamp(18px, 3vw, 24px);
+        font-weight: 600; /* Makes all the text bold and equal */
         letter-spacing: 1px;
-        color: #888;
+        color: #ffffff; /* Makes 'BINE AI VENIT' solid white instead of grey */
+        text-transform: uppercase; /* Makes everything match perfectly */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -354,8 +354,7 @@
               }
 
               // Update the welcome container below the title
-              welcomeContainer.innerHTML = `BINE AI VENIT, <span style="color: #fff; font-weight: 700;">${user.displayName}</span> ${badgeHtml}`;
-              welcomeContainer.style.opacity = '1';
+welcomeContainer.innerHTML = `BINE AI VENIT, <span style="color: var(--primary);">${user.displayName}</span> ${badgeHtml}`;              welcomeContainer.style.opacity = '1';
 
           } else {
               // User is signed out
