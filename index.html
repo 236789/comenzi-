@@ -452,25 +452,27 @@
         </div>
     </div>
 
-
     <!-- ==========================================
          FIREBASE INITIALIZATION & LOGIC
     ========================================== -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-      import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics.js";
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+      import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
       const firebaseConfig = {
-        apiKey: "AIzaSyDoH80kffNrzFAcyRqsTVdifs-whUhwH9A",
-        authDomain: "ksda-7546f.firebaseapp.com",
-        projectId: "ksda-7546f",
-        storageBucket: "ksda-7546f.firebasestorage.app",
-        messagingSenderId: "306437513808",
-        appId: "1:306437513808:web:28479810e3fdf71b32e755"
+        apiKey: "AIzaSyBFU90_W3kOJGcWsz30SnJrFHTePmQIW4I",
+        authDomain: "comenzi-f208b.firebaseapp.com",
+        projectId: "comenzi-f208b",
+        storageBucket: "comenzi-f208b.firebasestorage.app",
+        messagingSenderId: "783630339221",
+        appId: "1:783630339221:web:88464a0fa18d7a069bdf9c",
+        measurementId: "G-P2GM4P595R"
       };
 
       const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
       const auth = getAuth(app);
       const db = getFirestore(app);
       const provider = new GoogleAuthProvider();
