@@ -1290,8 +1290,8 @@ window.setFilter = (status) => {
 
 // 3. Funcția principală (Snapshot în timp real)
 function loadOrdersRealtime() {
-    const q = query(collection(db, "comenzi"), orderBy("createdAt", "desc"));
-    
+// This sorts by the calendar date first, then by creation time if dates are identical
+const q = query(collection(db, "comenzi"), orderBy("orderDate", "desc"), orderBy("createdAt", "desc"));    
     onSnapshot(q, (snapshot) => {
         ordersGrid.innerHTML = ""; // Curățăm grila
         currentOrders = []; // Resetăm lista locală
