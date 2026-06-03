@@ -647,44 +647,52 @@
         z-index: 10;
     }
 
-    .currency-btn {
-        background: rgba(0, 242, 254, 0.1);
-        border: 1px solid var(--primary);
-        color: var(--primary);
-        padding: 5px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 14px;
-        transition: 0.3s;
+  .currency-btn {
+        background: rgba(0, 242, 254, 0.1) !important;
+        border: 1px solid var(--primary) !important;
+        color: var(--primary) !important;
+        padding: 5px 12px !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        font-weight: bold !important;
+        font-size: 14px !important;
+        min-width: 50px;
     }
 
     .currency-menu {
         position: absolute;
-        bottom: 45px;
+        bottom: 50px; /* Apare deasupra butonului */
         right: 0;
-        background: #16213e;
+        background: #0b1120; /* Fundal închis ca restul cardului */
         border: 1px solid var(--primary);
         border-radius: 12px;
         display: none;
         flex-direction: column;
+        z-index: 1000;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        min-width: 120px;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        z-index: 100;
     }
     .currency-menu.active { display: flex; }
     
     .currency-option {
-        padding: 10px 15px;
-        color: #fff;
-        cursor: pointer;
-        white-space: nowrap;
+        padding: 12px 20px !important;
+        color: #fff !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        text-align: left !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
         transition: 0.2s;
-        display: flex;
-        gap: 10px;
+        display: block !important; /* Forțează așezarea pe rânduri separate */
     }
-    .currency-option:hover { background: var(--primary); color: #000; }
+    .currency-option:last-child { border-bottom: none; }
 
+
+    .currency-option:hover {
+        background: var(--primary) !important;
+        color: #000 !important;
+    }
   </style>
 </head>
 <body>
@@ -765,18 +773,17 @@
         <input type="number" id="oPrice" class="styled-input compact-input" placeholder="Ex: 1,000" required>
         <i class="fas fa-money-bill-wave"></i>
         
-        <!-- Selector Monedă -->
-        <div class="currency-selector-container">
-            <button type="button" class="currency-btn" id="activeCurrencyBtn" onclick="toggleCurrencyMenu()">RON</button>
-            <input type="hidden" id="oCurrency" value="RON"> <!-- Stochează moneda aleasă -->
-            
-            <div class="currency-menu" id="currencyMenu">
-                <div class="currency-option" onclick="selectCurrency('RON', 'RON')">RON (Leu)</div>
-                <div class="currency-option" onclick="selectCurrency('€', 'EUR')"><i class="fas fa-euro-sign"></i> Euro</div>
-                <div class="currency-option" onclick="selectCurrency('£', 'GBP')"><i class="fas fa-pound-sign"></i> Lire</div>
-                <div class="currency-option" onclick="selectCurrency('$', 'USD')"><i class="fas fa-dollar-sign"></i> Dolari</div>
-            </div>
-        </div>
+<div class="currency-selector-container">
+    <button type="button" class="currency-btn" id="activeCurrencyBtn" onclick="toggleCurrencyMenu()">RON</button>
+    <input type="hidden" id="oCurrency" value="RON"> 
+    
+    <div class="currency-menu" id="currencyMenu">
+        <div class="currency-option" onclick="selectCurrency('RON', 'RON')">RON (Leu)</div>
+        <div class="currency-option" onclick="selectCurrency('€', 'EUR')">EURO</div>
+        <div class="currency-option" onclick="selectCurrency('£', 'GBP')">LIRE</div>
+        <div class="currency-option" onclick="selectCurrency('$', 'USD')">DOLARI</div>
+    </div>
+</div>
     </div>
 </div>
 
@@ -1399,6 +1406,25 @@ window.toggleCurrencyMenu = () => {
     document.getElementById('currencyMenu').classList.toggle('active');
 };
 
+window.selectCurrency = (symbol, value) => {
+    document.getElementById('activeCurrencyBtn').innerText = symbol;
+    document.getElementById('oCurrency').value = value;
+    document.getElementById('currencyMenu').classList.remove('active');
+};
+
+
+window.formatPrice = (amount, currency) => {
+    // Formatează numărul cu virgulă la mii (Ex: 1,000)
+    const formattedNumber = new Intl.NumberFormat('en-US').format(amount);
+    
+    // Mapează codul de monedă la simbol
+    const symbols = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' };
+    const symbol = symbols[currency] || currency;
+    
+    return `${formattedNumber} ${symbol}`;
+};
+
+// Functia de selectie (asigura-te ca inchide meniul corect)
 window.selectCurrency = (symbol, value) => {
     document.getElementById('activeCurrencyBtn').innerText = symbol;
     document.getElementById('oCurrency').value = value;
