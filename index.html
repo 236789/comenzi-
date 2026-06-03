@@ -630,6 +630,61 @@
     }
     .status-menu.active { display: flex; }
 
+
+/* Elimină săgețile default de la input-ul de preț */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    /* Stil pentru selectorul de monedă în Formular */
+    .currency-selector-container {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        z-index: 10;
+    }
+
+    .currency-btn {
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        padding: 5px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .currency-menu {
+        position: absolute;
+        bottom: 45px;
+        right: 0;
+        background: #16213e;
+        border: 1px solid var(--primary);
+        border-radius: 12px;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        z-index: 100;
+    }
+    .currency-menu.active { display: flex; }
+    
+    .currency-option {
+        padding: 10px 15px;
+        color: #fff;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: 0.2s;
+        display: flex;
+        gap: 10px;
+    }
+    .currency-option:hover { background: var(--primary); color: #000; }
+
   </style>
 </head>
 <body>
@@ -704,13 +759,26 @@
                             </div>
                         </div>
 
-                        <div class="input-group">
-                            <label>Preț (LEI)</label>
-                            <div class="input-wrapper">
-                                <input type="number" id="oPrice" class="styled-input compact-input" placeholder="Ex: 150" required>
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                        </div>
+<div class="input-group">
+    <label>Preț și Monedă</label>
+    <div class="input-wrapper">
+        <input type="number" id="oPrice" class="styled-input compact-input" placeholder="Ex: 1,000" required>
+        <i class="fas fa-money-bill-wave"></i>
+        
+        <!-- Selector Monedă -->
+        <div class="currency-selector-container">
+            <button type="button" class="currency-btn" id="activeCurrencyBtn" onclick="toggleCurrencyMenu()">RON</button>
+            <input type="hidden" id="oCurrency" value="RON"> <!-- Stochează moneda aleasă -->
+            
+            <div class="currency-menu" id="currencyMenu">
+                <div class="currency-option" onclick="selectCurrency('RON', 'RON')">RON (Leu)</div>
+                <div class="currency-option" onclick="selectCurrency('€', 'EUR')"><i class="fas fa-euro-sign"></i> Euro</div>
+                <div class="currency-option" onclick="selectCurrency('£', 'GBP')"><i class="fas fa-pound-sign"></i> Lire</div>
+                <div class="currency-option" onclick="selectCurrency('$', 'USD')"><i class="fas fa-dollar-sign"></i> Dolari</div>
+            </div>
+        </div>
+    </div>
+</div>
 
                         <div class="input-group">
                             <label>Dovadă Plată</label>
@@ -1055,7 +1123,8 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
             imageUrl: finalImageUrl,
             paymentProof: finalProofUrl,
             orderDate: document.getElementById('oDate').value,
-            price: parseFloat(document.getElementById('oPrice').value),
+    price: parseFloat(document.getElementById('oPrice').value),
+    currency: document.getElementById('oCurrency').value, // SALVEAZĂ MONEDA
             name: document.getElementById('oName').value.trim(),
             phone: document.getElementById('oPhone').value.trim(),
             zipCode: document.getElementById('oZip').value.trim(),
@@ -1135,7 +1204,7 @@ function loadOrdersRealtime() {
                 <div class="card-footer">
                     <div class="footer-left-side">
                         <span class="footer-name">${data.name}</span>
-                        <span class="footer-price-text">${data.price} LEI</span>
+<span class="footer-price-text">${formatPrice(data.price, data.currency || 'RON')}</span>
                     </div>
                     <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); toggleStatusMenu('${data.id}')">
                         <i class="fas ${sIcon}"></i> ${sText}
@@ -1195,7 +1264,7 @@ window.openOrderDetails = function(orderId) {
 
           document.getElementById('dImage').src = order.imageUrl;
           document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
-          document.getElementById('dPrice').innerText = order.price;
+document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
           document.getElementById('dProof').href = order.paymentProof;
           document.getElementById('dName').innerText = order.name;
           document.getElementById('dPhone').innerText = order.phone;
@@ -1271,6 +1340,9 @@ function notify(message, isError = false) {
           if(!order) return;
           editingOrderId = id;
 
+const currentSymbol = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' }[order.currency || 'RON'];
+selectCurrency(currentSymbol, order.currency || 'RON');
+
           // Fill all fields
           document.getElementById('oDate').value = order.orderDate;
           document.getElementById('oPrice').value = order.price;
@@ -1313,6 +1385,25 @@ function notify(message, isError = false) {
              await addDoc(collection(db, "comenzi"), { ...yourData..., status: "In Curs" });
          }
       */
+
+
+// Transformă 1000 în 1,000 și adaugă moneda
+function formatPrice(amount, currency) {
+    const formatted = new Intl.NumberFormat('en-US').format(amount);
+    const symbols = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' };
+    const symbol = symbols[currency] || currency;
+    return `${formatted} ${symbol}`;
+}
+
+window.toggleCurrencyMenu = () => {
+    document.getElementById('currencyMenu').classList.toggle('active');
+};
+
+window.selectCurrency = (symbol, value) => {
+    document.getElementById('activeCurrencyBtn').innerText = symbol;
+    document.getElementById('oCurrency').value = value;
+    document.getElementById('currencyMenu').classList.remove('active');
+};
     </script>
 </body>
 </html>
