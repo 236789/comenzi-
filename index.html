@@ -316,45 +316,47 @@
 
 
 .copy-btn {
-        position: absolute; 
-        right: 8px; 
-        top: 50%; 
+        position: absolute;
+        right: 10px;
+        top: 50%;
         transform: translateY(-50%);
-        background: rgba(0, 242, 254, 0.05); 
-        border: 1px solid rgba(0, 242, 254, 0.5);
-        color: var(--primary); 
-        border-radius: 10px; 
-        width: 34px; 
+        background: rgba(0, 242, 254, 0.05);
+        border: 1px solid rgba(0, 242, 254, 0.4);
+        color: var(--primary);
+        border-radius: 10px;
+        width: 34px;
         height: 34px;
-        display: flex; 
-        align-items: center; 
-        justify-content: center;
-        cursor: pointer; 
-        transition: all 0.2s ease; 
-        pointer-events: auto; 
+        
+        /* THIS IS THE CENTERING MAGIC */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        cursor: pointer;
+        transition: all 0.2s ease;
+        pointer-events: auto;
         z-index: 10;
-        box-sizing: border-box;
+        padding: 0; /* Ensures no internal shifting */
+        margin: 0;
     }
 
     .copy-btn i {
-        font-size: 14px; /* Perfectly sized for a 34px button */
-        line-height: 1;
-        display: block;
-        /* This fixes the "squashed" look by forcing the icon to keep its proportions */
-        width: auto;
-        height: auto;
+        font-size: 14px;
+        line-height: 0 !important; /* Removes the "text baseline" gap at the bottom */
+        display: inline-block;
+        margin: 0;
+        padding: 0;
     }
 
-    .copy-btn:hover { 
-        background: var(--primary); 
-        color: #000; 
-        border-color: var(--primary);
-        box-shadow: 0 0 15px var(--primary-dim); 
+    .copy-btn:hover {
+        background: var(--primary);
+        color: #000;
+        box-shadow: 0 0 15px var(--primary-dim);
         transform: translateY(-50%) scale(1.05);
     }
 
     .copy-btn:active {
-        transform: translateY(-50%) scale(0.9); 
+        transform: translateY(-50%) scale(0.9);
     }
     
     /* Small adjustment to make room for the button */
