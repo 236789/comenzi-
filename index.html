@@ -878,42 +878,31 @@
     justify-content: flex-end !important;
 }
 
-/* Custom Size Menu (Same style as Currency/Status) */
-.size-menu {
-    position: absolute;
-    bottom: 50px; 
-    right: 0;
-    background: #0b1120;
-    border: 1px solid var(--primary);
-    border-radius: 12px;
-    display: none;
-    flex-direction: column;
-    z-index: 1000;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    min-width: 160px;
-    overflow: hidden;
-}
-.size-menu.active { display: flex; }
-
-.size-option {
-    padding: 12px 20px !important;
-    color: #fff !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    text-align: left !important;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    transition: 0.2s;
-}
-.size-option:hover { background: var(--primary) !important; color: #000 !important; }
-
-/* Grid adjustments to fit the new fields */
-.grid-3-row-extended {
+/* Clean Grid for Modal Inputs */
+.grid-3-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     grid-column: 1 / -1;
     margin-bottom: 10px;
+}
+
+/* Ensure Dovada Plata (File input) doesn't overlap or break the line */
+.full-row {
+    grid-column: 1 / -1;
+}
+
+/* Fix input wrapper issues */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .grid-3-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+    .grid-3-row { grid-template-columns: 1fr; }
 }
   </style>
 </head>
@@ -987,16 +976,89 @@
             <div class="modal-body-container">
                 <form id="addOrderForm" class="form-grid">
                     
-                    <!-- NEW IMAGE DROP AREA -->
-                    <div class="image-drop-area" id="imageDropArea">
-                        <input type="file" id="oImageFile" accept="image/*" required>
-                        <div class="image-drop-placeholder" id="imageDropPlaceholder">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Încarcă Imaginea Portretului</span>
-                        </div>
-                        <img id="imageDropPreview" class="image-drop-preview" src="" alt="Preview">
-                        <button type="button" id="imageRemoveBtn" class="image-remove-btn"><i class="fas fa-times"></i></button>
-                    </div>
+<!-- IMAGE AREA -->
+<div class="image-drop-area" id="imageDropArea">
+    <input type="file" id="oImageFile" accept="image/*" required>
+    <div class="image-drop-placeholder" id="imageDropPlaceholder">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <span>Încarcă Imaginea Portretului</span>
+    </div>
+    <img id="imageDropPreview" class="image-drop-preview" src="" alt="Preview">
+    <button type="button" id="imageRemoveBtn" class="image-remove-btn"><i class="fas fa-times"></i></button>
+</div>
+
+<!-- ROW 1: CORE DATA -->
+<div class="grid-3-row">
+    <div class="input-group">
+        <label>Data Plasării</label>
+        <div class="input-wrapper">
+            <input type="date" id="oDate" class="styled-input compact-input" required>
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Preț și Monedă</label>
+        <div class="input-wrapper">
+            <input type="number" id="oPrice" class="styled-input compact-input" placeholder="Ex: 1000" required>
+            <i class="fas fa-money-bill-wave"></i>
+            <div class="currency-selector-container">
+                <button type="button" class="currency-btn" id="activeCurrencyBtn" onclick="toggleCurrencyMenu()">RON</button>
+                <input type="hidden" id="oCurrency" value="RON"> 
+                <div class="currency-menu" id="currencyMenu">
+                    <div class="currency-option" onclick="selectCurrency('RON', 'RON')">RON</div>
+                    <div class="currency-option" onclick="selectCurrency('€', 'EUR')">EUR</div>
+                    <div class="currency-option" onclick="selectCurrency('£', 'GBP')">GBP</div>
+                    <div class="currency-option" onclick="selectCurrency('$', 'USD')">USD</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Tip Portret</label>
+        <div class="input-wrapper">
+            <input type="text" id="oType" class="styled-input compact-input" placeholder="Ex: Creion/Carbune" required>
+            <i class="fas fa-paint-brush"></i>
+        </div>
+    </div>
+</div>
+
+<!-- ROW 2: TECHNICAL DATA -->
+<div class="grid-3-row">
+    <div class="input-group">
+        <label>Dimensiune</label>
+        <div class="input-wrapper">
+            <input type="text" id="oSize" class="styled-input compact-input" placeholder="Ex: 30x40 cm" required>
+            <i class="fas fa-expand-arrows-alt"></i>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Tip de foaie</label>
+        <div class="input-wrapper">
+            <input type="text" id="oPaper" class="styled-input compact-input" placeholder="Ex: Carton/Texturata" required>
+            <i class="fas fa-scroll"></i>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Ore de Muncă</label>
+        <div class="input-wrapper">
+            <input type="text" id="oHours" class="styled-input compact-input" placeholder="Ex: 15 ore" required>
+            <i class="fas fa-clock"></i>
+        </div>
+    </div>
+</div>
+
+<!-- ROW 3: PROOF FILE -->
+<div class="input-group full-row">
+    <label>Dovadă Plată (Imagine)</label>
+    <div class="input-wrapper">
+        <input type="file" id="oProofFile" class="styled-input" accept="image/*" required>
+        <i class="fas fa-file-invoice-dollar"></i>
+    </div>
+</div>
 
                     <!-- 3 ITEMS ON 1 ROW -->
                     <div class="grid-3-row">
@@ -1025,41 +1087,6 @@
         <div class="currency-option" onclick="selectCurrency('$', 'USD')">DOLARI</div>
     </div>
 </div>
-    </div>
-</div>
-
-<!-- Inside addOrderForm, after the current grid-3-row -->
-<div class="grid-3-row-extended">
-    <div class="input-group">
-        <label>Tip Portret</label>
-        <div class="input-wrapper">
-            <input type="text" id="oType" class="styled-input compact-input" placeholder="Ex: Carbune/Creion" required>
-            <i class="fas fa-paint-brush"></i>
-        </div>
-    </div>
-
-    <div class="input-group">
-        <label>Dimensiune</label>
-        <div class="input-wrapper">
-            <button type="button" class="currency-btn" id="activeSizeBtn" style="width: 100%; text-align: left; padding-left: 45px;" onclick="toggleSizeMenu()">A3 30X40CM</button>
-            <input type="hidden" id="oSize" value="A3 30X40CM"> 
-            <i class="fas fa-expand-arrows-alt"></i>
-            
-            <div class="size-menu" id="sizeMenu">
-                <div class="size-option" onclick="selectSize('A3 30X40CM')">A3 30X40CM</div>
-                <div class="size-option" onclick="selectSize('A3.5 40X50CM')">A3.5 40X50CM</div>
-                <div class="size-option" onclick="selectSize('A2 50X70CM')">A2 50X70CM</div>
-                <div class="size-option" onclick="selectSize('A1 70X100CM')">A1 70X100CM</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="input-group">
-        <label>Ore de Muncă</label>
-        <div class="input-wrapper">
-            <input type="text" id="oHours" class="styled-input compact-input" placeholder="Ex: 12 ore" required>
-            <i class="fas fa-clock"></i>
-        </div>
     </div>
 </div>
 
@@ -1193,52 +1220,13 @@
 <div class="form-grid">
     <div class="form-section-title">Date Comandă</div>
     
-    <!-- Rândul pentru Dată - Fără buton copy -->
-    <div class="input-group">
-        <label>Data Plasării</label>
-        <div class="input-wrapper">
-            <div class="details-value" id="dDate"></div>
-            <i class="fas fa-calendar-alt"></i>
-        </div>
-    </div>
-
-    <!-- Rândul pentru Preț - Fără buton copy -->
-    <div class="input-group">
-        <label>Preț</label>
-        <div class="input-wrapper">
-            <div class="details-value" id="dPrice"></div>
-            <i class="fas fa-money-bill-wave"></i>
-        </div>
-    </div>     
-
-
-<!-- Inside orderDetailsModal, under the Price input-group -->
-<div class="input-group">
-    <label>Tip Portret</label>
-    <div class="input-wrapper">
-        <div class="details-value" id="dType"></div>
-        <i class="fas fa-paint-brush"></i>
-        <div class="copy-btn" onclick="copyValue('dType')"><i class="far fa-copy"></i></div>
-    </div>
-</div>
-
-<div class="input-group">
-    <label>Dimensiune</label>
-    <div class="input-wrapper">
-        <div class="details-value" id="dSize"></div>
-        <i class="fas fa-expand-arrows-alt"></i>
-        <div class="copy-btn" onclick="copyValue('dSize')"><i class="far fa-copy"></i></div>
-    </div>
-</div>
-
-<div class="input-group">
-    <label>Ore de Muncă</label>
-    <div class="input-wrapper">
-        <div class="details-value" id="dHours"></div>
-        <i class="fas fa-clock"></i>
-        <div class="copy-btn" onclick="copyValue('dHours')"><i class="far fa-copy"></i></div>
-    </div>
-</div>        
+    <div class="input-group"><label>Data Plasării</label><div class="input-wrapper"><div class="details-value" id="dDate"></div><i class="fas fa-calendar-alt"></i></div></div>
+    <div class="input-group"><label>Preț</label><div class="input-wrapper"><div class="details-value" id="dPrice"></div><i class="fas fa-money-bill-wave"></i></div></div>
+    <div class="input-group"><label>Tip Portret</label><div class="input-wrapper"><div class="details-value" id="dType"></div><i class="fas fa-paint-brush"></i></div></div>
+    <div class="input-group"><label>Dimensiune</label><div class="input-wrapper"><div class="details-value" id="dSize"></div><i class="fas fa-expand-arrows-alt"></i></div></div>
+    <div class="input-group"><label>Tip de foaie</label><div class="input-wrapper"><div class="details-value" id="dPaper"></div><i class="fas fa-scroll"></i></div></div>
+    <div class="input-group"><label>Ore de Muncă</label><div class="input-wrapper"><div class="details-value" id="dHours"></div><i class="fas fa-clock"></i></div></div>
+</div>           
                     <div class="form-section-title">Detalii de Livrare</div>
                     <div class="input-group"><label>Nume și Prenume</label><div class="input-wrapper"><div class="details-value" id="dName"></div><i class="fas fa-user"></i><div class="copy-btn" onclick="copyValue('dName')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group"><label>Nr. Telefon</label><div class="input-wrapper"><div class="details-value" id="dPhone"></div><i class="fas fa-phone"></i><div class="copy-btn" onclick="copyValue('dPhone')"><i class="far fa-copy"></i></div></div></div>
@@ -1447,12 +1435,12 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
 
         // Obiectul cu toate datele din formular
         const orderData = {
-            imageUrl: finalImageUrl,
             paymentProof: finalProofUrl,
             orderDate: document.getElementById('oDate').value,
     price: parseFloat(document.getElementById('oPrice').value),
     portraitType: document.getElementById('oType').value.trim(),
-    size: document.getElementById('oSize').value,
+    portraitSize: document.getElementById('oSize').value.trim(),
+    paperType: document.getElementById('oPaper').value.trim(),
     workHours: document.getElementById('oHours').value.trim(),
     currency: document.getElementById('oCurrency').value, // SALVEAZĂ MONEDA
             name: document.getElementById('oName').value.trim(),
@@ -1664,10 +1652,11 @@ window.openOrderDetails = function(orderId) {
 
           document.getElementById('dImage').src = order.imageUrl;
           document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
-document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
-   document.getElementById('dType').innerText = order.portraitType || "-";
-    document.getElementById('dSize').innerText = order.size || "-";
-    document.getElementById('dHours').innerText = order.workHours || "-";
+          document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
+document.getElementById('dType').innerText = order.portraitType || "-";
+document.getElementById('dSize').innerText = order.portraitSize || "-";
+document.getElementById('dPaper').innerText = order.paperType || "-";
+document.getElementById('dHours').innerText = order.workHours || "-";
           document.getElementById('dProof').href = order.paymentProof;
           document.getElementById('dName').innerText = order.name;
           document.getElementById('dPhone').innerText = order.phone;
@@ -1749,9 +1738,10 @@ selectCurrency(currentSymbol, order.currency || 'RON');
           // Fill all fields
           document.getElementById('oDate').value = order.orderDate;
           document.getElementById('oPrice').value = order.price;
-    document.getElementById('oType').value = order.portraitType || "";
-    document.getElementById('oHours').value = order.workHours || "";
-    selectSize(order.size || "A3 30X40CM"); // This sets the button and hidden input
+document.getElementById('oType').value = order.portraitType || "";
+document.getElementById('oSize').value = order.portraitSize || "";
+document.getElementById('oPaper').value = order.paperType || "";
+document.getElementById('oHours').value = order.workHours || "";
           document.getElementById('oName').value = order.name;
           document.getElementById('oPhone').value = order.phone;
           document.getElementById('oZip').value = order.zipCode;
@@ -1780,8 +1770,6 @@ selectCurrency(currentSymbol, order.currency || 'RON');
           document.querySelector('.btn-submit-order').innerText = "ADAUGĂ COMANDĂ";
           document.getElementById('oImageFile').required = true;
           document.getElementById('oProofFile').required = true;
-    selectSize("A3 30X40CM"); // Reset to default
-
       });
 
       // Modify the existing 'addOrderForm' submit listener to use editingOrderId
@@ -1832,15 +1820,7 @@ window.selectCurrency = (symbol, value) => {
     document.getElementById('currencyMenu').classList.remove('active');
 };
 
-window.toggleSizeMenu = () => {
-    document.getElementById('sizeMenu').classList.toggle('active');
-};
 
-window.selectSize = (val) => {
-    document.getElementById('activeSizeBtn').innerText = val;
-    document.getElementById('oSize').value = val;
-    document.getElementById('sizeMenu').classList.remove('active');
-};
 
     </script>
 </body>
