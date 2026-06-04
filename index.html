@@ -776,13 +776,20 @@
     flex: 1.2 !important; /* Give it slightly more room */
 }
 
-/* Style for the new date text */
 .footer-date {
     font-size: 11px !important;
-    color: rgba(255, 255, 255, 0.5) !important;
+    /* CHOOSE ONE COLOR BELOW: */
+    color: #ffeb3b !important; /* HUD Amber */
+    /* color: rgba(0, 242, 254, 0.8) !important; */ /* Dimmed Cyan */
+    
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 400;
+    letter-spacing: 2px; /* Increased for that tech look */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.9;
+    text-shadow: 0 0 5px rgba(255, 235, 59, 0.3); /* Match glow to color */
 }
   </style>
 </head>
