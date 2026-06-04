@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -753,6 +754,13 @@
         box-shadow: 0 0 15px var(--primary-dim);
         opacity: 0.5;
     }
+
+
+/* --- STATUS RESPINS (PORTOCALIU) --- */
+.status-respins { border-color: #ff9800 !important; box-shadow: 0 0 15px rgba(255, 152, 0, 0.2) !important; }
+.btn-st-respins { border: 1px solid #ff9800 !important; color: #ff9800 !important; }
+.opt-respins i { color: #ff9800; }
+.filter-btn.active[onclick*="Respins"] { border-color: #ff9800; color: #ff9800; box-shadow: 0 0 15px rgba(255, 152, 0, 0.3); }
   </style>
 </head>
 <body>
@@ -796,8 +804,11 @@
         <button class="filter-btn" onclick="setFilter('Livrat')" id="filter-livrat">
             <i class="fas fa-truck-fast"></i> LIVRAT <span class="filter-count" id="count-livrat">(0)</span>
         </button>
-        <button class="filter-btn" onclick="setFilter('Anulat')" id="filter-anulat">
+<button class="filter-btn" onclick="setFilter('Anulat')" id="filter-anulat">
             <i class="fas fa-ban"></i> ANULAT <span class="filter-count" id="count-anulat">(0)</span>
+        </button>
+        <button class="filter-btn" onclick="setFilter('Respins')" id="filter-respins">
+            <i class="fas fa-times-circle"></i> RESPINS <span class="filter-count" id="count-respins">(0)</span>
         </button>
     </div>
     <div class="cyber-line"></div>
@@ -1297,8 +1308,7 @@ const q = query(collection(db, "comenzi"), orderBy("orderDate", "desc"), orderBy
         currentOrders = []; // Resetăm lista locală
         
         // Obiect pentru numărare
-        let counts = { "In Curs": 0, "Livrat": 0, "Anulat": 0 };
-
+let counts = { "In Curs": 0, "Livrat": 0, "Anulat": 0, "Respins": 0 };
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
             data.id = docSnap.id;
@@ -1322,15 +1332,16 @@ const q = query(collection(db, "comenzi"), orderBy("orderDate", "desc"), orderBy
     });
 }
 
-// 4. Funcție pentru actualizarea numerelor de pe butoane (Ex: In Curs (5))
 function updateFilterLabels(counts) {
     const cursEl = document.getElementById('count-curs');
     const livratEl = document.getElementById('count-livrat');
     const anulatEl = document.getElementById('count-anulat');
+    const respinsEl = document.getElementById('count-respins');
 
     if (cursEl) cursEl.innerText = `(${counts["In Curs"]})`;
     if (livratEl) livratEl.innerText = `(${counts["Livrat"]})`;
     if (anulatEl) anulatEl.innerText = `(${counts["Anulat"]})`;
+    if (respinsEl) respinsEl.innerText = `(${counts["Respins"]})`;
 }
 
 // 5. Funcția care generează HTML-ul pentru un singur card
@@ -1338,10 +1349,12 @@ function renderCard(data) {
     const status = data.status || "In Curs";
     let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
     
-    if(status === "Livrat") { 
+if(status === "Livrat") { 
         sClass = "status-livrat"; sIcon = "fa-truck-fast"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
     } else if(status === "Anulat") { 
         sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
+    } else if(status === "Respins") {
+        sClass = "status-respins"; sIcon = "fa-times-circle"; sText = "Respins"; btnColorClass = "btn-st-respins";
     }
 
     // Butoanele de admin apar doar dacă ești logat ca admin
@@ -1372,8 +1385,9 @@ function renderCard(data) {
                 <div class="status-menu" id="menu-${data.id}">
                     <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
                     <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
-                    <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
-                </div>
+<div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
+                    <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
+                </div>                </div>
             </div>
         </div>
     `;
@@ -1394,10 +1408,10 @@ function renderCard(data) {
           if(!globalIsAdmin) return;
           
           let nextStatus = "In Curs";
-          if(currentStatus === "In Curs") nextStatus = "Livrat";
+if(currentStatus === "In Curs") nextStatus = "Livrat";
           else if(currentStatus === "Livrat") nextStatus = "Anulat";
-          else if(currentStatus === "Anulat") nextStatus = "In Curs";
-
+          else if(currentStatus === "Anulat") nextStatus = "Respins";
+          else if(currentStatus === "Respins") nextStatus = "In Curs";
           try {
               const orderRef = doc(db, "comenzi", id);
               await updateDoc(orderRef, { status: nextStatus });
