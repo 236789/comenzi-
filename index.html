@@ -776,20 +776,42 @@
     flex: 1.2 !important; /* Give it slightly more room */
 }
 
+/* Adjusted Footer for a more "Data-Heavy" look */
+.card-footer {
+    padding: 16px 18px !important; 
+    min-height: 75px; 
+    background: #0d1526 !important; /* Slightly lighter than the card to define the area */
+}
+
+.footer-left-side {
+    display: flex;
+    flex-direction: column !important; 
+    align-items: flex-start !important; 
+    gap: 2px !important;
+    flex: 1.2 !important; 
+}
+
+/* The Cyber Red Date Style */
 .footer-date {
-    font-size: 11px !important;
-    /* CHOOSE ONE COLOR BELOW: */
-    color: #ffeb3b !important; /* HUD Amber */
-    /* color: rgba(0, 242, 254, 0.8) !important; */ /* Dimmed Cyan */
-    
+    font-size: 10px !important;
+    color: var(--admin-red) !important; /* Uses your #ff4757 */
     text-transform: uppercase;
-    letter-spacing: 2px; /* Increased for that tech look */
-    font-weight: 600;
+    letter-spacing: 2px;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 4px;
-    opacity: 0.9;
-    text-shadow: 0 0 5px rgba(255, 235, 59, 0.3); /* Match glow to color */
+    gap: 5px;
+    text-shadow: 0 0 8px rgba(255, 71, 87, 0.5); /* Red Neon Glow */
+}
+
+.footer-date i {
+    font-size: 9px;
+    /* Optional: making the icon pulse slightly */
+    animation: blinker 2s linear infinite;
+}
+
+@keyframes blinker {
+    50% { opacity: 0.3; }
 }
   </style>
 </head>
