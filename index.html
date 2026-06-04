@@ -1425,8 +1425,9 @@ function renderCard(data) {
             <!-- LEFT SIDE: Name + Date -->
             <div class="footer-left-side">
                 <span class="footer-name">${data.name}</span>
-                <span class="footer-date">${data.orderDate}</span>
-            </div>
+<span class="footer-date">
+    ${data.orderDate ? data.orderDate.split('-').reverse().join('-') : 'N/A'}
+</span>
             
             <!-- CENTER: Price -->
             <div class="footer-center-side" style="flex:1; display:flex; justify-content:center;">
