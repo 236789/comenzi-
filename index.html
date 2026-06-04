@@ -813,6 +813,65 @@
     text-shadow: none !important; /* Removed glow */
     display: block !important;
 }
+
+
+/* THE FIXED FOOTER LAYOUT */
+.card-footer {
+    background: #0b1120 !important;
+    padding: 10px 15px !important;
+    min-height: 80px !important;
+    display: flex !important;
+    flex-direction: row !important; /* Force items to stay side-by-side */
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-radius: 0 0 20px 20px !important;
+    border-top: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+/* LEFT COLUMN: Name on top, Date on bottom */
+.footer-left-side {
+    display: flex !important;
+    flex-direction: column !important; /* Stacks name and date ONLY */
+    align-items: flex-start !important;
+    flex: 1.5 !important; /* Gives more room for long names */
+    overflow: hidden;
+}
+
+.footer-name {
+    font-size: 14px !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.footer-date {
+    color: #ff4757 !important; /* Big Red */
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    margin-top: 2px;
+}
+
+/* CENTER COLUMN: Price */
+.footer-center-side {
+    flex: 1 !important;
+    display: flex !important;
+    justify-content: center !important;
+    white-space: nowrap;
+}
+
+.footer-price-text {
+    color: #00ff88 !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+}
+
+/* RIGHT COLUMN: Status Button */
+.footer-right-side {
+    flex: 1 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
   </style>
 </head>
 <body>
@@ -1414,6 +1473,9 @@ function renderCard(data) {
             <button class="control-btn delete-btn" onclick="event.stopPropagation(); deleteOrder('${data.id}')"><i class="fas fa-trash"></i></button>
         </div>` : "";
 
+    // FORMAT DATE: YYYY-MM-DD -> DD-MM-YYYY
+    const formattedDate = data.orderDate ? data.orderDate.split('-').reverse().join('-') : '00-00-0000';
+
     const card = document.createElement('div');
     card.className = `order-card ${sClass}`;
     card.innerHTML = `
@@ -1421,29 +1483,31 @@ function renderCard(data) {
         <div class="order-img-container">
             <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
         </div>
+        
         <div class="card-footer">
-            <!-- LEFT SIDE: Name + Date -->
+            <!-- 1. LEFT: Name & Date stacked -->
             <div class="footer-left-side">
                 <span class="footer-name">${data.name}</span>
-<span class="footer-date">
-    ${data.orderDate ? data.orderDate.split('-').reverse().join('-') : 'N/A'}
-</span>
+                <span class="footer-date">${formattedDate}</span>
+            </div>
             
-            <!-- CENTER: Price -->
-            <div class="footer-center-side" style="flex:1; display:flex; justify-content:center;">
+            <!-- 2. CENTER: Price -->
+            <div class="footer-center-side">
                 <span class="footer-price-text">${formatPrice(data.price, data.currency || 'RON')}</span>
             </div>
             
-            <!-- RIGHT SIDE: Status -->
-            <div class="footer-right-side" style="flex:1; display:flex; justify-content:flex-end; position:relative;">
-                <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); ${globalIsAdmin ? `toggleStatusMenu('${data.id}')` : ''}">
-                    <i class="fas ${sIcon}"></i> ${sText}
-                </button>
-                <div class="status-menu" id="menu-${data.id}">
-                    <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
-                    <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
-                    <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
-                    <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
+            <!-- 3. RIGHT: Status -->
+            <div class="footer-right-side">
+                <div style="position: relative;">
+                    <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); ${globalIsAdmin ? `toggleStatusMenu('${data.id}')` : ''}">
+                        <i class="fas ${sIcon}"></i> ${sText}
+                    </button>
+                    <div class="status-menu" id="menu-${data.id}">
+                        <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
+                        <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
+                        <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
+                        <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
+                    </div>
                 </div>
             </div>
         </div>
