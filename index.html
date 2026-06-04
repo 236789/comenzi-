@@ -815,25 +815,25 @@
 }
 
 
-/* THE FIXED FOOTER LAYOUT */
+/* THE PERFECTED 3-COLUMN FOOTER */
 .card-footer {
     background: #0b1120 !important;
     padding: 10px 15px !important;
-    min-height: 80px !important;
+    min-height: 85px !important;
     display: flex !important;
-    flex-direction: row !important; /* Force items to stay side-by-side */
+    flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
     border-radius: 0 0 20px 20px !important;
     border-top: 1px solid rgba(255,255,255,0.05) !important;
 }
 
-/* LEFT COLUMN: Name on top, Date on bottom */
+/* LEFT COLUMN - Name & Date */
 .footer-left-side {
+    flex: 1 !important; /* Equal width to others */
     display: flex !important;
-    flex-direction: column !important; /* Stacks name and date ONLY */
+    flex-direction: column !important;
     align-items: flex-start !important;
-    flex: 1.5 !important; /* Gives more room for long names */
     overflow: hidden;
 }
 
@@ -843,32 +843,37 @@
     font-weight: 700 !important;
     text-transform: uppercase;
     white-space: nowrap;
+    text-overflow: ellipsis; /* Prevents long names from pushing the price */
+    max-width: 100%;
 }
 
 .footer-date {
-    color: #ff4757 !important; /* Big Red */
+    color: #ff4757 !important;
     font-size: 13px !important;
     font-weight: 700 !important;
     margin-top: 2px;
 }
 
-/* CENTER COLUMN: Price */
+/* CENTER COLUMN - Big Bold Price */
 .footer-center-side {
-    flex: 1 !important;
+    flex: 1 !important; /* Equal width ensures center */
     display: flex !important;
     justify-content: center !important;
-    white-space: nowrap;
+    align-items: center !important;
+    text-align: center !important;
 }
 
 .footer-price-text {
     color: #00ff88 !important;
-    font-weight: 700 !important;
-    font-size: 15px !important;
+    font-weight: 800 !important; /* Extra bold */
+    font-size: 20px !important; /* Increased size */
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.2); /* Subtle tech glow */
+    white-space: nowrap;
 }
 
-/* RIGHT COLUMN: Status Button */
+/* RIGHT COLUMN - Status Button */
 .footer-right-side {
-    flex: 1 !important;
+    flex: 1 !important; /* Equal width */
     display: flex !important;
     justify-content: flex-end !important;
 }
@@ -1473,7 +1478,7 @@ function renderCard(data) {
             <button class="control-btn delete-btn" onclick="event.stopPropagation(); deleteOrder('${data.id}')"><i class="fas fa-trash"></i></button>
         </div>` : "";
 
-    // FORMAT DATE: YYYY-MM-DD -> DD-MM-YYYY
+    // DD-MM-YYYY format
     const formattedDate = data.orderDate ? data.orderDate.split('-').reverse().join('-') : '00-00-0000';
 
     const card = document.createElement('div');
@@ -1485,18 +1490,15 @@ function renderCard(data) {
         </div>
         
         <div class="card-footer">
-            <!-- 1. LEFT: Name & Date stacked -->
             <div class="footer-left-side">
                 <span class="footer-name">${data.name}</span>
                 <span class="footer-date">${formattedDate}</span>
             </div>
             
-            <!-- 2. CENTER: Price -->
             <div class="footer-center-side">
                 <span class="footer-price-text">${formatPrice(data.price, data.currency || 'RON')}</span>
             </div>
             
-            <!-- 3. RIGHT: Status -->
             <div class="footer-right-side">
                 <div style="position: relative;">
                     <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); ${globalIsAdmin ? `toggleStatusMenu('${data.id}')` : ''}">
