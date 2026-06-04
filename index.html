@@ -776,42 +776,42 @@
     flex: 1.2 !important; /* Give it slightly more room */
 }
 
-/* Adjusted Footer for a more "Data-Heavy" look */
+/* Footer Container - Increased height for two lines */
 .card-footer {
-    padding: 16px 18px !important; 
-    min-height: 75px; 
-    background: #0d1526 !important; /* Slightly lighter than the card to define the area */
+    padding: 15px 18px !important;
+    min-height: 85px !important; 
+    display: flex !important;
+    align-items: center !important;
 }
 
+/* Left side container - Stacking Name and Date */
 .footer-left-side {
     display: flex;
-    flex-direction: column !important; 
-    align-items: flex-start !important; 
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
     gap: 2px !important;
-    flex: 1.2 !important; 
+    flex: 1.2 !important;
 }
 
-/* The Cyber Red Date Style */
-.footer-date {
-    font-size: 10px !important;
-    color: var(--admin-red) !important; /* Uses your #ff4757 */
+/* Name Style */
+.footer-name {
+    font-size: 16px !important;
+    color: #fff !important;
+    font-weight: 700 !important;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    text-shadow: 0 0 8px rgba(255, 71, 87, 0.5); /* Red Neon Glow */
+    line-height: 1.1;
 }
 
-.footer-date i {
-    font-size: 9px;
-    /* Optional: making the icon pulse slightly */
-    animation: blinker 2s linear infinite;
-}
-
-@keyframes blinker {
-    50% { opacity: 0.3; }
+/* Date Style - Solid Red, No Glow, Bigger */
+.footer-date {
+    color: #ff4757 !important; /* Admin Red */
+    font-size: 14px !important; /* Bigger text */
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: none !important; /* Removed glow */
+    display: block !important;
 }
   </style>
 </head>
@@ -1425,7 +1425,7 @@ function renderCard(data) {
             <!-- LEFT SIDE: Name + Date -->
             <div class="footer-left-side">
                 <span class="footer-name">${data.name}</span>
-                <span class="footer-date"><i class="far fa-calendar-alt" style="font-size: 9px; margin-right: 3px;"></i> ${data.orderDate}</span>
+                <span class="footer-date">${data.orderDate}</span>
             </div>
             
             <!-- CENTER: Price -->
