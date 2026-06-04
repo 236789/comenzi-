@@ -761,6 +761,29 @@
 .btn-st-respins { border: 1px solid #ff9800 !important; color: #ff9800 !important; }
 .opt-respins i { color: #ff9800; }
 .filter-btn.active[onclick*="Respins"] { border-color: #ff9800; color: #ff9800; box-shadow: 0 0 15px rgba(255, 152, 0, 0.3); }
+
+/* Adjusted Footer for two rows on the left */
+.card-footer {
+    padding: 15px 18px !important; /* Increased padding slightly */
+    min-height: 70px; /* Ensures enough room for double line */
+}
+
+.footer-left-side {
+    display: flex;
+    flex-direction: column !important; /* Stack Name and Date */
+    align-items: flex-start !important; /* Align to the left */
+    gap: 2px !important;
+    flex: 1.2 !important; /* Give it slightly more room */
+}
+
+/* Style for the new date text */
+.footer-date {
+    font-size: 11px !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 400;
+}
   </style>
 </head>
 <body>
@@ -1344,12 +1367,11 @@ function updateFilterLabels(counts) {
     if (respinsEl) respinsEl.innerText = `(${counts["Respins"]})`;
 }
 
-// 5. Funcția care generează HTML-ul pentru un singur card
 function renderCard(data) {
     const status = data.status || "In Curs";
     let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
     
-if(status === "Livrat") { 
+    if(status === "Livrat") { 
         sClass = "status-livrat"; sIcon = "fa-truck-fast"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
     } else if(status === "Anulat") { 
         sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
@@ -1357,7 +1379,6 @@ if(status === "Livrat") {
         sClass = "status-respins"; sIcon = "fa-times-circle"; sText = "Respins"; btnColorClass = "btn-st-respins";
     }
 
-    // Butoanele de admin apar doar dacă ești logat ca admin
     const adminControls = globalIsAdmin ? `
         <div class="card-controls">
             <button class="control-btn edit-btn" onclick="event.stopPropagation(); openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
@@ -1368,16 +1389,22 @@ if(status === "Livrat") {
     card.className = `order-card ${sClass}`;
     card.innerHTML = `
         ${adminControls}
-        <div class="order-img-container" style="height: 280px; overflow: hidden; border-radius: 18px 18px 0 0;">
-            <img src="${data.imageUrl}" class="order-img" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">
+        <div class="order-img-container">
+            <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
         </div>
         <div class="card-footer">
-            <div class="footer-left-side" style="flex:1; display:flex; justify-content:flex-start;">
+            <!-- LEFT SIDE: Name + Date -->
+            <div class="footer-left-side">
                 <span class="footer-name">${data.name}</span>
+                <span class="footer-date"><i class="far fa-calendar-alt" style="font-size: 9px; margin-right: 3px;"></i> ${data.orderDate}</span>
             </div>
+            
+            <!-- CENTER: Price -->
             <div class="footer-center-side" style="flex:1; display:flex; justify-content:center;">
                 <span class="footer-price-text">${formatPrice(data.price, data.currency || 'RON')}</span>
             </div>
+            
+            <!-- RIGHT SIDE: Status -->
             <div class="footer-right-side" style="flex:1; display:flex; justify-content:flex-end; position:relative;">
                 <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); ${globalIsAdmin ? `toggleStatusMenu('${data.id}')` : ''}">
                     <i class="fas ${sIcon}"></i> ${sText}
@@ -1385,9 +1412,9 @@ if(status === "Livrat") {
                 <div class="status-menu" id="menu-${data.id}">
                     <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
                     <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
-<div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
+                    <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
                     <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
-                </div>                </div>
+                </div>
             </div>
         </div>
     `;
