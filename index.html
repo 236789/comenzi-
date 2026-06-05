@@ -2054,20 +2054,36 @@ function updateStatistics() {
         }
 
         const g = groups[key];
+        const status = order.status || "In Curs";
+
+        // 1. Increment Total Orders for the month
         g.totalOrders++;
         
+        // 2. Sum Work Hours
         const hrMatch = order.workHours ? order.workHours.match(/\d+/) : null;
         if (hrMatch) g.hours += parseInt(hrMatch[0]);
 
-        if (order.status === "Livrat") g.delivered++;
-        if (order.status === "Respins") g.rejected++;
+        // 3. Status Counters
+        if (status === "Livrat") g.delivered++;
+        if (status === "Respins") g.rejected++;
 
+        // 4. INCOME CALCULATION (The 50% Rule)
         const price = parseFloat(order.price) || 0;
         const rate = EXCHANGE_RATES[order.currency] || 1;
-        g.incomeRON += (price * rate);
+        let calculatedValue = price * rate;
+
+        if (status === "Anulat") {
+            // Canceled orders bring in 0 RON
+            calculatedValue = 0;
+        } else if (status === "Respins") {
+            // Rejected orders count for only 50% (half goes back to client)
+            calculatedValue = calculatedValue / 2;
+        }
+
+        g.incomeRON += calculatedValue;
     });
 
-    // Sort months by date descending
+    // Sort months by date descending (Newest first)
     const sortedKeys = Object.keys(groups).sort((a, b) => groups[b].rawDate - groups[a].rawDate);
 
     monthListEl.innerHTML = "";
@@ -2134,27 +2150,49 @@ window.openMonthlyGallery = (monthKey) => {
     galleryGrid.innerHTML = "";
     modalTitle.innerText = `Portrete: ${monthKey}`;
 
-    // Filter currentOrders to find only ones from this specific month/year
+    // Filter: Same month AND NOT Anulat AND NOT Respins
     const filtered = currentOrders.filter(order => {
         if (!order.orderDate) return false;
         const dateParts = order.orderDate.split('-');
         const tempDate = new Date(dateParts[0], parseInt(dateParts[1]) - 1, 1);
         const name = `${tempDate.toLocaleString('ro-RO', { month: 'long' })} ${dateParts[0]}`;
-        return name === monthKey;
+        
+        // Only show successful/in-progress orders in the gallery
+        return name === monthKey && order.status !== "Anulat" && order.status !== "Respins";
     });
 
-    // Render cards into the modal grid
-    filtered.forEach(order => {
+    filtered.forEach(data => {
+        const status = data.status || "In Curs";
+        let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
+        
+        if(status === "Livrat") { 
+            sClass = "status-livrat"; sIcon = "fa-truck-fast"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
+        }
+
+        const formattedDate = data.orderDate ? data.orderDate.split('-').reverse().join('-') : '00-00-0000';
+
         const card = document.createElement('div');
-        card.className = 'order-card';
-        card.style.height = "auto";
+        card.className = `order-card ${sClass}`; // Matching main styles
         card.innerHTML = `
-            <div class="order-img-container" style="aspect-ratio: 1/1;">
-                <img src="${order.imageUrl}" class="order-img" onclick="openOrderDetails('${order.id}')">
+            <div class="order-img-container">
+                <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
             </div>
-            <div class="card-footer" style="min-height: 50px; padding: 10px !important;">
-                <span class="footer-name" style="font-size: 12px !important;">${order.name}</span>
-                <span class="footer-price-text" style="font-size: 12px !important;">${order.price} ${order.currency}</span>
+            
+            <div class="card-footer">
+                <div class="footer-left-side">
+                    <span class="footer-name">${data.name}</span>
+                    <span class="footer-date">${formattedDate}</span>
+                </div>
+                
+                <div class="footer-center-side">
+                    <span class="footer-price-text">${formatPrice(data.price, data.currency || 'RON')}</span>
+                </div>
+                
+                <div class="footer-right-side">
+                    <button class="status-picker-trigger ${btnColorClass}" style="cursor: default;">
+                        <i class="fas ${sIcon}"></i> ${sText}
+                    </button>
+                </div>
             </div>
         `;
         galleryGrid.appendChild(card);
