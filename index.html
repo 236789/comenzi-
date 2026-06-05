@@ -933,6 +933,40 @@
     </div>
 </div>
 
+<!-- DETALII ARTISTICE (Câmpurile care lipseau) -->
+<div class="form-section-title">Detalii Portret</div>
+<div class="grid-3-row">
+    <div class="input-group">
+        <label>Tip Portret (Ex: Creion/Ulei)</label>
+        <div class="input-wrapper">
+            <input type="text" id="oType" class="styled-input compact-input" placeholder="Ex: Creion">
+            <i class="fas fa-paint-brush"></i>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>Dimensiune (Ex: A3/A4)</label>
+        <div class="input-wrapper">
+            <input type="text" id="oSize" class="styled-input compact-input" placeholder="Ex: A3">
+            <i class="fas fa-expand"></i>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>Ore de lucru</label>
+        <div class="input-wrapper">
+            <input type="text" id="oHours" class="styled-input compact-input" placeholder="Ex: 15h">
+            <i class="fas fa-clock"></i>
+        </div>
+    </div>
+</div>
+<!-- Am adăugat și oPaper separat dedesubt dacă e nevoie -->
+<div class="input-group" style="grid-column: 1 / -1; margin-top: 10px;">
+    <label>Tip Hârtie / Suport</label>
+    <div class="input-wrapper">
+        <input type="text" id="oPaper" class="styled-input" placeholder="Ex: Canson 200g/mp">
+        <i class="fas fa-scroll"></i>
+    </div>
+</div>
+
                         <div class="input-group">
                             <label>Dovadă Plată</label>
                             <div class="input-wrapper">
@@ -1642,7 +1676,11 @@ selectCurrency(currentSymbol, order.currency || 'RON');
           document.getElementById('oStreet').value = order.street;
           document.getElementById('oNotes').value = order.notes;
 document.getElementById('oFinalImageFile').value = '';
-
+ // Adaugă aceste linii în openEditModal
+document.getElementById('oType').value = order.portraitType || '';
+document.getElementById('oSize').value = order.portraitSize || '';
+document.getElementById('oPaper').value = order.paperType || '';
+document.getElementById('oHours').value = order.workHours || '';
           // Show Preview
           imageDropPreview.src = order.imageUrl;
           imageDropPreview.style.display = 'block';
