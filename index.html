@@ -762,64 +762,154 @@
 .opt-respins i { color: #ff9800; }
 .filter-btn.active[onclick*="Respins"] { border-color: #ff9800; color: #ff9800; box-shadow: 0 0 15px rgba(255, 152, 0, 0.3); }
 
-
-/* --- STREAMER PRIVACY PROTECTION --- */
-.privacy-wrapper {
-    position: relative;
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    padding: 15px;
-    margin: -15px;
-    border-radius: 16px;
+/* Adjusted Footer for two rows on the left */
+.card-footer {
+    padding: 15px 18px !important; /* Increased padding slightly */
+    min-height: 70px; /* Ensures enough room for double line */
 }
 
-@media (max-width: 768px) {
-    .privacy-wrapper { grid-template-columns: 1fr; }
-}
-
-.privacy-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(8, 16, 27, 0.95); /* Dark background to hide text */
-    backdrop-filter: blur(15px); /* Strong blur */
-    z-index: 50;
+.footer-left-side {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 16px;
-    border: 1px dashed var(--primary);
-    box-shadow: inset 0 0 30px rgba(0, 242, 254, 0.1);
+    flex-direction: column !important; /* Stack Name and Date */
+    align-items: flex-start !important; /* Align to the left */
+    gap: 2px !important;
+    flex: 1.2 !important; /* Give it slightly more room */
+}
+
+/* Footer Container - Increased height for two lines */
+.card-footer {
+    padding: 15px 18px !important;
+    min-height: 85px !important; 
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Left side container - Stacking Name and Date */
+.footer-left-side {
+    display: flex;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    flex: 1.2 !important;
+}
+
+/* Name Style */
+.footer-name {
+    font-size: 16px !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+/* Date Style - Solid Red, No Glow, Bigger */
+.footer-date {
+    color: #ff4757 !important; /* Admin Red */
+    font-size: 14px !important; /* Bigger text */
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: none !important; /* Removed glow */
+    display: block !important;
 }
 
 
+/* THE PERFECTED 3-COLUMN FOOTER */
+.card-footer {
+    background: #0b1120 !important;
+    padding: 10px 15px !important;
+    min-height: 85px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-radius: 0 0 20px 20px !important;
+    border-top: 1px solid rgba(255,255,255,0.05) !important;
+}
 
-/* --- DUAL IMAGE CROSSFADE SWAP --- */
-.dual-img-original {
+/* LEFT COLUMN - Name & Date */
+.footer-left-side {
+    flex: 1 !important; /* Equal width to others */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    overflow: hidden;
+}
+
+.footer-name {
+    font-size: 14px !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* Prevents long names from pushing the price */
+    max-width: 100%;
+}
+
+.footer-date {
+    color: #ff4757 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    margin-top: 2px;
+}
+
+/* CENTER COLUMN - Big Bold Price */
+.footer-center-side {
+    flex: 1 !important; /* Equal width ensures center */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+
+.footer-price-text {
+    color: #00ff88 !important;
+    font-weight: 800 !important; /* Extra bold */
+    font-size: 20px !important; /* Increased size */
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.2); /* Subtle tech glow */
+    white-space: nowrap;
+}
+
+/* RIGHT COLUMN - Status Button */
+.footer-right-side {
+    flex: 1 !important; /* Equal width */
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* Clean Grid for Modal Inputs */
+.grid-3-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    grid-column: 1 / -1;
+    margin-bottom: 10px;
+}
+
+/* Ensure Dovada Plata (File input) doesn't overlap or break the line */
+.full-row {
+    grid-column: 1 / -1;
+}
+
+/* Fix input wrapper issues */
+.input-wrapper {
     position: relative;
-    z-index: 2;
-    animation: crossfadeSwap 8s infinite; /* Switches every 4 seconds */
-}
-
-.dual-img-final {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 1;
-    cursor: pointer;
 }
 
-@keyframes crossfadeSwap {
-    0%, 45% { opacity: 1; }   /* Show Original */
-    50%, 95% { opacity: 0; }  /* Fade out Original (Shows Final underneath) */
-    100% { opacity: 1; }      /* Fade back to Original */
+@media (max-width: 900px) {
+    .grid-3-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+    .grid-3-row { grid-template-columns: 1fr; }
 }
 
-
+.full-row {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    clear: both;
+}
   </style>
 </head>
 <body>
@@ -890,201 +980,160 @@
             </div>
             
             <div class="modal-body-container">
-                <form id="addOrderForm" class="form-grid">
-                    
-                    <!-- NEW IMAGE DROP AREA -->
-                    <div class="image-drop-area" id="imageDropArea">
-                        <input type="file" id="oImageFile" accept="image/*" required>
-                        <div class="image-drop-placeholder" id="imageDropPlaceholder">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Încarcă Imaginea Portretului</span>
-                        </div>
-                        <img id="imageDropPreview" class="image-drop-preview" src="" alt="Preview">
-                        <button type="button" id="imageRemoveBtn" class="image-remove-btn"><i class="fas fa-times"></i></button>
+<form id="addOrderForm" class="form-grid">
+    <!-- 1. IMAGE AREA -->
+    <div class="image-drop-area" id="imageDropArea">
+        <input type="file" id="oImageFile" accept="image/*" required>
+        <div class="image-drop-placeholder" id="imageDropPlaceholder">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Încarcă Imaginea Portretului</span>
+        </div>
+        <img id="imageDropPreview" class="image-drop-preview" src="" alt="Preview">
+        <button type="button" id="imageRemoveBtn" class="image-remove-btn"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- ROW 1: CORE DATA -->
+    <div class="grid-3-row">
+        <div class="input-group">
+            <label>Data Plasării</label>
+            <div class="input-wrapper">
+                <input type="date" id="oDate" class="styled-input compact-input" required>
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Preț și Monedă</label>
+            <div class="input-wrapper">
+                <input type="number" id="oPrice" class="styled-input compact-input" placeholder="Ex: 1000" required>
+                <i class="fas fa-money-bill-wave"></i>
+                <div class="currency-selector-container">
+                    <button type="button" class="currency-btn" id="activeCurrencyBtn" onclick="toggleCurrencyMenu()">RON</button>
+                    <input type="hidden" id="oCurrency" value="RON"> 
+                    <div class="currency-menu" id="currencyMenu">
+                        <div class="currency-option" onclick="selectCurrency('RON', 'RON')">RON</div>
+                        <div class="currency-option" onclick="selectCurrency('€', 'EUR')">EUR</div>
+                        <div class="currency-option" onclick="selectCurrency('£', 'GBP')">GBP</div>
+                        <div class="currency-option" onclick="selectCurrency('$', 'USD')">USD</div>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- 3 ITEMS ON 1 ROW -->
-                    <div class="grid-3-row">
-                        <div class="input-group">
-                            <label>Data Plasării Comenzii</label>
-                            <div class="input-wrapper">
-                                <input type="date" id="oDate" class="styled-input compact-input" required>
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                        </div>
-
-<div class="input-group">
-    <label>Preț și Monedă</label>
-    <div class="input-wrapper">
-        <input type="number" id="oPrice" class="styled-input compact-input" placeholder="Ex: 1,000" required>
-        <i class="fas fa-money-bill-wave"></i>
-        
-<div class="currency-selector-container">
-    <button type="button" class="currency-btn" id="activeCurrencyBtn" onclick="toggleCurrencyMenu()">RON</button>
-    <input type="hidden" id="oCurrency" value="RON"> 
-    
-    <div class="currency-menu" id="currencyMenu">
-        <div class="currency-option" onclick="selectCurrency('RON', 'RON')">RON (Leu)</div>
-        <div class="currency-option" onclick="selectCurrency('€', 'EUR')">EURO</div>
-        <div class="currency-option" onclick="selectCurrency('£', 'GBP')">LIRE</div>
-        <div class="currency-option" onclick="selectCurrency('$', 'USD')">DOLARI</div>
+        <div class="input-group">
+            <label>Tip Portret</label>
+            <div class="input-wrapper">
+                <input type="text" id="oType" class="styled-input compact-input" placeholder="Ex: Creion/Carbune" required>
+                <i class="fas fa-paint-brush"></i>
+            </div>
+        </div>
     </div>
-</div>
-    </div>
-</div>
 
-<!-- DETALII ARTISTICE (Câmpurile care lipseau) -->
-<div class="form-section-title">Detalii Portret</div>
-<div class="grid-3-row">
+    <!-- ROW 2: TECHNICAL DATA -->
+    <div class="grid-3-row">
+        <div class="input-group">
+            <label>Dimensiune</label>
+            <div class="input-wrapper">
+                <input type="text" id="oSize" class="styled-input compact-input" placeholder="Ex: 30x40 cm" required>
+                <i class="fas fa-expand-arrows-alt"></i>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Tip de foaie</label>
+            <div class="input-wrapper">
+                <input type="text" id="oPaper" class="styled-input compact-input" placeholder="Ex: Carton/Texturata" required>
+                <i class="fas fa-scroll"></i>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Ore de Muncă</label>
+            <div class="input-wrapper">
+                <input type="text" id="oHours" class="styled-input compact-input" placeholder="Ex: 15 ore" required>
+                <i class="fas fa-clock"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROW 3: PROOF FILE -->
+    <div class="input-group full-row" style="margin-bottom: 20px;">
+        <label>Dovadă Plată (Imagine)</label>
+        <div class="input-wrapper">
+            <input type="file" id="oProofFile" class="styled-input" accept="image/*" required>
+            <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+    </div>
+
+    <!-- DETALII LIVRARE SECTION -->
+    <div class="form-section-title">Detalii de Livrare</div>
+
     <div class="input-group">
-        <label>Tip Portret (Ex: Creion/Ulei)</label>
+        <label>Nume și Prenume</label>
         <div class="input-wrapper">
-            <input type="text" id="oType" class="styled-input compact-input" placeholder="Ex: Creion">
-            <i class="fas fa-paint-brush"></i>
+            <input type="text" id="oName" class="styled-input" required>
+            <i class="fas fa-user"></i>
         </div>
     </div>
+
     <div class="input-group">
-        <label>Dimensiune (Ex: A3/A4)</label>
+        <label>Nr. Telefon</label>
         <div class="input-wrapper">
-            <input type="text" id="oSize" class="styled-input compact-input" placeholder="Ex: A3">
-            <i class="fas fa-expand"></i>
+            <input type="text" id="oPhone" class="styled-input" required>
+            <i class="fas fa-phone"></i>
         </div>
     </div>
+
     <div class="input-group">
-        <label>Ore de lucru</label>
+        <label>Cod Poștal</label>
         <div class="input-wrapper">
-            <input type="text" id="oHours" class="styled-input compact-input" placeholder="Ex: 15h">
-            <i class="fas fa-clock"></i>
-        </div>
-    </div>
-</div>
-<!-- Am adăugat și oPaper separat dedesubt dacă e nevoie -->
-<div class="input-group" style="grid-column: 1 / -1; margin-top: 10px;">
-    <label>Tip Hârtie / Suport</label>
-    <div class="input-wrapper">
-        <input type="text" id="oPaper" class="styled-input" placeholder="Ex: Canson 200g/mp">
-        <i class="fas fa-scroll"></i>
-    </div>
-</div>
-
-                        <div class="input-group">
-                            <label>Dovadă Plată</label>
-                            <div class="input-wrapper">
-<!-- Change this line -->
-<input type="file" id="oProofFile" class="styled-input compact-input" accept="image/*" required>                                <i class="fas fa-file-invoice-dollar"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DETALII LIVRARE -->
-                    <div class="form-section-title">Detalii de Livrare</div>
-
-                    <div class="input-group">
-                        <label>Nume și Prenume</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="oName" class="styled-input" required>
-                            <i class="fas fa-user"></i>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Nr. Telefon</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="oPhone" class="styled-input" required>
-                            <i class="fas fa-phone"></i>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Cod Poștal</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="oZip" class="styled-input" required>
-                            <i class="fas fa-mail-bulk"></i>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Localitate</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="oCity" class="styled-input" required>
-                            <i class="fas fa-city"></i>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Județ / Sector</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="oCounty" class="styled-input" required>
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Stradă și nr.</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="oStreet" class="styled-input" required>
-                            <i class="fas fa-road"></i>
-                        </div>
-                    </div>
-
-                    <!-- 5 SMALL OPTIONS ON 1 ROW FOR BUILDING DETAILS -->
-                    <div class="grid-5-row">
-                        <div class="input-group">
-                            <label>Bloc</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="oBl" class="styled-input compact-input" placeholder="Bl.">
-                                <i class="fas fa-building"></i>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>Scara</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="oSc" class="styled-input compact-input" placeholder="Sc.">
-                                <i class="fas fa-list-ol"></i>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>Interfon</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="oInterfon" class="styled-input compact-input" placeholder="Int.">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>Etaj</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="oEt" class="styled-input compact-input" placeholder="Et.">
-                                <i class="fas fa-layer-group"></i>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>Apart.</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="oAp" class="styled-input compact-input" placeholder="Ap.">
-                                <i class="fas fa-door-closed"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="input-group" style="grid-column: 1 / -1;">
-                        <label>Repere sau alte informații</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="oNotes" class="styled-input" placeholder="Ex: Lăsați la recepție...">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                    </div>
-
-<!-- PORTRET FINALIZAT (OPTIONAL) -->
-    <div class="input-group full-row" style="margin-bottom: 20px; margin-top: 10px;">
-        <label>Portret Finalizat (Opțional)</label>
-        <div class="input-wrapper">
-            <input type="file" id="oFinalImageFile" class="styled-input" accept="image/*">
-            <i class="fas fa-image"></i>
+            <input type="text" id="oZip" class="styled-input" required>
+            <i class="fas fa-mail-bulk"></i>
         </div>
     </div>
 
-                    <button type="submit" class="btn-submit-order"><i class="fas fa-save"></i> ADAUGĂ COMANDĂ</button>
-                </form>
+    <div class="input-group">
+        <label>Localitate</label>
+        <div class="input-wrapper">
+            <input type="text" id="oCity" class="styled-input" required>
+            <i class="fas fa-city"></i>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Județ / Sector</label>
+        <div class="input-wrapper">
+            <input type="text" id="oCounty" class="styled-input" required>
+            <i class="fas fa-map-marker-alt"></i>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Stradă și nr.</label>
+        <div class="input-wrapper">
+            <input type="text" id="oStreet" class="styled-input" required>
+            <i class="fas fa-road"></i>
+        </div>
+    </div>
+
+    <div class="grid-5-row">
+        <div class="input-group"><label>Bloc</label><div class="input-wrapper"><input type="text" id="oBl" class="styled-input compact-input" placeholder="Bl."><i class="fas fa-building"></i></div></div>
+        <div class="input-group"><label>Scara</label><div class="input-wrapper"><input type="text" id="oSc" class="styled-input compact-input" placeholder="Sc."><i class="fas fa-list-ol"></i></div></div>
+        <div class="input-group"><label>Interfon</label><div class="input-wrapper"><input type="text" id="oInterfon" class="styled-input compact-input" placeholder="Int."><i class="fas fa-bell"></i></div></div>
+        <div class="input-group"><label>Etaj</label><div class="input-wrapper"><input type="text" id="oEt" class="styled-input compact-input" placeholder="Et."><i class="fas fa-layer-group"></i></div></div>
+        <div class="input-group"><label>Apart.</label><div class="input-wrapper"><input type="text" id="oAp" class="styled-input compact-input" placeholder="Ap."><i class="fas fa-door-closed"></i></div></div>
+    </div>
+
+    <div class="input-group" style="grid-column: 1 / -1;">
+        <label>Repere sau alte informații</label>
+        <div class="input-wrapper">
+            <input type="text" id="oNotes" class="styled-input" placeholder="Ex: Lăsați la recepție...">
+            <i class="fas fa-info-circle"></i>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-submit-order"><i class="fas fa-save"></i> ADAUGĂ COMANDĂ</button>
+</form>
             </div>
         </div>
     </div>
@@ -1106,60 +1155,32 @@
 <div class="form-grid">
     <div class="form-section-title">Date Comandă</div>
     
-    <!-- Rândul pentru Dată - Fără buton copy -->
-    <div class="input-group">
-        <label>Data Plasării</label>
-        <div class="input-wrapper">
-            <div class="details-value" id="dDate"></div>
-            <i class="fas fa-calendar-alt"></i>
-        </div>
-    </div>
+    <div class="input-group"><label>Data Plasării</label><div class="input-wrapper"><div class="details-value" id="dDate"></div><i class="fas fa-calendar-alt"></i></div></div>
+    <div class="input-group"><label>Preț</label><div class="input-wrapper"><div class="details-value" id="dPrice"></div><i class="fas fa-money-bill-wave"></i></div></div>
+    <div class="input-group"><label>Tip Portret</label><div class="input-wrapper"><div class="details-value" id="dType"></div><i class="fas fa-paint-brush"></i></div></div>
+    <div class="input-group"><label>Dimensiune</label><div class="input-wrapper"><div class="details-value" id="dSize"></div><i class="fas fa-expand-arrows-alt"></i></div></div>
+    <div class="input-group"><label>Tip de foaie</label><div class="input-wrapper"><div class="details-value" id="dPaper"></div><i class="fas fa-scroll"></i></div></div>
+    <div class="input-group"><label>Ore de Muncă</label><div class="input-wrapper"><div class="details-value" id="dHours"></div><i class="fas fa-clock"></i></div></div>
+</div>           
+                    <div class="form-section-title">Detalii de Livrare</div>
+                    <div class="input-group"><label>Nume și Prenume</label><div class="input-wrapper"><div class="details-value" id="dName"></div><i class="fas fa-user"></i><div class="copy-btn" onclick="copyValue('dName')"><i class="far fa-copy"></i></div></div></div>
+                    <div class="input-group"><label>Nr. Telefon</label><div class="input-wrapper"><div class="details-value" id="dPhone"></div><i class="fas fa-phone"></i><div class="copy-btn" onclick="copyValue('dPhone')"><i class="far fa-copy"></i></div></div></div>
+                    <div class="input-group"><label>Cod Poștal</label><div class="input-wrapper"><div class="details-value" id="dZip"></div><i class="fas fa-mail-bulk"></i><div class="copy-btn" onclick="copyValue('dZip')"><i class="far fa-copy"></i></div></div></div>
+                    <div class="input-group"><label>Localitate</label><div class="input-wrapper"><div class="details-value" id="dCity"></div><i class="fas fa-city"></i><div class="copy-btn" onclick="copyValue('dCity')"><i class="far fa-copy"></i></div></div></div>
+                    <div class="input-group"><label>Județ / Sector</label><div class="input-wrapper"><div class="details-value" id="dCounty"></div><i class="fas fa-map-marker-alt"></i><div class="copy-btn" onclick="copyValue('dCounty')"><i class="far fa-copy"></i></div></div></div>
+                    <div class="input-group"><label>Stradă și nr.</label><div class="input-wrapper"><div class="details-value" id="dStreet"></div><i class="fas fa-road"></i><div class="copy-btn" onclick="copyValue('dStreet')"><i class="far fa-copy"></i></div></div></div>
 
-    <!-- Rândul pentru Preț - Fără buton copy -->
-    <div class="input-group">
-        <label>Preț</label>
-        <div class="input-wrapper">
-            <div class="details-value" id="dPrice"></div>
-            <i class="fas fa-money-bill-wave"></i>
-        </div>
-    </div>             
-<div class="form-section-title">Detalii de Livrare</div>
+                    <!-- 5 SEPARATE BOXES FOR BUILDING -->
+                    <div class="grid-5-row">
+                        <div class="input-group"><label>Bloc</label><div class="input-wrapper"><div class="details-value compact-input" id="dBl"></div><i class="fas fa-building"></i><div class="copy-btn" onclick="copyValue('dBl')"><i class="far fa-copy"></i></div></div></div>
+                        <div class="input-group"><label>Scara</label><div class="input-wrapper"><div class="details-value compact-input" id="dSc"></div><i class="fas fa-list-ol"></i><div class="copy-btn" onclick="copyValue('dSc')"><i class="far fa-copy"></i></div></div></div>
+                        <div class="input-group"><label>Int.</label><div class="input-wrapper"><div class="details-value compact-input" id="dInt"></div><i class="fas fa-bell"></i><div class="copy-btn" onclick="copyValue('dInt')"><i class="far fa-copy"></i></div></div></div>
+                        <div class="input-group"><label>Etaj</label><div class="input-wrapper"><div class="details-value compact-input" id="dEt"></div><i class="fas fa-layer-group"></i><div class="copy-btn" onclick="copyValue('dEt')"><i class="far fa-copy"></i></div></div></div>
+                        <div class="input-group"><label>Ap.</label><div class="input-wrapper"><div class="details-value compact-input" id="dAp"></div><i class="fas fa-door-closed"></i><div class="copy-btn" onclick="copyValue('dAp')"><i class="far fa-copy"></i></div></div></div>
+                    </div>
 
-<!-- STREAMER PRIVACY WRAPPER -->
-<div class="privacy-wrapper">
-    
-    <!-- THE BLUR OVERLAY -->
-    <div class="privacy-overlay" id="privacyOverlay">
-        <div style="text-align: center;">
-            <i class="fas fa-user-secret" style="font-size: 40px; margin-bottom: 10px; color: var(--primary);"></i>
-            <h3 style="color: #fff; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase;">Informații Personale</h3>
-            <button class="cyber-btn" style="margin: 0 auto;" onclick="document.getElementById('privacyOverlay').style.display='none'">
-                <i class="fas fa-eye"></i> AFIȘEAZĂ DATELE
-            </button>
-        </div>
-    </div>
-
-    <!-- THE DATA (Your exact inputs, now inside the wrapper) -->
-    <div class="input-group"><label>Nume și Prenume</label><div class="input-wrapper"><div class="details-value" id="dName"></div><i class="fas fa-user"></i><div class="copy-btn" onclick="copyValue('dName')"><i class="far fa-copy"></i></div></div></div>
-    <div class="input-group"><label>Nr. Telefon</label><div class="input-wrapper"><div class="details-value" id="dPhone"></div><i class="fas fa-phone"></i><div class="copy-btn" onclick="copyValue('dPhone')"><i class="far fa-copy"></i></div></div></div>
-    <div class="input-group"><label>Cod Poștal</label><div class="input-wrapper"><div class="details-value" id="dZip"></div><i class="fas fa-mail-bulk"></i><div class="copy-btn" onclick="copyValue('dZip')"><i class="far fa-copy"></i></div></div></div>
-    <div class="input-group"><label>Localitate</label><div class="input-wrapper"><div class="details-value" id="dCity"></div><i class="fas fa-city"></i><div class="copy-btn" onclick="copyValue('dCity')"><i class="far fa-copy"></i></div></div></div>
-    <div class="input-group"><label>Județ / Sector</label><div class="input-wrapper"><div class="details-value" id="dCounty"></div><i class="fas fa-map-marker-alt"></i><div class="copy-btn" onclick="copyValue('dCounty')"><i class="far fa-copy"></i></div></div></div>
-    <div class="input-group"><label>Stradă și nr.</label><div class="input-wrapper"><div class="details-value" id="dStreet"></div><i class="fas fa-road"></i><div class="copy-btn" onclick="copyValue('dStreet')"><i class="far fa-copy"></i></div></div></div>
-
-    <div class="grid-5-row" style="grid-column: 1 / -1;">
-        <div class="input-group"><label>Bloc</label><div class="input-wrapper"><div class="details-value compact-input" id="dBl"></div><i class="fas fa-building"></i><div class="copy-btn" onclick="copyValue('dBl')"><i class="far fa-copy"></i></div></div></div>
-        <div class="input-group"><label>Scara</label><div class="input-wrapper"><div class="details-value compact-input" id="dSc"></div><i class="fas fa-list-ol"></i><div class="copy-btn" onclick="copyValue('dSc')"><i class="far fa-copy"></i></div></div></div>
-        <div class="input-group"><label>Int.</label><div class="input-wrapper"><div class="details-value compact-input" id="dInt"></div><i class="fas fa-bell"></i><div class="copy-btn" onclick="copyValue('dInt')"><i class="far fa-copy"></i></div></div></div>
-        <div class="input-group"><label>Etaj</label><div class="input-wrapper"><div class="details-value compact-input" id="dEt"></div><i class="fas fa-layer-group"></i><div class="copy-btn" onclick="copyValue('dEt')"><i class="far fa-copy"></i></div></div></div>
-        <div class="input-group"><label>Ap.</label><div class="input-wrapper"><div class="details-value compact-input" id="dAp"></div><i class="fas fa-door-closed"></i><div class="copy-btn" onclick="copyValue('dAp')"><i class="far fa-copy"></i></div></div></div>
-    </div>
-
-    <div class="input-group" style="grid-column: 1 / -1;"><label>Repere / Informații</label><div class="input-wrapper"><div class="details-value" id="dNotes"></div><i class="fas fa-info-circle"></i><div class="copy-btn" onclick="copyValue('dNotes')"><i class="far fa-copy"></i></div></div></div>
-</div> 
-<!-- END STREAMER PRIVACY WRAPPER -->
-
-<div class="input-group" style="grid-column: 1 / -1;"><label>Dovadă Plată</label><div class="input-wrapper"><div class="details-value"><a href="#" id="dProof" target="_blank" class="proof-link">Deschide Imaginea</a></div><i class="fas fa-file-invoice-dollar"></i></div></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Repere / Informații</label><div class="input-wrapper"><div class="details-value" id="dNotes"></div><i class="fas fa-info-circle"></i><div class="copy-btn" onclick="copyValue('dNotes')"><i class="far fa-copy"></i></div></div></div>
+                    <div class="input-group" style="grid-column: 1 / -1;"><label>Dovadă Plată</label><div class="input-wrapper"><div class="details-value"><a href="#" id="dProof" target="_blank" class="proof-link">Deschide Imaginea</a></div><i class="fas fa-file-invoice-dollar"></i></div></div>
                 </div>
             </div>
         </div>
@@ -1312,19 +1333,16 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
     try {
         let finalImageUrl = null;
         let finalProofUrl = null;
-        let finalFinishedImageUrl = null; // --- NEW: Imaginea portretului terminat
 
         // Dacă suntem în modul EDITARE, luăm link-urile vechi ca bază
         if (editingOrderId) {
             const oldOrder = currentOrders.find(o => o.id === editingOrderId);
             finalImageUrl = oldOrder.imageUrl;
             finalProofUrl = oldOrder.paymentProof;
-            finalFinishedImageUrl = oldOrder.finalImageUrl || null; // --- Păstrează imaginea finală veche ---
         }
 
         const imageFile = document.getElementById('oImageFile').files[0];
         const proofFile = document.getElementById('oProofFile').files[0];
-        const finalImageFile = document.getElementById('oFinalImageFile').files[0]; // --- Ia fișierul nou ---
 
         // Încărcăm poze noi DOAR dacă au fost selectate fișiere
         if (imageFile) {
@@ -1334,10 +1352,6 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         if (proofFile) {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
             finalProofUrl = await uploadToImgBB(proofFile);
-        }
-        if (finalImageFile) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE REZULTAT FINAL...';
-            finalFinishedImageUrl = await uploadToImgBB(finalImageFile); // --- Uploadează pe ImgBB ---
         }
 
         // Construim string-ul pentru bloc/adresă
@@ -1354,21 +1368,16 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         if(ap) bParts.push(`Ap. ${ap}`);
         const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
 
-// Obiectul cu toate datele din formular
+        // Obiectul cu toate datele din formular
         const orderData = {
-            imageUrl: finalImageUrl,
             paymentProof: finalProofUrl,
-            finalImageUrl: finalFinishedImageUrl, 
             orderDate: document.getElementById('oDate').value,
-            price: parseFloat(document.getElementById('oPrice').value),
-            currency: document.getElementById('oCurrency').value, 
-            
-            // Detaliile artistice
-            portraitType: document.getElementById('oType').value.trim(),
-            portraitSize: document.getElementById('oSize').value.trim(),
-            paperType: document.getElementById('oPaper').value.trim(),
-            workHours: document.getElementById('oHours').value.trim(),
-
+    price: parseFloat(document.getElementById('oPrice').value),
+    portraitType: document.getElementById('oType').value.trim(),
+    portraitSize: document.getElementById('oSize').value.trim(),
+    paperType: document.getElementById('oPaper').value.trim(),
+    workHours: document.getElementById('oHours').value.trim(),
+    currency: document.getElementById('oCurrency').value, // SALVEAZĂ MONEDA
             name: document.getElementById('oName').value.trim(),
             phone: document.getElementById('oPhone').value.trim(),
             zipCode: document.getElementById('oZip').value.trim(),
@@ -1479,7 +1488,6 @@ function updateFilterLabels(counts) {
     if (respinsEl) respinsEl.innerText = `(${counts["Respins"]})`;
 }
 
-// 5. Funcția care generează HTML-ul pentru un singur card
 function renderCard(data) {
     const status = data.status || "In Curs";
     let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
@@ -1492,47 +1500,44 @@ function renderCard(data) {
         sClass = "status-respins"; sIcon = "fa-times-circle"; sText = "Respins"; btnColorClass = "btn-st-respins";
     }
 
-    // Butoanele de admin apar doar dacă ești logat ca admin
     const adminControls = globalIsAdmin ? `
         <div class="card-controls">
             <button class="control-btn edit-btn" onclick="event.stopPropagation(); openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
             <button class="control-btn delete-btn" onclick="event.stopPropagation(); deleteOrder('${data.id}')"><i class="fas fa-trash"></i></button>
         </div>` : "";
 
-    // --- CHECK IF IT HAS A FINISHED IMAGE FOR ANIMATION ---
-    let cardImageHTML = '';
-    if (data.finalImageUrl) {
-        cardImageHTML = `
-            <img src="${data.imageUrl}" class="order-img dual-img-original" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">
-            <img src="${data.finalImageUrl}" class="order-img dual-img-final" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">
-        `;
-    } else {
-        cardImageHTML = `<img src="${data.imageUrl}" class="order-img" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">`;
-    }
+    // DD-MM-YYYY format
+    const formattedDate = data.orderDate ? data.orderDate.split('-').reverse().join('-') : '00-00-0000';
 
     const card = document.createElement('div');
     card.className = `order-card ${sClass}`;
     card.innerHTML = `
         ${adminControls}
-        <div class="order-img-container" style="height: 280px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
-            ${cardImageHTML}
+        <div class="order-img-container">
+            <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
         </div>
+        
         <div class="card-footer">
-            <div class="footer-left-side" style="flex:1; display:flex; justify-content:flex-start;">
+            <div class="footer-left-side">
                 <span class="footer-name">${data.name}</span>
+                <span class="footer-date">${formattedDate}</span>
             </div>
-            <div class="footer-center-side" style="flex:1; display:flex; justify-content:center;">
+            
+            <div class="footer-center-side">
                 <span class="footer-price-text">${formatPrice(data.price, data.currency || 'RON')}</span>
             </div>
-            <div class="footer-right-side" style="flex:1; display:flex; justify-content:flex-end; position:relative;">
-                <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); ${globalIsAdmin ? `toggleStatusMenu('${data.id}')` : ''}">
-                    <i class="fas ${sIcon}"></i> ${sText}
-                </button>
-                <div class="status-menu" id="menu-${data.id}">
-                    <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
-                    <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
-                    <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
-                    <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
+            
+            <div class="footer-right-side">
+                <div style="position: relative;">
+                    <button class="status-picker-trigger ${btnColorClass}" onclick="event.stopPropagation(); ${globalIsAdmin ? `toggleStatusMenu('${data.id}')` : ''}">
+                        <i class="fas ${sIcon}"></i> ${sText}
+                    </button>
+                    <div class="status-menu" id="menu-${data.id}">
+                        <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
+                        <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
+                        <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
+                        <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1577,36 +1582,36 @@ if(currentStatus === "In Curs") nextStatus = "Livrat";
       }
 
 window.openOrderDetails = function(orderId) {
-    const order = currentOrders.find(o => o.id === orderId);
-    if(!order) return;
+          const order = currentOrders.find(o => o.id === orderId);
+          if(!order) return;
 
-    document.getElementById('dImage').src = order.imageUrl;
-    document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
-    document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
-    document.getElementById('dProof').href = order.paymentProof;
-    document.getElementById('dName').innerText = order.name;
-    document.getElementById('dPhone').innerText = order.phone;
-    document.getElementById('dZip').innerText = order.zipCode;
-    document.getElementById('dCity').innerText = order.city;
-    document.getElementById('dCounty').innerText = order.county;
-    document.getElementById('dStreet').innerText = order.street;
-    document.getElementById('dNotes').innerText = order.notes || "Nicio notiță";
+          document.getElementById('dImage').src = order.imageUrl;
+          document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
+          document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
+document.getElementById('dType').innerText = order.portraitType || "-";
+document.getElementById('dSize').innerText = order.portraitSize || "-";
+document.getElementById('dPaper').innerText = order.paperType || "-";
+document.getElementById('dHours').innerText = order.workHours || "-";
+          document.getElementById('dProof').href = order.paymentProof;
+          document.getElementById('dName').innerText = order.name;
+          document.getElementById('dPhone').innerText = order.phone;
+          document.getElementById('dZip').innerText = order.zipCode;
+          document.getElementById('dCity').innerText = order.city;
+          document.getElementById('dCounty').innerText = order.county;
+          document.getElementById('dStreet').innerText = order.street;
+          document.getElementById('dNotes').innerText = order.notes || "Nicio notiță";
 
-    // Splitting the building string back into 5 parts
-    // This looks for "Bl. X", "Sc. X", etc. in your saved string
-    const b = order.building || "";
-    document.getElementById('dBl').innerText = b.match(/Bl\. ([^,]+)/)?.[1] || "-";
-    document.getElementById('dSc').innerText = b.match(/Sc\. ([^,]+)/)?.[1] || "-";
-    document.getElementById('dInt').innerText = b.match(/Int\. ([^,]+)/)?.[1] || "-";
-    document.getElementById('dEt').innerText = b.match(/Et\. ([^,]+)/)?.[1] || "-";
-    document.getElementById('dAp').innerText = b.match(/Ap\. ([^,]+)/)?.[1] || "-";
+          // Splitting the building string back into 5 parts
+          // This looks for "Bl. X", "Sc. X", etc. in your saved string
+          const b = order.building || "";
+          document.getElementById('dBl').innerText = b.match(/Bl\. ([^,]+)/)?.[1] || "-";
+          document.getElementById('dSc').innerText = b.match(/Sc\. ([^,]+)/)?.[1] || "-";
+          document.getElementById('dInt').innerText = b.match(/Int\. ([^,]+)/)?.[1] || "-";
+          document.getElementById('dEt').innerText = b.match(/Et\. ([^,]+)/)?.[1] || "-";
+          document.getElementById('dAp').innerText = b.match(/Ap\. ([^,]+)/)?.[1] || "-";
 
-    // --- RE-ENABLE PRIVACY BLUR EVERY TIME WE OPEN THE MODAL ---
-    const privacyOverlay = document.getElementById('privacyOverlay');
-    if (privacyOverlay) privacyOverlay.style.display = 'flex';
-
-    document.getElementById('orderDetailsModal').classList.add('active');
-};
+          document.getElementById('orderDetailsModal').classList.add('active');
+      };
 
 
 // Function to copy text to clipboard
@@ -1668,6 +1673,10 @@ selectCurrency(currentSymbol, order.currency || 'RON');
           // Fill all fields
           document.getElementById('oDate').value = order.orderDate;
           document.getElementById('oPrice').value = order.price;
+document.getElementById('oType').value = order.portraitType || "";
+document.getElementById('oSize').value = order.portraitSize || "";
+document.getElementById('oPaper').value = order.paperType || "";
+document.getElementById('oHours').value = order.workHours || "";
           document.getElementById('oName').value = order.name;
           document.getElementById('oPhone').value = order.phone;
           document.getElementById('oZip').value = order.zipCode;
@@ -1675,12 +1684,7 @@ selectCurrency(currentSymbol, order.currency || 'RON');
           document.getElementById('oCounty').value = order.county;
           document.getElementById('oStreet').value = order.street;
           document.getElementById('oNotes').value = order.notes;
-document.getElementById('oFinalImageFile').value = '';
- // Adaugă aceste linii în openEditModal
-document.getElementById('oType').value = order.portraitType || '';
-document.getElementById('oSize').value = order.portraitSize || '';
-document.getElementById('oPaper').value = order.paperType || '';
-document.getElementById('oHours').value = order.workHours || '';
+
           // Show Preview
           imageDropPreview.src = order.imageUrl;
           imageDropPreview.style.display = 'block';
@@ -1701,7 +1705,6 @@ document.getElementById('oHours').value = order.workHours || '';
           document.querySelector('.btn-submit-order').innerText = "ADAUGĂ COMANDĂ";
           document.getElementById('oImageFile').required = true;
           document.getElementById('oProofFile').required = true;
-document.getElementById('oFinalImageFile').value = '';
       });
 
       // Modify the existing 'addOrderForm' submit listener to use editingOrderId
