@@ -1072,6 +1072,62 @@
         white-space: nowrap;
     }
 }
+
+
+/* Update the stats window to be more professional */
+.stats-window {
+    background: rgba(8, 16, 27, 0.4) !important;
+    border: 1px solid rgba(0, 242, 254, 0.3) !important;
+    backdrop-filter: blur(10px);
+    padding: 30px !important;
+    border-radius: 30px !important;
+    display: block !important; /* Change from flex to block for better layout control */
+}
+
+/* Professional Stat Cards with Icons */
+.stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: 4px solid var(--primary);
+    padding: 25px;
+    position: relative;
+    transition: 0.3s;
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateY(-5px);
+}
+
+.stat-card i.card-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 40px;
+    opacity: 0.1; /* Large subtle background icon */
+    color: var(--primary);
+}
+
+/* The "View List" Button style */
+.btn-view-month {
+    margin-top: 15px;
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Oswald';
+    font-size: 12px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.btn-view-month:hover {
+    background: var(--primary);
+    color: #000;
+}
   </style>
 </head>
 <body>
@@ -1128,6 +1184,10 @@
             <!-- ORDERS GRID -->
             <div id="ordersGrid" class="orders-grid"></div>
         </div>
+
+
+
+
     </main>
 
 <!-- STATISTICS SECTION -->
@@ -1369,6 +1429,21 @@
             </div>
         </div>
     </div>
+
+<!-- MONTHLY GALLERY MODAL -->
+<div id="monthGalleryModal" class="custom-modal-overlay">
+    <div class="custom-modal-card" style="max-width: 1000px;">
+        <div class="modal-header-container">
+            <button class="close-modal-btn" onclick="document.getElementById('monthGalleryModal').classList.remove('active')">✕</button>
+            <h2 class="modal-title" id="galleryModalTitle">Portrete Luna...</h2>
+        </div>
+        <div class="modal-body-container">
+            <div id="galleryGrid" class="orders-grid" style="display: grid; padding-top: 0;">
+                <!-- Monthly portraits injected here -->
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- ==========================================
          FIREBASE INITIALIZATION & LOGIC
@@ -2004,38 +2079,46 @@ function updateStatistics() {
         monthListEl.appendChild(btn);
     });
 }
-
 window.showMonthDetails = (data, btn) => {
-    // UI active state
     document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
     const display = document.getElementById('statsDetails');
     display.innerHTML = `
-        <h3 style="font-size: 30px; margin-bottom: 25px; color: var(--primary); text-transform: uppercase;">
-            Rezumat ${data.name}
-        </h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h3 style="font-size: 30px; color: var(--primary); text-transform: uppercase; margin: 0;">
+                Rezumat ${data.name}
+            </h3>
+            <button class="btn-view-month" onclick="openMonthlyGallery('${data.name}')">
+                <i class="fas fa-images"></i> VEZI TOATE PORTRETELE
+            </button>
+        </div>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Portrete Totale</div>
                 <div class="stat-value">${data.totalOrders}</div>
+                <i class="fas fa-palette card-icon"></i>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Ore de Muncă</div>
                 <div class="stat-value">${data.hours}h</div>
+                <i class="fas fa-clock card-icon"></i>
             </div>
             <div class="stat-card" style="border-color: #00ff88;">
                 <div class="stat-label">Portrete Livrate</div>
                 <div class="stat-value">${data.delivered}</div>
+                <i class="fas fa-check-double card-icon" style="color: #00ff88;"></i>
             </div>
-            <div class="stat-card" style="border-color: #ff9800;">
+            <div class="stat-card" style="border-color: #ff4757;">
                 <div class="stat-label">Portrete Respinse</div>
                 <div class="stat-value">${data.rejected}</div>
+                <i class="fas fa-times-circle card-icon" style="color: #ff4757;"></i>
             </div>
             <div class="stat-card" style="grid-column: 1 / -1; border-color: #00ff88; background: rgba(0, 255, 136, 0.05);">
                 <div class="stat-label">Venit Total (Calculat în LEI)</div>
-                <div class="stat-value income-value">${new Intl.NumberFormat('ro-RO').format(Math.round(data.incomeRON))} RON</div>
-                <small style="color: #666; font-size: 10px;">*Conversie: 1€=5LEI, 1£=5.8LEI, 1$=4.6LEI</small>
+                <div class="stat-value income-value" style="font-size: 35px;">${new Intl.NumberFormat('ro-RO').format(Math.round(data.incomeRON))} RON</div>
+                <i class="fas fa-wallet card-icon" style="color: #00ff88;"></i>
+                <small style="color: #666; font-size: 10px; display: block; margin-top: 5px;">*Conversie: 1€=5LEI, 1£=5.8LEI, 1$=4.6LEI</small>
             </div>
         </div>
     `;
@@ -2043,6 +2126,42 @@ window.showMonthDetails = (data, btn) => {
 
 // Hook into the existing data loader
 // Find your 'onSnapshot' block and add 'updateStatistics()' inside it
+
+
+window.openMonthlyGallery = (monthKey) => {
+    const galleryGrid = document.getElementById('galleryGrid');
+    const modalTitle = document.getElementById('galleryModalTitle');
+    galleryGrid.innerHTML = "";
+    modalTitle.innerText = `Portrete: ${monthKey}`;
+
+    // Filter currentOrders to find only ones from this specific month/year
+    const filtered = currentOrders.filter(order => {
+        if (!order.orderDate) return false;
+        const dateParts = order.orderDate.split('-');
+        const tempDate = new Date(dateParts[0], parseInt(dateParts[1]) - 1, 1);
+        const name = `${tempDate.toLocaleString('ro-RO', { month: 'long' })} ${dateParts[0]}`;
+        return name === monthKey;
+    });
+
+    // Render cards into the modal grid
+    filtered.forEach(order => {
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.style.height = "auto";
+        card.innerHTML = `
+            <div class="order-img-container" style="aspect-ratio: 1/1;">
+                <img src="${order.imageUrl}" class="order-img" onclick="openOrderDetails('${order.id}')">
+            </div>
+            <div class="card-footer" style="min-height: 50px; padding: 10px !important;">
+                <span class="footer-name" style="font-size: 12px !important;">${order.name}</span>
+                <span class="footer-price-text" style="font-size: 12px !important;">${order.price} ${order.currency}</span>
+            </div>
+        `;
+        galleryGrid.appendChild(card);
+    });
+
+    document.getElementById('monthGalleryModal').classList.add('active');
+};
     </script>
 </body>
 </html>
