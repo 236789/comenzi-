@@ -792,6 +792,34 @@
     border: 1px dashed var(--primary);
     box-shadow: inset 0 0 30px rgba(0, 242, 254, 0.1);
 }
+
+
+
+/* --- DUAL IMAGE CROSSFADE SWAP --- */
+.dual-img-original {
+    position: relative;
+    z-index: 2;
+    animation: crossfadeSwap 8s infinite; /* Switches every 4 seconds */
+}
+
+.dual-img-final {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    cursor: pointer;
+}
+
+@keyframes crossfadeSwap {
+    0%, 45% { opacity: 1; }   /* Show Original */
+    50%, 95% { opacity: 0; }  /* Fade out Original (Shows Final underneath) */
+    100% { opacity: 1; }      /* Fade back to Original */
+}
+
+
   </style>
 </head>
 <body>
@@ -1011,6 +1039,15 @@
                             <i class="fas fa-info-circle"></i>
                         </div>
                     </div>
+
+<!-- PORTRET FINALIZAT (OPTIONAL) -->
+    <div class="input-group full-row" style="margin-bottom: 20px; margin-top: 10px;">
+        <label>Portret Finalizat (Opțional)</label>
+        <div class="input-wrapper">
+            <input type="file" id="oFinalImageFile" class="styled-input" accept="image/*">
+            <i class="fas fa-image"></i>
+        </div>
+    </div>
 
                     <button type="submit" class="btn-submit-order"><i class="fas fa-save"></i> ADAUGĂ COMANDĂ</button>
                 </form>
@@ -1241,16 +1278,19 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
     try {
         let finalImageUrl = null;
         let finalProofUrl = null;
+        let finalFinishedImageUrl = null; // --- NEW: Imaginea portretului terminat
 
         // Dacă suntem în modul EDITARE, luăm link-urile vechi ca bază
         if (editingOrderId) {
             const oldOrder = currentOrders.find(o => o.id === editingOrderId);
             finalImageUrl = oldOrder.imageUrl;
             finalProofUrl = oldOrder.paymentProof;
+            finalFinishedImageUrl = oldOrder.finalImageUrl || null; // --- Păstrează imaginea finală veche ---
         }
 
         const imageFile = document.getElementById('oImageFile').files[0];
         const proofFile = document.getElementById('oProofFile').files[0];
+        const finalImageFile = document.getElementById('oFinalImageFile').files[0]; // --- Ia fișierul nou ---
 
         // Încărcăm poze noi DOAR dacă au fost selectate fișiere
         if (imageFile) {
@@ -1260,6 +1300,10 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         if (proofFile) {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
             finalProofUrl = await uploadToImgBB(proofFile);
+        }
+        if (finalImageFile) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE REZULTAT FINAL...';
+            finalFinishedImageUrl = await uploadToImgBB(finalImageFile); // --- Uploadează pe ImgBB ---
         }
 
         // Construim string-ul pentru bloc/adresă
@@ -1280,9 +1324,17 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         const orderData = {
             imageUrl: finalImageUrl,
             paymentProof: finalProofUrl,
+            finalImageUrl: finalFinishedImageUrl, // --- NEW: Salvează link-ul în Firestore ---
             orderDate: document.getElementById('oDate').value,
-    price: parseFloat(document.getElementById('oPrice').value),
-    currency: document.getElementById('oCurrency').value, // SALVEAZĂ MONEDA
+            price: parseFloat(document.getElementById('oPrice').value),
+            currency: document.getElementById('oCurrency').value, 
+            
+            // Detaliile artistice adăugate înapoi (lipseau din codul postat de tine!)
+            portraitType: document.getElementById('oType').value.trim(),
+            portraitSize: document.getElementById('oSize').value.trim(),
+            paperType: document.getElementById('oPaper').value.trim(),
+            workHours: document.getElementById('oHours').value.trim(),
+
             name: document.getElementById('oName').value.trim(),
             phone: document.getElementById('oPhone').value.trim(),
             zipCode: document.getElementById('oZip').value.trim(),
@@ -1398,7 +1450,7 @@ function renderCard(data) {
     const status = data.status || "In Curs";
     let sClass = "status-in-curs", sIcon = "fa-spinner fa-spin", sText = "În Curs", btnColorClass = "btn-st-curs";
     
-if(status === "Livrat") { 
+    if(status === "Livrat") { 
         sClass = "status-livrat"; sIcon = "fa-truck-fast"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
     } else if(status === "Anulat") { 
         sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
@@ -1413,12 +1465,23 @@ if(status === "Livrat") {
             <button class="control-btn delete-btn" onclick="event.stopPropagation(); deleteOrder('${data.id}')"><i class="fas fa-trash"></i></button>
         </div>` : "";
 
+    // --- CHECK IF IT HAS A FINISHED IMAGE FOR ANIMATION ---
+    let cardImageHTML = '';
+    if (data.finalImageUrl) {
+        cardImageHTML = `
+            <img src="${data.imageUrl}" class="order-img dual-img-original" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">
+            <img src="${data.finalImageUrl}" class="order-img dual-img-final" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">
+        `;
+    } else {
+        cardImageHTML = `<img src="${data.imageUrl}" class="order-img" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">`;
+    }
+
     const card = document.createElement('div');
     card.className = `order-card ${sClass}`;
     card.innerHTML = `
         ${adminControls}
-        <div class="order-img-container" style="height: 280px; overflow: hidden; border-radius: 18px 18px 0 0;">
-            <img src="${data.imageUrl}" class="order-img" style="width:100%; height:100%; object-fit:cover;" onclick="openOrderDetails('${data.id}')">
+        <div class="order-img-container" style="height: 280px; overflow: hidden; border-radius: 18px 18px 0 0; position: relative;">
+            ${cardImageHTML}
         </div>
         <div class="card-footer">
             <div class="footer-left-side" style="flex:1; display:flex; justify-content:flex-start;">
@@ -1434,9 +1497,9 @@ if(status === "Livrat") {
                 <div class="status-menu" id="menu-${data.id}">
                     <div class="status-option opt-curs" onclick="updateStatus('${data.id}', 'In Curs')"><i class="fas fa-spinner"></i> ÎN CURS</div>
                     <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
-<div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
+                    <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
                     <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
-                </div>                </div>
+                </div>
             </div>
         </div>
     `;
@@ -1578,6 +1641,7 @@ selectCurrency(currentSymbol, order.currency || 'RON');
           document.getElementById('oCounty').value = order.county;
           document.getElementById('oStreet').value = order.street;
           document.getElementById('oNotes').value = order.notes;
+document.getElementById('oFinalImageFile').value = '';
 
           // Show Preview
           imageDropPreview.src = order.imageUrl;
@@ -1599,6 +1663,7 @@ selectCurrency(currentSymbol, order.currency || 'RON');
           document.querySelector('.btn-submit-order').innerText = "ADAUGĂ COMANDĂ";
           document.getElementById('oImageFile').required = true;
           document.getElementById('oProofFile').required = true;
+document.getElementById('oFinalImageFile').value = '';
       });
 
       // Modify the existing 'addOrderForm' submit listener to use editingOrderId
