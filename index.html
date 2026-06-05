@@ -948,6 +948,81 @@
     margin-top: auto !important;
     min-height: 85px !important;
 }
+
+/* --- STATISTICS SECTION STYLES --- */
+.stats-section { padding-bottom: 100px; position: relative; z-index: 10; }
+
+.stats-wrapper {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+    margin-top: 30px;
+    min-height: 400px;
+}
+
+.month-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.month-btn {
+    background: rgba(13, 25, 41, 0.7);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Oswald', sans-serif;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+
+.month-btn:hover, .month-btn.active {
+    border-color: var(--primary);
+    background: rgba(0, 242, 254, 0.1);
+    box-shadow: 0 0 15px var(--primary-dim);
+}
+
+.stats-window {
+    background: var(--glass-bg);
+    border: 1px solid var(--primary);
+    border-radius: 24px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: inset 0 0 30px rgba(0, 242, 254, 0.05);
+}
+
+.stats-placeholder { text-align: center; color: #555; }
+.stats-placeholder i { font-size: 50px; margin-bottom: 10px; }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background: rgba(0,0,0,0.3);
+    padding: 20px;
+    border-radius: 16px;
+    border-left: 4px solid var(--primary);
+}
+
+.stat-label { font-size: 12px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+.stat-value { font-size: 28px; font-weight: 700; margin-top: 5px; }
+.income-value { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+
+@media (max-width: 768px) {
+    .stats-wrapper { grid-template-columns: 1fr; }
+    .month-sidebar { flex-direction: row; overflow-x: auto; }
+}
   </style>
 </head>
 <body>
@@ -1006,6 +1081,28 @@
         </div>
     </main>
 
+<!-- STATISTICS SECTION -->
+<section class="stats-section">
+    <div class="container">
+        <div class="cyber-line" style="margin: 40px auto;"></div>
+        <h2 class="page-main-title" style="font-size: 40px;">Arhivă & Statistici</h2>
+        
+        <div class="stats-wrapper">
+            <!-- Left Side: Month List -->
+            <div class="month-sidebar" id="monthList">
+                <!-- Months will be injected here -->
+            </div>
+
+            <!-- Right Side: Details Window -->
+            <div class="stats-window" id="statsDetails">
+                <div class="stats-placeholder">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Selectează o lună pentru a vedea rezumatul</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
     <!-- ==========================================
          1. ADD ORDER MODAL (REVAMPED)
     ========================================== -->
@@ -1794,7 +1891,105 @@ window.selectCurrency = (symbol, value) => {
 };
 
 
+// --- STATISTICS LOGIC ---
 
+// 1. Fixed Exchange Rates (Approximate)
+const EXCHANGE_RATES = {
+    'RON': 1,
+    'EUR': 5.0,  // 1 EUR = 5 RON
+    'GBP': 5.8,  // 1 GBP = 5.8 RON
+    'USD': 4.6   // 1 USD = 4.6 RON
+};
+
+function updateStatistics() {
+    const monthListEl = document.getElementById('monthList');
+    if (!currentOrders.length) return;
+
+    // Group orders by Month-Year
+    const groups = {};
+    currentOrders.forEach(order => {
+        if (!order.orderDate) return;
+        const date = new Date(order.orderDate);
+        const monthName = date.toLocaleString('ro-RO', { month: 'long' });
+        const year = date.getFullYear();
+        const key = `${monthName} ${year}`;
+
+        if (!groups[key]) {
+            groups[key] = {
+                name: key,
+                totalOrders: 0,
+                hours: 0,
+                delivered: 0,
+                rejected: 0,
+                incomeRON: 0
+            };
+        }
+
+        const g = groups[key];
+        g.totalOrders++;
+        
+        // Extract numbers from "15 ore" or "15h"
+        const hrMatch = order.workHours ? order.workHours.match(/\d+/) : null;
+        if (hrMatch) g.hours += parseInt(hrMatch[0]);
+
+        if (order.status === "Livrat") g.delivered++;
+        if (order.status === "Respins") g.rejected++;
+
+        // Currency Calculation
+        const price = parseFloat(order.price) || 0;
+        const rate = EXCHANGE_RATES[order.currency] || 1;
+        g.incomeRON += (price * rate);
+    });
+
+    // Render Month Buttons
+    monthListEl.innerHTML = "";
+    Object.keys(groups).sort((a,b) => new Date(b) - new Date(a)).forEach(key => {
+        const btn = document.createElement('button');
+        btn.className = 'month-btn';
+        btn.innerText = key;
+        btn.onclick = () => showMonthDetails(groups[key], btn);
+        monthListEl.appendChild(btn);
+    });
+}
+
+window.showMonthDetails = (data, btn) => {
+    // UI active state
+    document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const display = document.getElementById('statsDetails');
+    display.innerHTML = `
+        <h3 style="font-size: 30px; margin-bottom: 25px; color: var(--primary); text-transform: uppercase;">
+            Rezumat ${data.name}
+        </h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Portrete Totale</div>
+                <div class="stat-value">${data.totalOrders}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ore de Muncă</div>
+                <div class="stat-value">${data.hours}h</div>
+            </div>
+            <div class="stat-card" style="border-color: #00ff88;">
+                <div class="stat-label">Portrete Livrate</div>
+                <div class="stat-value">${data.delivered}</div>
+            </div>
+            <div class="stat-card" style="border-color: #ff9800;">
+                <div class="stat-label">Portrete Respinse</div>
+                <div class="stat-value">${data.rejected}</div>
+            </div>
+            <div class="stat-card" style="grid-column: 1 / -1; border-color: #00ff88; background: rgba(0, 255, 136, 0.05);">
+                <div class="stat-label">Venit Total (Calculat în LEI)</div>
+                <div class="stat-value income-value">${new Intl.NumberFormat('ro-RO').format(Math.round(data.incomeRON))} RON</div>
+                <small style="color: #666; font-size: 10px;">*Conversie: 1€=5LEI, 1£=5.8LEI, 1$=4.6LEI</small>
+            </div>
+        </div>
+    `;
+};
+
+// Hook into the existing data loader
+// Find your 'onSnapshot' block and add 'updateStatistics()' inside it
     </script>
 </body>
 </html>
