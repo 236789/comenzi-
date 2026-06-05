@@ -1320,16 +1320,16 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         if(ap) bParts.push(`Ap. ${ap}`);
         const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
 
-        // Obiectul cu toate datele din formular
+// Obiectul cu toate datele din formular
         const orderData = {
             imageUrl: finalImageUrl,
             paymentProof: finalProofUrl,
-            finalImageUrl: finalFinishedImageUrl, // --- NEW: Salvează link-ul în Firestore ---
+            finalImageUrl: finalFinishedImageUrl, 
             orderDate: document.getElementById('oDate').value,
             price: parseFloat(document.getElementById('oPrice').value),
             currency: document.getElementById('oCurrency').value, 
             
-            // Detaliile artistice adăugate înapoi (lipseau din codul postat de tine!)
+            // Detaliile artistice
             portraitType: document.getElementById('oType').value.trim(),
             portraitSize: document.getElementById('oSize').value.trim(),
             paperType: document.getElementById('oPaper').value.trim(),
