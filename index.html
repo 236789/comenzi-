@@ -912,36 +912,41 @@
 }
 
 
+/* --- OVERRIDE: SYMMETRICAL VERTICAL CARDS --- */
 
-    /* --- OVERRIDES FOR VERTICAL DYNAMIC CARDS --- */
-
-/* 1. Prevents cards in the same row from stretching to match the tallest one */
+/* 1. Force the grid to keep all cards in a row the same height */
 .orders-grid {
-    align-items: start !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    align-items: stretch !important; 
 }
 
-/* 2. Removes the fixed height from the image container so it can grow vertically */
-.order-img-container {
-    height: auto !important; 
-    min-height: 250px; /* Ensures a minimum size even if image fails to load */
-}
-
-/* 3. Forces the image to keep its original shape (vertical or horizontal) */
-.order-img {
-    height: auto !important; 
-    max-height: 600px; /* Optional: prevents extremely long images from breaking the layout */
-    object-fit: contain !important; /* Shows the full portrait without cropping */
-    background: rgba(0,0,0,0.2); /* Adds a subtle background for transparent images */
-}
-
-/* 4. Ensures the card adjusts its height to fit the new image shape */
+/* 2. Force every card to be a vertical rectangle */
 .order-card {
-    height: auto !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
-/* 5. Keeps the footer pinned to the bottom of the vertical image */
+/* 3. The Magic: Force a 3:4 Portrait Ratio on the image area */
+.order-img-container {
+    height: auto !important;
+    aspect-ratio: 3 / 4 !important; /* Forces vertical shape (Portrait) */
+    width: 100% !important;
+}
+
+/* 4. Ensure the image fills the portrait frame perfectly without stretching */
+.order-img {
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: cover !important; /* Crops image to fill the vertical frame */
+    display: block !important;
+}
+
+/* 5. Keeps the footer at the very bottom so all cards look identical */
 .card-footer {
     margin-top: auto !important;
+    min-height: 85px !important;
 }
   </style>
 </head>
