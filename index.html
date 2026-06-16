@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -1128,6 +1129,13 @@
     background: var(--primary);
     color: #000;
 }
+
+
+/* --- STATUS ESUAT (LIVRARE ESUATA) --- */
+.status-esuat { border-color: #d63031 !important; box-shadow: 0 0 15px rgba(214, 48, 49, 0.2) !important; }
+.btn-st-esuat { border: 1px solid #d63031 !important; color: #d63031 !important; }
+.opt-esuat i { color: #d63031; }
+.filter-btn.active[onclick*="Esuat"] { border-color: #d63031; color: #d63031; box-shadow: 0 0 15px rgba(214, 48, 49, 0.3); }
   </style>
 </head>
 <body>
@@ -1173,6 +1181,10 @@
         </button>
 <button class="filter-btn" onclick="setFilter('Anulat')" id="filter-anulat">
             <i class="fas fa-ban"></i> ANULAT <span class="filter-count" id="count-anulat">(0)</span>
+        </button>
+
+<button class="filter-btn" onclick="setFilter('Esuat')" id="filter-esuat">
+            <i class="fas fa-truck-fast"></i><i class="fas fa-times" style="margin-left: 3px;"></i> EȘUAT <span class="filter-count" id="count-esuat">(0)</span>
         </button>
         <button class="filter-btn" onclick="setFilter('Respins')" id="filter-respins">
             <i class="fas fa-times-circle"></i> RESPINS <span class="filter-count" id="count-respins">(0)</span>
@@ -1821,7 +1833,7 @@ function loadOrdersRealtime() {
         ordersGrid.innerHTML = ""; 
         currentOrders = []; 
         
-        let counts = { "In Curs": 0, "Livrat": 0, "Anulat": 0, "Respins": 0 };
+let counts = { "In Curs": 0, "Livrat": 0, "Anulat": 0, "Respins": 0, "Esuat": 0 };
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
             data.id = docSnap.id;
@@ -1849,11 +1861,13 @@ function updateFilterLabels(counts) {
     const livratEl = document.getElementById('count-livrat');
     const anulatEl = document.getElementById('count-anulat');
     const respinsEl = document.getElementById('count-respins');
+const esuatEl = document.getElementById('count-esuat');
 
     if (cursEl) cursEl.innerText = `(${counts["In Curs"]})`;
     if (livratEl) livratEl.innerText = `(${counts["Livrat"]})`;
     if (anulatEl) anulatEl.innerText = `(${counts["Anulat"]})`;
     if (respinsEl) respinsEl.innerText = `(${counts["Respins"]})`;
+if (esuatEl) esuatEl.innerText = `(${counts["Esuat"]})`;
 }
 
 function renderCard(data) {
@@ -1864,8 +1878,11 @@ function renderCard(data) {
         sClass = "status-livrat"; sIcon = "fa-truck-fast"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
     } else if(status === "Anulat") { 
         sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
-    } else if(status === "Respins") {
+} else if(status === "Respins") {
         sClass = "status-respins"; sIcon = "fa-times-circle"; sText = "Respins"; btnColorClass = "btn-st-respins";
+    } else if(status === "Esuat") {
+        /* Aici folosim un mic truc (hack) HTML pentru a pune camionul și X-ul unul langa altul în buton */
+        sClass = "status-esuat"; sIcon = "fa-truck-fast\"></i><i class=\"fas fa-times"; sText = "Eșuat"; btnColorClass = "btn-st-esuat";
     }
 
     const adminControls = globalIsAdmin ? `
@@ -1905,6 +1922,8 @@ function renderCard(data) {
                         <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
                         <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
                         <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
+
+<div class="status-option opt-esuat" onclick="updateStatus('${data.id}', 'Esuat')"><i class="fas fa-truck-fast"></i><i class="fas fa-times" style="margin-left: 3px;"></i> EȘUAT</div>
                     </div>
                 </div>
             </div>
@@ -2161,6 +2180,7 @@ function updateStatistics() {
                 hours: 0,
                 delivered: 0,
                 rejected: 0,
+                failed: 0, // <-- ADAUGĂ ASTA
                 incomeRON: 0,
                 rawDate: tempDate // for sorting
             };
@@ -2179,14 +2199,16 @@ function updateStatistics() {
         // 3. Status Counters
         if (status === "Livrat") g.delivered++;
         if (status === "Respins") g.rejected++;
+        if (status === "Esuat") g.failed++;
+
 
         // 4. INCOME CALCULATION (The 50% Rule)
         const price = parseFloat(order.price) || 0;
         const rate = EXCHANGE_RATES[order.currency] || 1;
         let calculatedValue = price * rate;
 
-        if (status === "Anulat") {
-            // Canceled orders bring in 0 RON
+if (status === "Anulat" || status === "Esuat") {
+            // Canceled or Failed deliveries bring in 0 RON
             calculatedValue = 0;
         } else if (status === "Respins") {
             // Rejected orders count for only 50% (half goes back to client)
@@ -2243,6 +2265,13 @@ window.showMonthDetails = (data, btn) => {
                 <div class="stat-value">${data.rejected}</div>
                 <i class="fas fa-times-circle card-icon" style="color: #ff4757;"></i>
             </div>
+
+<div class="stat-card" style="border-color: #d63031;">
+                <div class="stat-label">Livrări Eșuate</div>
+                <div class="stat-value">${data.failed || 0}</div>
+                <i class="fas fa-truck-fast card-icon" style="color: #d63031;"></i>
+            </div>
+
             <div class="stat-card" style="grid-column: 1 / -1; border-color: #00ff88; background: rgba(0, 255, 136, 0.05);">
                 <div class="stat-label">Venit Total (Calculat în LEI)</div>
                 <div class="stat-value income-value" style="font-size: 35px;">${new Intl.NumberFormat('ro-RO').format(Math.round(data.incomeRON))} RON</div>
