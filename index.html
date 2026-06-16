@@ -1130,12 +1130,17 @@
     color: #000;
 }
 
-
 /* --- STATUS ESUAT (LIVRARE ESUATA) --- */
 .status-esuat { border-color: #d63031 !important; box-shadow: 0 0 15px rgba(214, 48, 49, 0.2) !important; }
 .btn-st-esuat { border: 1px solid #d63031 !important; color: #d63031 !important; }
 .opt-esuat i { color: #d63031; }
 .filter-btn.active[onclick*="Esuat"] { border-color: #d63031; color: #d63031; box-shadow: 0 0 15px rgba(214, 48, 49, 0.3); }
+
+/* Clasă pentru a întoarce camionul spre stânga */
+.flip-icon {
+    display: inline-block;
+    transform: scaleX(-1);
+}
   </style>
 </head>
 <body>
@@ -1184,7 +1189,7 @@
         </button>
 
 <button class="filter-btn" onclick="setFilter('Esuat')" id="filter-esuat">
-            <i class="fas fa-truck-fast"></i><i class="fas fa-times" style="margin-left: 3px;"></i> EȘUAT <span class="filter-count" id="count-esuat">(0)</span>
+            <i class="fas fa-truck-fast flip-icon"></i> EȘUAT <span class="filter-count" id="count-esuat">(0)</span>
         </button>
         <button class="filter-btn" onclick="setFilter('Respins')" id="filter-respins">
             <i class="fas fa-times-circle"></i> RESPINS <span class="filter-count" id="count-respins">(0)</span>
@@ -1880,11 +1885,9 @@ function renderCard(data) {
         sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
 } else if(status === "Respins") {
         sClass = "status-respins"; sIcon = "fa-times-circle"; sText = "Respins"; btnColorClass = "btn-st-respins";
-    } else if(status === "Esuat") {
-        /* Aici folosim un mic truc (hack) HTML pentru a pune camionul și X-ul unul langa altul în buton */
-        sClass = "status-esuat"; sIcon = "fa-truck-fast\"></i><i class=\"fas fa-times"; sText = "Eșuat"; btnColorClass = "btn-st-esuat";
+} else if(status === "Esuat") {
+        sClass = "status-esuat"; sIcon = "fa-truck-fast flip-icon"; sText = "Eșuat"; btnColorClass = "btn-st-esuat";
     }
-
     const adminControls = globalIsAdmin ? `
         <div class="card-controls">
             <button class="control-btn edit-btn" onclick="event.stopPropagation(); openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
@@ -1923,8 +1926,7 @@ function renderCard(data) {
                         <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
                         <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
 
-<div class="status-option opt-esuat" onclick="updateStatus('${data.id}', 'Esuat')"><i class="fas fa-truck-fast"></i><i class="fas fa-times" style="margin-left: 3px;"></i> EȘUAT</div>
-                    </div>
+<div class="status-option opt-esuat" onclick="updateStatus('${data.id}', 'Esuat')"><i class="fas fa-truck-fast flip-icon"></i> EȘUAT</div>
                 </div>
             </div>
         </div>
