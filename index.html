@@ -1593,49 +1593,47 @@ const adminQuery = query(collection(db, "admin_emails"), where("email", "==", us
       document.getElementById('openAddModalBtn').onclick = () => {
           document.getElementById('addOrderModal').classList.add('active');
       };
-// --- UNIFIED SUBMIT HANDLER ---
+// --- CORRECTED SUBMIT HANDLER ---
 document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!globalIsAdmin) return notify("Acces restricționat!", true);
 
     const submitBtn = e.target.querySelector('.btn-submit-order');
+    const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE PROCESEAZĂ...';
     submitBtn.disabled = true;
 
     try {
         let finalImageUrl = null;
-        let finalFinishedUrl = null;
         let finalProofUrl = null;
 
+        // If editing, get existing URLs first
         if (editingOrderId) {
             const oldOrder = currentOrders.find(o => o.id === editingOrderId);
-            
-            // Dacă user-ul nu a apăsat "X", păstrăm URL-urile vechi. Dacă a apăsat, le setăm null
-            finalImageUrl = document.getElementById('imageDropArea').dataset.removed === "true" ? null : oldOrder.imageUrl;
-            finalFinishedUrl = document.getElementById('finishedDropArea').dataset.removed === "true" ? null : (oldOrder.finishedUrl || null);
-            finalProofUrl = oldOrder.paymentProof; // Dovada ramane aceeasi daca nu se schimba
+            finalImageUrl = oldOrder.imageUrl;
+            finalProofUrl = oldOrder.paymentProof;
         }
 
         const imageFile = document.getElementById('oImageFile').files[0];
-        const finishedFile = document.getElementById('oFinishedFile').files[0];
         const proofFile = document.getElementById('oProofFile').files[0];
 
+        // Upload new files only if selected
         if (imageFile) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE REFERINȚĂ...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE PORTRET...';
             finalImageUrl = await uploadToImgBB(imageFile);
         }
-        if (finishedFile) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE FINALIZAT...';
-            finalFinishedUrl = await uploadToImgBB(finishedFile);
-        }
+        
         if (proofFile) {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
             finalProofUrl = await uploadToImgBB(proofFile);
         }
 
-        if (!finalImageUrl && !editingOrderId) throw new Error("Imaginea portretului lipsește!");
+        // Check if we have an image (especially for new orders)
+        if (!finalImageUrl) {
+            throw new Error("Imaginea portretului lipsește!");
+        }
 
-        // Generare adresa bloc
+        // Build address string
         const bl = document.getElementById('oBl').value.trim();
         const sc = document.getElementById('oSc').value.trim();
         const inter = document.getElementById('oInterfon').value.trim();
@@ -1649,9 +1647,9 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         if(ap) bParts.push(`Ap. ${ap}`);
         const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
 
+        // THE FIX: Added imageUrl to the object below
         const orderData = {
-            imageUrl: finalImageUrl,
-            finishedUrl: finalFinishedUrl, // SALVĂM ȘI POZA NOUĂ
+            imageUrl: finalImageUrl, // <--- THIS WAS MISSING
             paymentProof: finalProofUrl,
             orderDate: document.getElementById('oDate').value,
             price: parseFloat(document.getElementById('oPrice').value),
@@ -1681,16 +1679,12 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
             notify("Comanda a fost adăugată!");
         }
 
-        // RESET COMPLET
+        // Reset UI
         editingOrderId = null;
         document.getElementById('addOrderForm').reset();
         document.getElementById('addOrderModal').classList.remove('active');
-        
-        ['image', 'finished'].forEach(prefix => {
-            document.getElementById(prefix + 'DropPreview').style.display = 'none';
-            document.getElementById(prefix + 'DropPlaceholder').style.display = 'block';
-            document.getElementById(prefix + 'RemoveBtn').style.display = 'none';
-        });
+        imageDropPreview.style.display = 'none';
+        imageDropPlaceholder.style.display = 'block';
 
     } catch (err) {
         console.error(err);
@@ -1698,6 +1692,106 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
+    }
+});
+document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!globalIsAdmin) return notify("Acces restricționat!", true);
+
+    const submitBtn = e.target.querySelector('.btn-submit-order');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE PROCESEAZĂ...';
+    submitBtn.disabled = true;
+
+    try {
+        let finalImageUrl = null;
+        let finalProofUrl = null;
+
+        // Dacă suntem în modul EDITARE, luăm link-urile vechi ca bază
+        if (editingOrderId) {
+            const oldOrder = currentOrders.find(o => o.id === editingOrderId);
+            finalImageUrl = oldOrder.imageUrl;
+            finalProofUrl = oldOrder.paymentProof;
+        }
+
+        const imageFile = document.getElementById('oImageFile').files[0];
+        const proofFile = document.getElementById('oProofFile').files[0];
+
+        // Încărcăm poze noi DOAR dacă au fost selectate fișiere
+        if (imageFile) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE PORTRET...';
+            finalImageUrl = await uploadToImgBB(imageFile);
+        }
+        if (proofFile) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
+            finalProofUrl = await uploadToImgBB(proofFile);
+        }
+
+        // Construim string-ul pentru bloc/adresă
+        const bl = document.getElementById('oBl').value.trim();
+        const sc = document.getElementById('oSc').value.trim();
+        const inter = document.getElementById('oInterfon').value.trim();
+        const et = document.getElementById('oEt').value.trim();
+        const ap = document.getElementById('oAp').value.trim();
+        let bParts = [];
+        if(bl) bParts.push(`Bl. ${bl}`);
+        if(sc) bParts.push(`Sc. ${sc}`);
+        if(inter) bParts.push(`Int. ${inter}`);
+        if(et) bParts.push(`Et. ${et}`);
+        if(ap) bParts.push(`Ap. ${ap}`);
+        const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
+
+        // Obiectul cu toate datele din formular
+        const orderData = {
+            paymentProof: finalProofUrl,
+            orderDate: document.getElementById('oDate').value,
+    price: parseFloat(document.getElementById('oPrice').value),
+    portraitType: document.getElementById('oType').value.trim(),
+    portraitSize: document.getElementById('oSize').value.trim(),
+    paperType: document.getElementById('oPaper').value.trim(),
+    workHours: document.getElementById('oHours').value.trim(),
+    currency: document.getElementById('oCurrency').value, // SALVEAZĂ MONEDA
+            name: document.getElementById('oName').value.trim(),
+            phone: document.getElementById('oPhone').value.trim(),
+            zipCode: document.getElementById('oZip').value.trim(),
+            city: document.getElementById('oCity').value.trim(),
+            county: document.getElementById('oCounty').value.trim(),
+            street: document.getElementById('oStreet').value.trim(),
+            building: finalBuilding,
+            notes: document.getElementById('oNotes').value.trim()
+        };
+
+        if (editingOrderId) {
+            // MOD EDITARE: Actualizăm documentul existent
+            await updateDoc(doc(db, "comenzi", editingOrderId), orderData);
+            notify("Comanda a fost actualizată cu succes!");
+        } else {
+            // MOD ADĂUGARE: Creăm un document nou
+            orderData.status = "In Curs"; // Status default doar la comenzi noi
+            orderData.createdAt = serverTimestamp();
+            orderData.createdBy = auth.currentUser.email;
+            await addDoc(collection(db, "comenzi"), orderData);
+            notify("Comanda a fost adăugată!");
+        }
+
+        // RESETARE FORMULAR ȘI MODAL
+        editingOrderId = null; // Resetăm starea de editare
+        document.getElementById('addOrderForm').reset();
+        document.getElementById('addOrderModal').classList.remove('active');
+        
+        // Resetăm UI-ul la starea de "Adăugare"
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
+        document.getElementById('oImageFile').required = true;
+        document.getElementById('oProofFile').required = true;
+        imageDropPreview.style.display = 'none';
+        imageDropPlaceholder.style.display = 'block';
+
+    } catch (err) {
+        console.error(err);
+        notify("Eroare: " + err.message, true);
+    } finally {
+        submitBtn.disabled = false;
+        if (!editingOrderId) submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
     }
 });
 
