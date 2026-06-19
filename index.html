@@ -1129,18 +1129,6 @@
     background: var(--primary);
     color: #000;
 }
-
-/* --- STATUS ESUAT (LIVRARE ESUATA) --- */
-.status-esuat { border-color: #d63031 !important; box-shadow: 0 0 15px rgba(214, 48, 49, 0.2) !important; }
-.btn-st-esuat { border: 1px solid #d63031 !important; color: #d63031 !important; }
-.opt-esuat i { color: #d63031; }
-.filter-btn.active[onclick*="Esuat"] { border-color: #d63031; color: #d63031; box-shadow: 0 0 15px rgba(214, 48, 49, 0.3); }
-
-/* Clasă pentru a întoarce camionul spre stânga */
-.flip-icon {
-    display: inline-block;
-    transform: scaleX(-1);
-}
   </style>
 </head>
 <body>
@@ -1186,10 +1174,6 @@
         </button>
 <button class="filter-btn" onclick="setFilter('Anulat')" id="filter-anulat">
             <i class="fas fa-ban"></i> ANULAT <span class="filter-count" id="count-anulat">(0)</span>
-        </button>
-
-<button class="filter-btn" onclick="setFilter('Esuat')" id="filter-esuat">
-            <i class="fas fa-truck-fast flip-icon"></i> EȘUAT <span class="filter-count" id="count-esuat">(0)</span>
         </button>
         <button class="filter-btn" onclick="setFilter('Respins')" id="filter-respins">
             <i class="fas fa-times-circle"></i> RESPINS <span class="filter-count" id="count-respins">(0)</span>
@@ -1609,47 +1593,49 @@ const adminQuery = query(collection(db, "admin_emails"), where("email", "==", us
       document.getElementById('openAddModalBtn').onclick = () => {
           document.getElementById('addOrderModal').classList.add('active');
       };
-// --- CORRECTED SUBMIT HANDLER ---
+// --- UNIFIED SUBMIT HANDLER ---
 document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!globalIsAdmin) return notify("Acces restricționat!", true);
 
     const submitBtn = e.target.querySelector('.btn-submit-order');
-    const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE PROCESEAZĂ...';
     submitBtn.disabled = true;
 
     try {
         let finalImageUrl = null;
+        let finalFinishedUrl = null;
         let finalProofUrl = null;
 
-        // If editing, get existing URLs first
         if (editingOrderId) {
             const oldOrder = currentOrders.find(o => o.id === editingOrderId);
-            finalImageUrl = oldOrder.imageUrl;
-            finalProofUrl = oldOrder.paymentProof;
+            
+            // Dacă user-ul nu a apăsat "X", păstrăm URL-urile vechi. Dacă a apăsat, le setăm null
+            finalImageUrl = document.getElementById('imageDropArea').dataset.removed === "true" ? null : oldOrder.imageUrl;
+            finalFinishedUrl = document.getElementById('finishedDropArea').dataset.removed === "true" ? null : (oldOrder.finishedUrl || null);
+            finalProofUrl = oldOrder.paymentProof; // Dovada ramane aceeasi daca nu se schimba
         }
 
         const imageFile = document.getElementById('oImageFile').files[0];
+        const finishedFile = document.getElementById('oFinishedFile').files[0];
         const proofFile = document.getElementById('oProofFile').files[0];
 
-        // Upload new files only if selected
         if (imageFile) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE PORTRET...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE REFERINȚĂ...';
             finalImageUrl = await uploadToImgBB(imageFile);
         }
-        
+        if (finishedFile) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE FINALIZAT...';
+            finalFinishedUrl = await uploadToImgBB(finishedFile);
+        }
         if (proofFile) {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
             finalProofUrl = await uploadToImgBB(proofFile);
         }
 
-        // Check if we have an image (especially for new orders)
-        if (!finalImageUrl) {
-            throw new Error("Imaginea portretului lipsește!");
-        }
+        if (!finalImageUrl && !editingOrderId) throw new Error("Imaginea portretului lipsește!");
 
-        // Build address string
+        // Generare adresa bloc
         const bl = document.getElementById('oBl').value.trim();
         const sc = document.getElementById('oSc').value.trim();
         const inter = document.getElementById('oInterfon').value.trim();
@@ -1663,9 +1649,9 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         if(ap) bParts.push(`Ap. ${ap}`);
         const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
 
-        // THE FIX: Added imageUrl to the object below
         const orderData = {
-            imageUrl: finalImageUrl, // <--- THIS WAS MISSING
+            imageUrl: finalImageUrl,
+            finishedUrl: finalFinishedUrl, // SALVĂM ȘI POZA NOUĂ
             paymentProof: finalProofUrl,
             orderDate: document.getElementById('oDate').value,
             price: parseFloat(document.getElementById('oPrice').value),
@@ -1695,119 +1681,23 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
             notify("Comanda a fost adăugată!");
         }
 
-        // Reset UI
+        // RESET COMPLET
         editingOrderId = null;
         document.getElementById('addOrderForm').reset();
         document.getElementById('addOrderModal').classList.remove('active');
-        imageDropPreview.style.display = 'none';
-        imageDropPlaceholder.style.display = 'block';
-
-    } catch (err) {
-        console.error(err);
-        notify("Eroare: " + err.message, true);
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
-    }
-});
-document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!globalIsAdmin) return notify("Acces restricționat!", true);
-
-    const submitBtn = e.target.querySelector('.btn-submit-order');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE PROCESEAZĂ...';
-    submitBtn.disabled = true;
-
-    try {
-        let finalImageUrl = null;
-        let finalProofUrl = null;
-
-        // Dacă suntem în modul EDITARE, luăm link-urile vechi ca bază
-        if (editingOrderId) {
-            const oldOrder = currentOrders.find(o => o.id === editingOrderId);
-            finalImageUrl = oldOrder.imageUrl;
-            finalProofUrl = oldOrder.paymentProof;
-        }
-
-        const imageFile = document.getElementById('oImageFile').files[0];
-        const proofFile = document.getElementById('oProofFile').files[0];
-
-        // Încărcăm poze noi DOAR dacă au fost selectate fișiere
-        if (imageFile) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE PORTRET...';
-            finalImageUrl = await uploadToImgBB(imageFile);
-        }
-        if (proofFile) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
-            finalProofUrl = await uploadToImgBB(proofFile);
-        }
-
-        // Construim string-ul pentru bloc/adresă
-        const bl = document.getElementById('oBl').value.trim();
-        const sc = document.getElementById('oSc').value.trim();
-        const inter = document.getElementById('oInterfon').value.trim();
-        const et = document.getElementById('oEt').value.trim();
-        const ap = document.getElementById('oAp').value.trim();
-        let bParts = [];
-        if(bl) bParts.push(`Bl. ${bl}`);
-        if(sc) bParts.push(`Sc. ${sc}`);
-        if(inter) bParts.push(`Int. ${inter}`);
-        if(et) bParts.push(`Et. ${et}`);
-        if(ap) bParts.push(`Ap. ${ap}`);
-        const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
-
-        // Obiectul cu toate datele din formular
-        const orderData = {
-            paymentProof: finalProofUrl,
-            orderDate: document.getElementById('oDate').value,
-    price: parseFloat(document.getElementById('oPrice').value),
-    portraitType: document.getElementById('oType').value.trim(),
-    portraitSize: document.getElementById('oSize').value.trim(),
-    paperType: document.getElementById('oPaper').value.trim(),
-    workHours: document.getElementById('oHours').value.trim(),
-    currency: document.getElementById('oCurrency').value, // SALVEAZĂ MONEDA
-            name: document.getElementById('oName').value.trim(),
-            phone: document.getElementById('oPhone').value.trim(),
-            zipCode: document.getElementById('oZip').value.trim(),
-            city: document.getElementById('oCity').value.trim(),
-            county: document.getElementById('oCounty').value.trim(),
-            street: document.getElementById('oStreet').value.trim(),
-            building: finalBuilding,
-            notes: document.getElementById('oNotes').value.trim()
-        };
-
-        if (editingOrderId) {
-            // MOD EDITARE: Actualizăm documentul existent
-            await updateDoc(doc(db, "comenzi", editingOrderId), orderData);
-            notify("Comanda a fost actualizată cu succes!");
-        } else {
-            // MOD ADĂUGARE: Creăm un document nou
-            orderData.status = "In Curs"; // Status default doar la comenzi noi
-            orderData.createdAt = serverTimestamp();
-            orderData.createdBy = auth.currentUser.email;
-            await addDoc(collection(db, "comenzi"), orderData);
-            notify("Comanda a fost adăugată!");
-        }
-
-        // RESETARE FORMULAR ȘI MODAL
-        editingOrderId = null; // Resetăm starea de editare
-        document.getElementById('addOrderForm').reset();
-        document.getElementById('addOrderModal').classList.remove('active');
         
-        // Resetăm UI-ul la starea de "Adăugare"
-        submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
-        document.getElementById('oImageFile').required = true;
-        document.getElementById('oProofFile').required = true;
-        imageDropPreview.style.display = 'none';
-        imageDropPlaceholder.style.display = 'block';
+        ['image', 'finished'].forEach(prefix => {
+            document.getElementById(prefix + 'DropPreview').style.display = 'none';
+            document.getElementById(prefix + 'DropPlaceholder').style.display = 'block';
+            document.getElementById(prefix + 'RemoveBtn').style.display = 'none';
+        });
 
     } catch (err) {
         console.error(err);
         notify("Eroare: " + err.message, true);
     } finally {
         submitBtn.disabled = false;
-        if (!editingOrderId) submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
     }
 });
 
@@ -1838,7 +1728,7 @@ function loadOrdersRealtime() {
         ordersGrid.innerHTML = ""; 
         currentOrders = []; 
         
-let counts = { "In Curs": 0, "Livrat": 0, "Anulat": 0, "Respins": 0, "Esuat": 0 };
+        let counts = { "In Curs": 0, "Livrat": 0, "Anulat": 0, "Respins": 0 };
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
             data.id = docSnap.id;
@@ -1866,13 +1756,11 @@ function updateFilterLabels(counts) {
     const livratEl = document.getElementById('count-livrat');
     const anulatEl = document.getElementById('count-anulat');
     const respinsEl = document.getElementById('count-respins');
-const esuatEl = document.getElementById('count-esuat');
 
     if (cursEl) cursEl.innerText = `(${counts["In Curs"]})`;
     if (livratEl) livratEl.innerText = `(${counts["Livrat"]})`;
     if (anulatEl) anulatEl.innerText = `(${counts["Anulat"]})`;
     if (respinsEl) respinsEl.innerText = `(${counts["Respins"]})`;
-if (esuatEl) esuatEl.innerText = `(${counts["Esuat"]})`;
 }
 
 function renderCard(data) {
@@ -1883,11 +1771,10 @@ function renderCard(data) {
         sClass = "status-livrat"; sIcon = "fa-truck-fast"; sText = "Livrat"; btnColorClass = "btn-st-livrat";
     } else if(status === "Anulat") { 
         sClass = "status-anulat"; sIcon = "fa-ban"; sText = "Anulat"; btnColorClass = "btn-st-anulat";
-} else if(status === "Respins") {
+    } else if(status === "Respins") {
         sClass = "status-respins"; sIcon = "fa-times-circle"; sText = "Respins"; btnColorClass = "btn-st-respins";
-} else if(status === "Esuat") {
-        sClass = "status-esuat"; sIcon = "fa-truck-fast flip-icon"; sText = "Eșuat"; btnColorClass = "btn-st-esuat";
     }
+
     const adminControls = globalIsAdmin ? `
         <div class="card-controls">
             <button class="control-btn edit-btn" onclick="event.stopPropagation(); openEditModal('${data.id}')"><i class="fas fa-edit"></i></button>
@@ -1925,8 +1812,7 @@ function renderCard(data) {
                         <div class="status-option opt-livrat" onclick="updateStatus('${data.id}', 'Livrat')"><i class="fas fa-truck-fast"></i> LIVRAT</div>
                         <div class="status-option opt-anulat" onclick="updateStatus('${data.id}', 'Anulat')"><i class="fas fa-ban"></i> ANULAT</div>
                         <div class="status-option opt-respins" onclick="updateStatus('${data.id}', 'Respins')"><i class="fas fa-times-circle"></i> RESPINS</div>
-
-<div class="status-option opt-esuat" onclick="updateStatus('${data.id}', 'Esuat')"><i class="fas fa-truck-fast flip-icon"></i> EȘUAT</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1971,36 +1857,48 @@ if(currentStatus === "In Curs") nextStatus = "Livrat";
       }
 
 window.openOrderDetails = function(orderId) {
-          const order = currentOrders.find(o => o.id === orderId);
-          if(!order) return;
+    const order = currentOrders.find(o => o.id === orderId);
+    if(!order) return;
 
-          document.getElementById('dImage').src = order.imageUrl;
-          document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
-          document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
-document.getElementById('dType').innerText = order.portraitType || "-";
-document.getElementById('dSize').innerText = order.portraitSize || "-";
-document.getElementById('dPaper').innerText = order.paperType || "-";
-document.getElementById('dHours').innerText = order.workHours || "-";
-          document.getElementById('dProof').href = order.paymentProof;
-          document.getElementById('dName').innerText = order.name;
-          document.getElementById('dPhone').innerText = order.phone;
-          document.getElementById('dZip').innerText = order.zipCode;
-          document.getElementById('dCity').innerText = order.city;
-          document.getElementById('dCounty').innerText = order.county;
-          document.getElementById('dStreet').innerText = order.street;
-          document.getElementById('dNotes').innerText = order.notes || "Nicio notiță";
+    // Afișare Imagine Referință
+    document.getElementById('dImage').src = order.imageUrl;
+    
+    // Afișare Portret Finalizat (dacă există)
+    const dFinishedImage = document.getElementById('dFinishedImage');
+    if (order.finishedUrl) {
+        dFinishedImage.src = order.finishedUrl;
+        dFinishedImage.style.display = 'block';
+    } else {
+        dFinishedImage.src = '';
+        dFinishedImage.style.display = 'none';
+    }
 
-          // Splitting the building string back into 5 parts
-          // This looks for "Bl. X", "Sc. X", etc. in your saved string
-          const b = order.building || "";
-          document.getElementById('dBl').innerText = b.match(/Bl\. ([^,]+)/)?.[1] || "-";
-          document.getElementById('dSc').innerText = b.match(/Sc\. ([^,]+)/)?.[1] || "-";
-          document.getElementById('dInt').innerText = b.match(/Int\. ([^,]+)/)?.[1] || "-";
-          document.getElementById('dEt').innerText = b.match(/Et\. ([^,]+)/)?.[1] || "-";
-          document.getElementById('dAp').innerText = b.match(/Ap\. ([^,]+)/)?.[1] || "-";
+    document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
+    document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
+    document.getElementById('dType').innerText = order.portraitType || "-";
+    document.getElementById('dSize').innerText = order.portraitSize || "-";
+    document.getElementById('dPaper').innerText = order.paperType || "-";
+    document.getElementById('dHours').innerText = order.workHours || "-";
+    document.getElementById('dProof').href = order.paymentProof;
+    document.getElementById('dName').innerText = order.name;
+    document.getElementById('dPhone').innerText = order.phone;
+    document.getElementById('dZip').innerText = order.zipCode;
+    document.getElementById('dCity').innerText = order.city;
+    document.getElementById('dCounty').innerText = order.county;
+    document.getElementById('dStreet').innerText = order.street;
+    document.getElementById('dNotes').innerText = order.notes || "Nicio notiță";
 
-          document.getElementById('orderDetailsModal').classList.add('active');
-      };
+    // Splitting the building string back into 5 parts
+    // This looks for "Bl. X", "Sc. X", etc. in your saved string
+    const b = order.building || "";
+    document.getElementById('dBl').innerText = b.match(/Bl\. ([^,]+)/)?.[1] || "-";
+    document.getElementById('dSc').innerText = b.match(/Sc\. ([^,]+)/)?.[1] || "-";
+    document.getElementById('dInt').innerText = b.match(/Int\. ([^,]+)/)?.[1] || "-";
+    document.getElementById('dEt').innerText = b.match(/Et\. ([^,]+)/)?.[1] || "-";
+    document.getElementById('dAp').innerText = b.match(/Ap\. ([^,]+)/)?.[1] || "-";
+
+    document.getElementById('orderDetailsModal').classList.add('active');
+};
 
 
 // Function to copy text to clipboard
@@ -2050,42 +1948,65 @@ function notify(message, isError = false) {
           await updateDoc(doc(db, "comenzi", id), { status: newStatus });
       };
 
-      // --- FULL EDIT MODAL LOGIC ---
-      window.openEditModal = (id) => {
-          const order = currentOrders.find(o => o.id === id);
-          if(!order) return;
-          editingOrderId = id;
+// --- FULL EDIT MODAL LOGIC ---
+window.openEditModal = (id) => {
+    const order = currentOrders.find(o => o.id === id);
+    if(!order) return;
+    editingOrderId = id;
 
-const currentSymbol = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' }[order.currency || 'RON'];
-selectCurrency(currentSymbol, order.currency || 'RON');
+    const currentSymbol = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' }[order.currency || 'RON'];
+    selectCurrency(currentSymbol, order.currency || 'RON');
 
-          // Fill all fields
-          document.getElementById('oDate').value = order.orderDate;
-          document.getElementById('oPrice').value = order.price;
-document.getElementById('oType').value = order.portraitType || "";
-document.getElementById('oSize').value = order.portraitSize || "";
-document.getElementById('oPaper').value = order.paperType || "";
-document.getElementById('oHours').value = order.workHours || "";
-          document.getElementById('oName').value = order.name;
-          document.getElementById('oPhone').value = order.phone;
-          document.getElementById('oZip').value = order.zipCode;
-          document.getElementById('oCity').value = order.city;
-          document.getElementById('oCounty').value = order.county;
-          document.getElementById('oStreet').value = order.street;
-          document.getElementById('oNotes').value = order.notes;
+    // Fill all fields
+    document.getElementById('oDate').value = order.orderDate;
+    document.getElementById('oPrice').value = order.price;
+    document.getElementById('oType').value = order.portraitType || "";
+    document.getElementById('oSize').value = order.portraitSize || "";
+    document.getElementById('oPaper').value = order.paperType || "";
+    document.getElementById('oHours').value = order.workHours || "";
+    document.getElementById('oName').value = order.name;
+    document.getElementById('oPhone').value = order.phone;
+    document.getElementById('oZip').value = order.zipCode;
+    document.getElementById('oCity').value = order.city;
+    document.getElementById('oCounty').value = order.county;
+    document.getElementById('oStreet').value = order.street;
+    document.getElementById('oNotes').value = order.notes;
 
-          // Show Preview
-          imageDropPreview.src = order.imageUrl;
-          imageDropPreview.style.display = 'block';
-          imageDropPlaceholder.style.display = 'none';
+    // Show Previews (Imagine Referință)
+    const imageDropPreview = document.getElementById('imageDropPreview');
+    imageDropPreview.src = order.imageUrl;
+    imageDropPreview.style.display = 'block';
+    document.getElementById('imageDropPlaceholder').style.display = 'none';
+    document.getElementById('imageRemoveBtn').style.display = 'flex';
+    document.getElementById('imageDropArea').dataset.removed = "false";
 
-          // Update Button UI
-          document.querySelector('.btn-submit-order').innerText = "SALVEAZĂ MODIFICĂRILE";
-          document.getElementById('oImageFile').required = false;
-          document.getElementById('oProofFile').required = false;
-          document.getElementById('addOrderModal').classList.add('active');
-      };
+    // Show Previews (Portret Finalizat)
+    const finishedDropPreview = document.getElementById('finishedDropPreview');
+    const finishedDropPlaceholder = document.getElementById('finishedDropPlaceholder');
+    const finishedRemoveBtn = document.getElementById('finishedRemoveBtn');
+    const finishedDropArea = document.getElementById('finishedDropArea');
+    
+    if (order.finishedUrl) {
+        finishedDropPreview.src = order.finishedUrl;
+        finishedDropPreview.style.display = 'block';
+        finishedDropPlaceholder.style.display = 'none';
+        finishedRemoveBtn.style.display = 'flex';
+        finishedDropArea.dataset.removed = "false";
+    } else {
+        finishedDropPreview.src = '';
+        finishedDropPreview.style.display = 'none';
+        finishedDropPlaceholder.style.display = 'block';
+        finishedRemoveBtn.style.display = 'none';
+        finishedDropArea.dataset.removed = "false";
+    }
 
+    // Update Button UI
+    document.querySelector('.btn-submit-order').innerText = "SALVEAZĂ MODIFICĂRILE";
+    document.getElementById('oImageFile').required = false;
+    // Nu setam required la oFinishedFile pt ca e mereu optional
+    document.getElementById('oProofFile').required = false;
+    document.getElementById('addOrderModal').classList.add('active');
+};
       // --- UPDATE THE SUBMIT HANDLER ---
       // Re-map the open modal button to reset the "Edit Mode"
       document.getElementById('openAddModalBtn').addEventListener('click', () => {
@@ -2182,7 +2103,6 @@ function updateStatistics() {
                 hours: 0,
                 delivered: 0,
                 rejected: 0,
-                failed: 0, // <-- ADAUGĂ ASTA
                 incomeRON: 0,
                 rawDate: tempDate // for sorting
             };
@@ -2201,16 +2121,14 @@ function updateStatistics() {
         // 3. Status Counters
         if (status === "Livrat") g.delivered++;
         if (status === "Respins") g.rejected++;
-        if (status === "Esuat") g.failed++;
-
 
         // 4. INCOME CALCULATION (The 50% Rule)
         const price = parseFloat(order.price) || 0;
         const rate = EXCHANGE_RATES[order.currency] || 1;
         let calculatedValue = price * rate;
 
-if (status === "Anulat" || status === "Esuat") {
-            // Canceled or Failed deliveries bring in 0 RON
+        if (status === "Anulat") {
+            // Canceled orders bring in 0 RON
             calculatedValue = 0;
         } else if (status === "Respins") {
             // Rejected orders count for only 50% (half goes back to client)
@@ -2267,13 +2185,6 @@ window.showMonthDetails = (data, btn) => {
                 <div class="stat-value">${data.rejected}</div>
                 <i class="fas fa-times-circle card-icon" style="color: #ff4757;"></i>
             </div>
-
-<div class="stat-card" style="border-color: #d63031;">
-                <div class="stat-label">Livrări Eșuate</div>
-                <div class="stat-value">${data.failed || 0}</div>
-                <i class="fas fa-truck-fast card-icon" style="color: #d63031;"></i>
-            </div>
-
             <div class="stat-card" style="grid-column: 1 / -1; border-color: #00ff88; background: rgba(0, 255, 136, 0.05);">
                 <div class="stat-label">Venit Total (Calculat în LEI)</div>
                 <div class="stat-value income-value" style="font-size: 35px;">${new Intl.NumberFormat('ro-RO').format(Math.round(data.incomeRON))} RON</div>
