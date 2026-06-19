@@ -1857,48 +1857,36 @@ if(currentStatus === "In Curs") nextStatus = "Livrat";
       }
 
 window.openOrderDetails = function(orderId) {
-    const order = currentOrders.find(o => o.id === orderId);
-    if(!order) return;
+          const order = currentOrders.find(o => o.id === orderId);
+          if(!order) return;
 
-    // Afișare Imagine Referință
-    document.getElementById('dImage').src = order.imageUrl;
-    
-    // Afișare Portret Finalizat (dacă există)
-    const dFinishedImage = document.getElementById('dFinishedImage');
-    if (order.finishedUrl) {
-        dFinishedImage.src = order.finishedUrl;
-        dFinishedImage.style.display = 'block';
-    } else {
-        dFinishedImage.src = '';
-        dFinishedImage.style.display = 'none';
-    }
+          document.getElementById('dImage').src = order.imageUrl;
+          document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
+          document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
+document.getElementById('dType').innerText = order.portraitType || "-";
+document.getElementById('dSize').innerText = order.portraitSize || "-";
+document.getElementById('dPaper').innerText = order.paperType || "-";
+document.getElementById('dHours').innerText = order.workHours || "-";
+          document.getElementById('dProof').href = order.paymentProof;
+          document.getElementById('dName').innerText = order.name;
+          document.getElementById('dPhone').innerText = order.phone;
+          document.getElementById('dZip').innerText = order.zipCode;
+          document.getElementById('dCity').innerText = order.city;
+          document.getElementById('dCounty').innerText = order.county;
+          document.getElementById('dStreet').innerText = order.street;
+          document.getElementById('dNotes').innerText = order.notes || "Nicio notiță";
 
-    document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
-    document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
-    document.getElementById('dType').innerText = order.portraitType || "-";
-    document.getElementById('dSize').innerText = order.portraitSize || "-";
-    document.getElementById('dPaper').innerText = order.paperType || "-";
-    document.getElementById('dHours').innerText = order.workHours || "-";
-    document.getElementById('dProof').href = order.paymentProof;
-    document.getElementById('dName').innerText = order.name;
-    document.getElementById('dPhone').innerText = order.phone;
-    document.getElementById('dZip').innerText = order.zipCode;
-    document.getElementById('dCity').innerText = order.city;
-    document.getElementById('dCounty').innerText = order.county;
-    document.getElementById('dStreet').innerText = order.street;
-    document.getElementById('dNotes').innerText = order.notes || "Nicio notiță";
+          // Splitting the building string back into 5 parts
+          // This looks for "Bl. X", "Sc. X", etc. in your saved string
+          const b = order.building || "";
+          document.getElementById('dBl').innerText = b.match(/Bl\. ([^,]+)/)?.[1] || "-";
+          document.getElementById('dSc').innerText = b.match(/Sc\. ([^,]+)/)?.[1] || "-";
+          document.getElementById('dInt').innerText = b.match(/Int\. ([^,]+)/)?.[1] || "-";
+          document.getElementById('dEt').innerText = b.match(/Et\. ([^,]+)/)?.[1] || "-";
+          document.getElementById('dAp').innerText = b.match(/Ap\. ([^,]+)/)?.[1] || "-";
 
-    // Splitting the building string back into 5 parts
-    // This looks for "Bl. X", "Sc. X", etc. in your saved string
-    const b = order.building || "";
-    document.getElementById('dBl').innerText = b.match(/Bl\. ([^,]+)/)?.[1] || "-";
-    document.getElementById('dSc').innerText = b.match(/Sc\. ([^,]+)/)?.[1] || "-";
-    document.getElementById('dInt').innerText = b.match(/Int\. ([^,]+)/)?.[1] || "-";
-    document.getElementById('dEt').innerText = b.match(/Et\. ([^,]+)/)?.[1] || "-";
-    document.getElementById('dAp').innerText = b.match(/Ap\. ([^,]+)/)?.[1] || "-";
-
-    document.getElementById('orderDetailsModal').classList.add('active');
-};
+          document.getElementById('orderDetailsModal').classList.add('active');
+      };
 
 
 // Function to copy text to clipboard
@@ -1948,65 +1936,42 @@ function notify(message, isError = false) {
           await updateDoc(doc(db, "comenzi", id), { status: newStatus });
       };
 
-// --- FULL EDIT MODAL LOGIC ---
-window.openEditModal = (id) => {
-    const order = currentOrders.find(o => o.id === id);
-    if(!order) return;
-    editingOrderId = id;
+      // --- FULL EDIT MODAL LOGIC ---
+      window.openEditModal = (id) => {
+          const order = currentOrders.find(o => o.id === id);
+          if(!order) return;
+          editingOrderId = id;
 
-    const currentSymbol = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' }[order.currency || 'RON'];
-    selectCurrency(currentSymbol, order.currency || 'RON');
+const currentSymbol = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' }[order.currency || 'RON'];
+selectCurrency(currentSymbol, order.currency || 'RON');
 
-    // Fill all fields
-    document.getElementById('oDate').value = order.orderDate;
-    document.getElementById('oPrice').value = order.price;
-    document.getElementById('oType').value = order.portraitType || "";
-    document.getElementById('oSize').value = order.portraitSize || "";
-    document.getElementById('oPaper').value = order.paperType || "";
-    document.getElementById('oHours').value = order.workHours || "";
-    document.getElementById('oName').value = order.name;
-    document.getElementById('oPhone').value = order.phone;
-    document.getElementById('oZip').value = order.zipCode;
-    document.getElementById('oCity').value = order.city;
-    document.getElementById('oCounty').value = order.county;
-    document.getElementById('oStreet').value = order.street;
-    document.getElementById('oNotes').value = order.notes;
+          // Fill all fields
+          document.getElementById('oDate').value = order.orderDate;
+          document.getElementById('oPrice').value = order.price;
+document.getElementById('oType').value = order.portraitType || "";
+document.getElementById('oSize').value = order.portraitSize || "";
+document.getElementById('oPaper').value = order.paperType || "";
+document.getElementById('oHours').value = order.workHours || "";
+          document.getElementById('oName').value = order.name;
+          document.getElementById('oPhone').value = order.phone;
+          document.getElementById('oZip').value = order.zipCode;
+          document.getElementById('oCity').value = order.city;
+          document.getElementById('oCounty').value = order.county;
+          document.getElementById('oStreet').value = order.street;
+          document.getElementById('oNotes').value = order.notes;
 
-    // Show Previews (Imagine Referință)
-    const imageDropPreview = document.getElementById('imageDropPreview');
-    imageDropPreview.src = order.imageUrl;
-    imageDropPreview.style.display = 'block';
-    document.getElementById('imageDropPlaceholder').style.display = 'none';
-    document.getElementById('imageRemoveBtn').style.display = 'flex';
-    document.getElementById('imageDropArea').dataset.removed = "false";
+          // Show Preview
+          imageDropPreview.src = order.imageUrl;
+          imageDropPreview.style.display = 'block';
+          imageDropPlaceholder.style.display = 'none';
 
-    // Show Previews (Portret Finalizat)
-    const finishedDropPreview = document.getElementById('finishedDropPreview');
-    const finishedDropPlaceholder = document.getElementById('finishedDropPlaceholder');
-    const finishedRemoveBtn = document.getElementById('finishedRemoveBtn');
-    const finishedDropArea = document.getElementById('finishedDropArea');
-    
-    if (order.finishedUrl) {
-        finishedDropPreview.src = order.finishedUrl;
-        finishedDropPreview.style.display = 'block';
-        finishedDropPlaceholder.style.display = 'none';
-        finishedRemoveBtn.style.display = 'flex';
-        finishedDropArea.dataset.removed = "false";
-    } else {
-        finishedDropPreview.src = '';
-        finishedDropPreview.style.display = 'none';
-        finishedDropPlaceholder.style.display = 'block';
-        finishedRemoveBtn.style.display = 'none';
-        finishedDropArea.dataset.removed = "false";
-    }
+          // Update Button UI
+          document.querySelector('.btn-submit-order').innerText = "SALVEAZĂ MODIFICĂRILE";
+          document.getElementById('oImageFile').required = false;
+          document.getElementById('oProofFile').required = false;
+          document.getElementById('addOrderModal').classList.add('active');
+      };
 
-    // Update Button UI
-    document.querySelector('.btn-submit-order').innerText = "SALVEAZĂ MODIFICĂRILE";
-    document.getElementById('oImageFile').required = false;
-    // Nu setam required la oFinishedFile pt ca e mereu optional
-    document.getElementById('oProofFile').required = false;
-    document.getElementById('addOrderModal').classList.add('active');
-};
       // --- UPDATE THE SUBMIT HANDLER ---
       // Re-map the open modal button to reset the "Edit Mode"
       document.getElementById('openAddModalBtn').addEventListener('click', () => {
