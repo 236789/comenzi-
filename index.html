@@ -1366,11 +1366,20 @@
         </div>
     </div>
 
-    <div class="input-group">
-        <label>Stradă și nr.</label>
-        <div class="input-wrapper">
-            <input type="text" id="oStreet" class="styled-input" required>
-            <i class="fas fa-road"></i>
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+        <div class="input-group">
+            <label>Stradă</label>
+            <div class="input-wrapper">
+                <input type="text" id="oStreet" class="styled-input" required>
+                <i class="fas fa-road"></i>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Nr.</label>
+            <div class="input-wrapper">
+                <input type="text" id="oStreetNr" class="styled-input" required>
+                <i class="fas fa-home"></i>
+            </div>
         </div>
     </div>
 
@@ -1426,7 +1435,10 @@
                     <div class="input-group"><label>Cod Poștal</label><div class="input-wrapper"><div class="details-value" id="dZip"></div><i class="fas fa-mail-bulk"></i><div class="copy-btn" onclick="copyValue('dZip')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group"><label>Localitate</label><div class="input-wrapper"><div class="details-value" id="dCity"></div><i class="fas fa-city"></i><div class="copy-btn" onclick="copyValue('dCity')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group"><label>Județ / Sector</label><div class="input-wrapper"><div class="details-value" id="dCounty"></div><i class="fas fa-map-marker-alt"></i><div class="copy-btn" onclick="copyValue('dCounty')"><i class="far fa-copy"></i></div></div></div>
-                    <div class="input-group"><label>Stradă și nr.</label><div class="input-wrapper"><div class="details-value" id="dStreet"></div><i class="fas fa-road"></i><div class="copy-btn" onclick="copyValue('dStreet')"><i class="far fa-copy"></i></div></div></div>
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+    <div class="input-group"><label>Stradă</label><div class="input-wrapper"><div class="details-value" id="dStreet"></div><i class="fas fa-road"></i><div class="copy-btn" onclick="copyValue('dStreet')"><i class="far fa-copy"></i></div></div></div>
+    <div class="input-group"><label>Nr.</label><div class="input-wrapper"><div class="details-value" id="dStreetNr"></div><i class="fas fa-home"></i><div class="copy-btn" onclick="copyValue('dStreetNr')"><i class="far fa-copy"></i></div></div></div>
+</div>
 
                     <!-- 5 SEPARATE BOXES FOR BUILDING -->
                     <div class="grid-5-row">
@@ -1606,107 +1618,7 @@ const adminQuery = query(collection(db, "admin_emails"), where("email", "==", us
       document.getElementById('openAddModalBtn').onclick = () => {
           document.getElementById('addOrderModal').classList.add('active');
       };
-// --- CORRECTED SUBMIT HANDLER ---
-document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!globalIsAdmin) return notify("Acces restricționat!", true);
-
-    const submitBtn = e.target.querySelector('.btn-submit-order');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE PROCESEAZĂ...';
-    submitBtn.disabled = true;
-
-    try {
-        let finalImageUrl = null;
-        let finalProofUrl = null;
-
-        // If editing, get existing URLs first
-        if (editingOrderId) {
-            const oldOrder = currentOrders.find(o => o.id === editingOrderId);
-            finalImageUrl = oldOrder.imageUrl;
-            finalProofUrl = oldOrder.paymentProof;
-        }
-
-        const imageFile = document.getElementById('oImageFile').files[0];
-        const proofFile = document.getElementById('oProofFile').files[0];
-
-        // Upload new files only if selected
-        if (imageFile) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE PORTRET...';
-            finalImageUrl = await uploadToImgBB(imageFile);
-        }
-        
-        if (proofFile) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
-            finalProofUrl = await uploadToImgBB(proofFile);
-        }
-
-        // Check if we have an image (especially for new orders)
-        if (!finalImageUrl) {
-            throw new Error("Imaginea portretului lipsește!");
-        }
-
-        // Build address string
-        const bl = document.getElementById('oBl').value.trim();
-        const sc = document.getElementById('oSc').value.trim();
-        const inter = document.getElementById('oInterfon').value.trim();
-        const et = document.getElementById('oEt').value.trim();
-        const ap = document.getElementById('oAp').value.trim();
-        let bParts = [];
-        if(bl) bParts.push(`Bl. ${bl}`);
-        if(sc) bParts.push(`Sc. ${sc}`);
-        if(inter) bParts.push(`Int. ${inter}`);
-        if(et) bParts.push(`Et. ${et}`);
-        if(ap) bParts.push(`Ap. ${ap}`);
-        const finalBuilding = bParts.length > 0 ? bParts.join(', ') : "La casă";
-
-        // THE FIX: Added imageUrl to the object below
-        const orderData = {
-            imageUrl: finalImageUrl, // <--- THIS WAS MISSING
-            paymentProof: finalProofUrl,
-            orderDate: document.getElementById('oDate').value,
-            price: parseFloat(document.getElementById('oPrice').value),
-            portraitType: document.getElementById('oType').value.trim(),
-            portraitSize: document.getElementById('oSize').value.trim(),
-            paperType: document.getElementById('oPaper').value.trim(),
-            workHours: document.getElementById('oHours').value.trim(),
-            currency: document.getElementById('oCurrency').value, 
-            name: document.getElementById('oName').value.trim(),
-            phone: document.getElementById('oPhone').value.trim(),
-            zipCode: document.getElementById('oZip').value.trim(),
-            city: document.getElementById('oCity').value.trim(),
-            county: document.getElementById('oCounty').value.trim(),
-            street: document.getElementById('oStreet').value.trim(),
-            building: finalBuilding,
-            notes: document.getElementById('oNotes').value.trim()
-        };
-
-        if (editingOrderId) {
-            await updateDoc(doc(db, "comenzi", editingOrderId), orderData);
-            notify("Comanda a fost actualizată!");
-        } else {
-            orderData.status = "In Curs"; 
-            orderData.createdAt = serverTimestamp();
-            orderData.createdBy = auth.currentUser.email;
-            await addDoc(collection(db, "comenzi"), orderData);
-            notify("Comanda a fost adăugată!");
-        }
-
-        // Reset UI
-        editingOrderId = null;
-        document.getElementById('addOrderForm').reset();
-        document.getElementById('addOrderModal').classList.remove('active');
-        imageDropPreview.style.display = 'none';
-        imageDropPlaceholder.style.display = 'block';
-
-    } catch (err) {
-        console.error(err);
-        notify("Eroare: " + err.message, true);
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
-    }
-});
+// --- UNIFIED SUBMIT HANDLER ---
 document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!globalIsAdmin) return notify("Acces restricționat!", true);
@@ -1735,10 +1647,13 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE PORTRET...';
             finalImageUrl = await uploadToImgBB(imageFile);
         }
+        
         if (proofFile) {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE DOVADĂ...';
             finalProofUrl = await uploadToImgBB(proofFile);
         }
+
+        if (!finalImageUrl) throw new Error("Imaginea portretului lipsește!");
 
         // Construim string-ul pentru bloc/adresă
         const bl = document.getElementById('oBl').value.trim();
@@ -1756,20 +1671,22 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
 
         // Obiectul cu toate datele din formular
         const orderData = {
+            imageUrl: finalImageUrl,
             paymentProof: finalProofUrl,
             orderDate: document.getElementById('oDate').value,
-    price: parseFloat(document.getElementById('oPrice').value),
-    portraitType: document.getElementById('oType').value.trim(),
-    portraitSize: document.getElementById('oSize').value.trim(),
-    paperType: document.getElementById('oPaper').value.trim(),
-    workHours: document.getElementById('oHours').value.trim(),
-    currency: document.getElementById('oCurrency').value, // SALVEAZĂ MONEDA
+            price: parseFloat(document.getElementById('oPrice').value),
+            portraitType: document.getElementById('oType').value.trim(),
+            portraitSize: document.getElementById('oSize').value.trim(),
+            paperType: document.getElementById('oPaper').value.trim(),
+            workHours: document.getElementById('oHours').value.trim(),
+            currency: document.getElementById('oCurrency').value, 
             name: document.getElementById('oName').value.trim(),
             phone: document.getElementById('oPhone').value.trim(),
             zipCode: document.getElementById('oZip').value.trim(),
             city: document.getElementById('oCity').value.trim(),
             county: document.getElementById('oCounty').value.trim(),
             street: document.getElementById('oStreet').value.trim(),
+            streetNumber: document.getElementById('oStreetNr').value.trim(), // Adăugat din Step 2
             building: finalBuilding,
             notes: document.getElementById('oNotes').value.trim()
         };
@@ -1780,7 +1697,7 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
             notify("Comanda a fost actualizată cu succes!");
         } else {
             // MOD ADĂUGARE: Creăm un document nou
-            orderData.status = "In Curs"; // Status default doar la comenzi noi
+            orderData.status = "In Curs"; 
             orderData.createdAt = serverTimestamp();
             orderData.createdBy = auth.currentUser.email;
             await addDoc(collection(db, "comenzi"), orderData);
@@ -1788,7 +1705,7 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         }
 
         // RESETARE FORMULAR ȘI MODAL
-        editingOrderId = null; // Resetăm starea de editare
+        editingOrderId = null; 
         document.getElementById('addOrderForm').reset();
         document.getElementById('addOrderModal').classList.remove('active');
         
@@ -1796,8 +1713,8 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         submitBtn.innerHTML = '<i class="fas fa-save"></i> ADAUGĂ COMANDĂ';
         document.getElementById('oImageFile').required = true;
         document.getElementById('oProofFile').required = true;
-        imageDropPreview.style.display = 'none';
-        imageDropPlaceholder.style.display = 'block';
+        document.getElementById('imageDropPreview').style.display = 'none';
+        document.getElementById('imageDropPlaceholder').style.display = 'block';
 
     } catch (err) {
         console.error(err);
@@ -1981,6 +1898,8 @@ document.getElementById('dHours').innerText = order.workHours || "-";
           document.getElementById('dCity').innerText = order.city;
           document.getElementById('dCounty').innerText = order.county;
           document.getElementById('dStreet').innerText = order.street;
+document.getElementById('dStreetNr').innerText = order.streetNumber || "-";
+
           document.getElementById('dNotes').innerText = order.notes || "Nicio notiță";
 
           // Splitting the building string back into 5 parts
@@ -2065,6 +1984,8 @@ document.getElementById('oHours').value = order.workHours || "";
           document.getElementById('oCity').value = order.city;
           document.getElementById('oCounty').value = order.county;
           document.getElementById('oStreet').value = order.street;
+          document.getElementById('oStreetNr').value = order.streetNumber || "";
+
           document.getElementById('oNotes').value = order.notes;
 
           // Show Preview
