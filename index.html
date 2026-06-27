@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -1538,7 +1539,11 @@ let editingOrderId = null;
       loginBtn.addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }});
       logoutBtn.addEventListener('click', () => { signOut(auth); });
 
-      onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async (user) => {
+          // Select the main app containers that we want to hide from regular users
+          const mainAppContainer = document.querySelector('.cyber-page-section .container');
+          const statsSection = document.querySelector('.stats-section');
+
           if (user) {
               loginBtn.style.display = 'none';
               userProfileUI.style.display = 'flex';
@@ -1547,37 +1552,41 @@ let editingOrderId = null;
               // Admin Check
               globalIsAdmin = false;
               try {
-const adminQuery = query(collection(db, "admin_emails"), where("email", "==", user.email));
+                  const adminQuery = query(collection(db, "admin_emails"), where("email", "==", user.email));
                   const adminSnapshot = await getDocs(adminQuery);
                   globalIsAdmin = !adminSnapshot.empty;
               } catch (error) { console.warn("Blocked by rules or error.", error); }
 
-              let badgeHtml = "";
-              let nameStyle = "";
-
               if (globalIsAdmin) {
-                  badgeHtml = `<span class="badge badge-admin"><i class="fas fa-hammer"></i> ADMIN</span>`;
-                  nameStyle = "color: #ff4757; text-shadow: 0 0 15px rgba(255, 71, 87, 0.4);";
-                  
+                  // --- ADMIN USER: SHOW EVERYTHING ---
+                  mainAppContainer.style.display = 'block';
+                  statsSection.style.display = 'block';
                   adminActionBar.style.display = 'flex';
                   ordersGrid.style.display = 'grid';
+                  
+                  let badgeHtml = `<span class="badge badge-admin"><i class="fas fa-hammer"></i> ADMIN</span>`;
+                  let nameStyle = "color: #ff4757; text-shadow: 0 0 15px rgba(255, 71, 87, 0.4);";
+                  welcomeContainer.innerHTML = `BINE AI VENIT, <span style="${nameStyle}">${user.displayName}</span> ${badgeHtml}`;              
+                  welcomeContainer.style.opacity = '1';
+
                   loadOrdersRealtime(); 
               } else {
-                  badgeHtml = `<span class="badge badge-user"><i class="fas fa-user"></i> MEMBRU</span>`;
-                  nameStyle = "color: var(--primary); text-shadow: 0 0 15px var(--primary-dim);";
+                  // --- REGULAR USER: SHOW ABSOLUTELY NOTHING ---
+                  // We hide the containers completely. They will only see the background and the "Logout" button.
+                  mainAppContainer.style.display = 'none';
+                  statsSection.style.display = 'none';
                   
-                  adminActionBar.style.display = 'none';
-                  ordersGrid.style.display = 'none';
+                  notify("Acces interzis! Pagina este doar pentru administratori.", true);
               }
 
-              welcomeContainer.innerHTML = `BINE AI VENIT, <span style="${nameStyle}">${user.displayName}</span> ${badgeHtml}`;              
-              welcomeContainer.style.opacity = '1';
-
           } else {
+              // --- LOGGED OUT VISITOR: SHOW NOTHING BUT LOGIN BUTTON ---
               loginBtn.style.display = 'flex';
               userProfileUI.style.display = 'none';
-              adminActionBar.style.display = 'none';
-              ordersGrid.style.display = 'none';
+              
+              mainAppContainer.style.display = 'none';
+              statsSection.style.display = 'none';
+              
               welcomeContainer.style.opacity = '0';
               setTimeout(() => { welcomeContainer.innerHTML = ''; }, 500);
           }
