@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -1172,6 +1173,100 @@
         z-index: 2;
         animation: pulseFade 8s ease-in-out infinite;
     }
+
+
+/* --- SETTINGS BUTTON (FAB) --- */
+.settings-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--bg-dark);
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 3000;
+    box-shadow: 0 0 15px var(--primary-dim);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.settings-fab:hover {
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 25px var(--primary);
+}
+
+/* --- SETTINGS BOX (CORNER) --- */
+.settings-corner-box {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    width: 220px;
+    background: rgba(8, 16, 27, 0.95);
+    border: 1px solid var(--primary);
+    border-radius: 16px;
+    backdrop-filter: blur(15px);
+    z-index: 3000;
+    padding: 15px;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    animation: slideUp 0.3s ease-out;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--primary);
+}
+.settings-header button {
+    background: none; border: none; color: #fff; cursor: pointer; font-size: 14px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* --- THE CYBER SWITCH --- */
+.cyber-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+.cyber-switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #333; transition: .4s; border-radius: 20px;
+}
+.slider:before {
+    position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+    background-color: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--primary); box-shadow: 0 0 10px var(--primary-dim); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* --- LOGIC: HIDING PRICES --- */
+body.hide-prices-mode .footer-center-side, 
+body.hide-prices-mode .income-value,
+body.hide-prices-mode #dPrice {
+    display: none !important;
+}
   </style>
 </head>
 <body>
@@ -1536,6 +1631,28 @@
     </div>
 </div>
 
+
+<!-- SETTINGS FLOATING BUTTON -->
+<button id="settingsFab" class="settings-fab">
+    <i class="fas fa-cog"></i>
+</button>
+
+<!-- SETTINGS MODAL (CORNER) -->
+<div id="settingsBox" class="settings-corner-box">
+    <div class="settings-header">
+        <span><i class="fas fa-sliders-h"></i> Preferințe</span>
+        <button id="closeSettings"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="settings-body">
+        <div class="setting-item">
+            <span>Arată Prețuri</span>
+            <label class="cyber-switch">
+                <input type="checkbox" id="togglePrices" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+</div>
     <!-- ==========================================
          FIREBASE INITIALIZATION & LOGIC
     ========================================== -->
@@ -2507,6 +2624,42 @@ window.openMonthlyGallery = (monthKey) => {
               }
           }
       });
+
+
+// Settings UI Logic
+const settingsFab = document.getElementById('settingsFab');
+const settingsBox = document.getElementById('settingsBox');
+const closeSettings = document.getElementById('closeSettings');
+const togglePrices = document.getElementById('togglePrices');
+
+// 1. Open/Close Menu
+settingsFab.addEventListener('click', () => {
+    settingsBox.style.display = settingsBox.style.display === 'flex' ? 'none' : 'flex';
+});
+
+closeSettings.addEventListener('click', () => {
+    settingsBox.style.display = 'none';
+});
+
+// 2. Toggle Price Visibility
+togglePrices.addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.remove('hide-prices-mode');
+        localStorage.setItem('priceVisibility', 'visible');
+    } else {
+        document.body.classList.add('hide-prices-mode');
+        localStorage.setItem('priceVisibility', 'hidden');
+    }
+});
+
+// 3. Load Preference on Startup
+window.addEventListener('DOMContentLoaded', () => {
+    const pref = localStorage.getItem('priceVisibility');
+    if (pref === 'hidden') {
+        togglePrices.checked = false;
+        document.body.classList.add('hide-prices-mode');
+    }
+});
     </script>
 </body>
 </html>
