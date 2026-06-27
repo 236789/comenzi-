@@ -1139,6 +1139,39 @@
     box-shadow: inset 0 0 30px rgba(0, 255, 136, 0.3) !important;
     transition: all 0.3s ease;
 }
+
+/* --- CARD IMAGE CROSSFADE ANIMATION --- */
+    .order-img-container {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .order-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    /* Slight zoom effect on hover for the container */
+    .order-card:hover .order-img {
+        transform: scale(1.05);
+    }
+
+    /* The animation keyframes */
+    @keyframes pulseFade {
+        0%, 40% { opacity: 0; }      /* Show Reference */
+        50%, 90% { opacity: 1; }     /* Show Final */
+        100% { opacity: 0; }         /* Fade back to Reference */
+    }
+
+    .crossfade-top {
+        z-index: 2;
+        animation: pulseFade 8s ease-in-out infinite;
+    }
   </style>
 </head>
 <body>
@@ -1884,12 +1917,18 @@ function renderCard(data) {
     // DD-MM-YYYY format
     const formattedDate = data.orderDate ? data.orderDate.split('-').reverse().join('-') : '00-00-0000';
 
+    // --- ANIMATION LOGIC: Check for final image ---
+    let imagesHtml = `<img src="${data.imageUrl}" class="order-img">`;
+    if (data.finalImageUrl) {
+        imagesHtml += `<img src="${data.finalImageUrl}" class="order-img crossfade-top">`;
+    }
+
     const card = document.createElement('div');
     card.className = `order-card ${sClass}`;
     card.innerHTML = `
         ${adminControls}
-        <div class="order-img-container">
-            <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
+        <div class="order-img-container" onclick="openOrderDetails('${data.id}')">
+            ${imagesHtml}
         </div>
         
         <div class="card-footer">
@@ -2319,7 +2358,7 @@ window.showMonthDetails = (data, btn) => {
     `;
 };
 
-// Hook into the existing data loader
+// Hook into the existing data loader 
 // Find your 'onSnapshot' block and add 'updateStatistics()' inside it
 
 
