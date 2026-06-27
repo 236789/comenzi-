@@ -1267,6 +1267,127 @@ body.hide-prices-mode .income-value,
 body.hide-prices-mode #dPrice {
     display: none !important;
 }
+
+/* --- SETTINGS BUTTON (FAB) - LEFT --- */
+.settings-fab {
+    position: fixed;
+    bottom: 30px;
+    left: 30px; /* Changed to Left */
+    right: auto;
+    width: 50px;
+    height: 50px;
+    background: var(--bg-dark);
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 3000;
+    box-shadow: 0 0 15px var(--primary-dim);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.settings-fab:hover {
+    transform: rotate(-90deg) scale(1.1); /* Rotates left now */
+    box-shadow: 0 0 25px var(--primary);
+}
+
+/* --- SETTINGS BOX (CORNER) - LEFT --- */
+.settings-corner-box {
+    position: fixed;
+    bottom: 90px;
+    left: 30px; /* Changed to Left */
+    right: auto;
+    width: 220px;
+    background: rgba(8, 16, 27, 0.98);
+    border: 1px solid var(--primary);
+    border-radius: 16px;
+    backdrop-filter: blur(15px);
+    z-index: 3000;
+    padding: 15px;
+    display: none; 
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    animation: slideUpLeft 0.3s ease-out;
+}
+
+@keyframes slideUpLeft { 
+    from { opacity: 0; transform: translateY(20px) translateX(-10px); } 
+    to { opacity: 1; transform: translateY(0) translateX(0); } 
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: var(--primary);
+}
+.settings-header button { background: none; border: none; color: #fff; cursor: pointer; }
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* --- THE CYBER SWITCH --- */
+.cyber-switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+.cyber-switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #333; transition: .4s; border-radius: 20px;
+}
+.slider:before {
+    position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+    background-color: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--primary); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* --- LOGIC: HIDING PRICES --- */
+body.hide-prices-mode .footer-center-side, 
+body.hide-prices-mode .income-value,
+body.hide-prices-mode #dPrice {
+    display: none !important;
+}
+
+
+/* --- LOGIC: HIDING PRICES (KEEP BUBBLES, HIDE TEXT) --- */
+
+/* 1. For the Modal Detail Bubble (#dPrice) */
+body.hide-prices-mode #dPrice {
+    color: transparent !important; /* Makes text invisible but keeps the box */
+    text-shadow: none !important;  /* Removes the glow effect from invisible text */
+    user-select: none;             /* Prevents selecting/copying the hidden price */
+}
+
+/* 2. For the Order Cards Price */
+body.hide-prices-mode .footer-price-text {
+    visibility: hidden !important; /* Hides text but keeps the space in the footer */
+}
+
+/* 3. For the Statistics Total Income */
+body.hide-prices-mode .income-value {
+    color: transparent !important;
+    text-shadow: none !important;
+    position: relative;
+}
+
+/* Optional: Add a "HIDDEN" placeholder effect inside the bubble if you want */
+body.hide-prices-mode #dPrice::after {
+    content: "****";
+    color: rgba(0, 242, 254, 0.2); /* Very faint placeholder */
+    position: absolute;
+    left: 45px;
+}
   </style>
 </head>
 <body>
@@ -1632,12 +1753,12 @@ body.hide-prices-mode #dPrice {
 </div>
 
 
-<!-- SETTINGS FLOATING BUTTON -->
+<!-- SETTINGS FLOATING BUTTON (LEFT SIDE) -->
 <button id="settingsFab" class="settings-fab">
     <i class="fas fa-cog"></i>
 </button>
 
-<!-- SETTINGS MODAL (CORNER) -->
+<!-- SETTINGS MODAL (LEFT CORNER) -->
 <div id="settingsBox" class="settings-corner-box">
     <div class="settings-header">
         <span><i class="fas fa-sliders-h"></i> Preferințe</span>
