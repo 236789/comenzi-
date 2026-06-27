@@ -1388,6 +1388,81 @@ body.hide-prices-mode #dPrice::after {
     position: absolute;
     left: 45px;
 }
+
+
+/* --- PRIVACY OVERLAY SYSTEM --- */
+.privacy-wrapper {
+    position: relative;
+    margin-top: 20px;
+    padding-top: 10px;
+    min-height: 200px; /* Ensures the overlay has height */
+}
+
+.privacy-overlay {
+    position: absolute;
+    inset: -10px; /* Slight overflow to cover borders */
+    background: rgba(8, 16, 27, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    border: 1px dashed var(--primary);
+    transition: all 0.4s ease;
+}
+
+.overlay-content {
+    text-align: center;
+    padding: 30px;
+}
+
+.overlay-content i {
+    font-size: 40px;
+    color: var(--primary);
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px var(--primary);
+}
+
+.overlay-content h3 {
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.overlay-content p {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.unlock-info-btn {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 12px 25px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.unlock-info-btn:hover {
+    background: var(--primary);
+    color: #000;
+    box-shadow: 0 0 20px var(--primary);
+}
+
+/* Class to hide overlay */
+.privacy-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
   </style>
 </head>
 <body>
@@ -1670,57 +1745,74 @@ body.hide-prices-mode #dPrice::after {
 
     <!-- 2. ORDER DETAILS MODAL (Adjusted layout to fix scrollbar consistently) -->
 <!-- 2. ORDER DETAILS MODAL (VIEW MODE WITH COPY BUTTONS) -->
-    <div id="orderDetailsModal" class="custom-modal-overlay">
-        <div class="custom-modal-card">
-            <div class="modal-header-container">
-                <button class="close-modal-btn" onclick="document.getElementById('orderDetailsModal').classList.remove('active')">✕</button>
-                <h2 class="modal-title"><i class="fas fa-box-open"></i> Fișă Comandă</h2>
-            </div>
-            
-<div class="modal-body-container">
-                <!-- IMAGES CONTAINER (BEFORE & AFTER) -->
-                <div style="display: flex; gap: 30px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap;">
-                    
-                    <!-- 1. Imagine Referință -->
-                    <div style="flex: 1; min-width: 250px; max-width: 350px; display: flex; flex-direction: column; align-items: center;">
-                        <div style="font-size: 14px; color: var(--primary); margin-bottom: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 2px;">
-                            <i class="fas fa-image"></i> Referință
-                        </div>
-                        <img id="dImage" src="" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 16px; border: 2px solid var(--primary); box-shadow: 0 0 30px var(--primary-dim); display: block;">
+<!-- 2. ORDER DETAILS MODAL (VIEW MODE WITH PRIVACY OVERLAY) -->
+<div id="orderDetailsModal" class="custom-modal-overlay">
+    <div class="custom-modal-card">
+        <div class="modal-header-container">
+            <button class="close-modal-btn" onclick="document.getElementById('orderDetailsModal').classList.remove('active')">✕</button>
+            <h2 class="modal-title"><i class="fas fa-box-open"></i> Fișă Comandă</h2>
+        </div>
+        
+        <div class="modal-body-container">
+            <!-- IMAGES CONTAINER (BEFORE & AFTER) -->
+            <div style="display: flex; gap: 30px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap;">
+                <!-- 1. Imagine Referință -->
+                <div style="flex: 1; min-width: 250px; max-width: 350px; display: flex; flex-direction: column; align-items: center;">
+                    <div style="font-size: 14px; color: var(--primary); margin-bottom: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 2px;">
+                        <i class="fas fa-image"></i> Referință
                     </div>
-
-                    <!-- 2. Imagine Finalizată (Ascunsă by default) -->
-                    <div id="dFinalImageWrapper" style="flex: 1; min-width: 250px; max-width: 350px; display: none; flex-direction: column; align-items: center;">
-                        <div style="font-size: 14px; color: #00ff88; margin-bottom: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 2px;">
-                            <i class="fas fa-check-double"></i> Lucrare Finalizată
-                        </div>
-                        <img id="dFinalImage" src="" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 16px; border: 2px solid #00ff88; box-shadow: 0 0 30px rgba(0, 255, 136, 0.3); display: block;">
-                    </div>
-                    
+                    <img id="dImage" src="" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 16px; border: 2px solid var(--primary); box-shadow: 0 0 30px var(--primary-dim); display: block;">
                 </div>
 
-<div class="form-grid">
-    <div class="form-section-title">Date Comandă</div>
-    
-    <div class="input-group"><label>Data Plasării</label><div class="input-wrapper"><div class="details-value" id="dDate"></div><i class="fas fa-calendar-alt"></i></div></div>
-    <div class="input-group"><label>Preț</label><div class="input-wrapper"><div class="details-value" id="dPrice"></div><i class="fas fa-money-bill-wave"></i></div></div>
-    <div class="input-group"><label>Tip Portret</label><div class="input-wrapper"><div class="details-value" id="dType"></div><i class="fas fa-paint-brush"></i></div></div>
-    <div class="input-group"><label>Dimensiune</label><div class="input-wrapper"><div class="details-value" id="dSize"></div><i class="fas fa-expand-arrows-alt"></i></div></div>
-    <div class="input-group"><label>Tip de foaie</label><div class="input-wrapper"><div class="details-value" id="dPaper"></div><i class="fas fa-scroll"></i></div></div>
-    <div class="input-group"><label>Ore de Muncă</label><div class="input-wrapper"><div class="details-value" id="dHours"></div><i class="fas fa-clock"></i></div></div>
-</div>           
+                <!-- 2. Imagine Finalizată -->
+                <div id="dFinalImageWrapper" style="flex: 1; min-width: 250px; max-width: 350px; display: none; flex-direction: column; align-items: center;">
+                    <div style="font-size: 14px; color: #00ff88; margin-bottom: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 2px;">
+                        <i class="fas fa-check-double"></i> Lucrare Finalizată
+                    </div>
+                    <img id="dFinalImage" src="" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 16px; border: 2px solid #00ff88; box-shadow: 0 0 30px rgba(0, 255, 136, 0.3); display: block;">
+                </div>
+            </div>
+
+            <!-- PUBLIC INFO (Always Visible) -->
+            <div class="form-grid">
+                <div class="form-section-title">Date Comandă</div>
+                <div class="input-group"><label>Data Plasării</label><div class="input-wrapper"><div class="details-value" id="dDate"></div><i class="fas fa-calendar-alt"></i></div></div>
+                <div class="input-group"><label>Preț</label><div class="input-wrapper"><div class="details-value" id="dPrice"></div><i class="fas fa-money-bill-wave"></i></div></div>
+                <div class="input-group"><label>Tip Portret</label><div class="input-wrapper"><div class="details-value" id="dType"></div><i class="fas fa-paint-brush"></i></div></div>
+                <div class="input-group"><label>Dimensiune</label><div class="input-wrapper"><div class="details-value" id="dSize"></div><i class="fas fa-expand-arrows-alt"></i></div></div>
+                <div class="input-group"><label>Tip de foaie</label><div class="input-wrapper"><div class="details-value" id="dPaper"></div><i class="fas fa-scroll"></i></div></div>
+                <div class="input-group"><label>Ore de Muncă</label><div class="input-wrapper"><div class="details-value" id="dHours"></div><i class="fas fa-clock"></i></div></div>
+            </div>
+
+            <!-- CONFIDENTIAL AREA (PROTECTED BY OVERLAY) -->
+            <div id="privacyWrapper" class="privacy-wrapper">
+                
+                <!-- The Blur Overlay -->
+                <div id="privacyOverlay" class="privacy-overlay">
+                    <div class="overlay-content">
+                        <i class="fas fa-user-shield"></i>
+                        <h3>ZONĂ CONFIDENȚIALĂ</h3>
+                        <p>Informațiile de livrare și plata sunt protejate.</p>
+                        <button type="button" class="unlock-info-btn" onclick="revealConfidentialData()">
+                            <i class="fas fa-eye"></i> ARATĂ INFORMAȚII
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden Fields -->
+                <div class="form-grid">
                     <div class="form-section-title">Detalii de Livrare</div>
                     <div class="input-group"><label>Nume și Prenume</label><div class="input-wrapper"><div class="details-value" id="dName"></div><i class="fas fa-user"></i><div class="copy-btn" onclick="copyValue('dName')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group"><label>Nr. Telefon</label><div class="input-wrapper"><div class="details-value" id="dPhone"></div><i class="fas fa-phone"></i><div class="copy-btn" onclick="copyValue('dPhone')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group"><label>Cod Poștal</label><div class="input-wrapper"><div class="details-value" id="dZip"></div><i class="fas fa-mail-bulk"></i><div class="copy-btn" onclick="copyValue('dZip')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group"><label>Localitate</label><div class="input-wrapper"><div class="details-value" id="dCity"></div><i class="fas fa-city"></i><div class="copy-btn" onclick="copyValue('dCity')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group"><label>Județ / Sector</label><div class="input-wrapper"><div class="details-value" id="dCounty"></div><i class="fas fa-map-marker-alt"></i><div class="copy-btn" onclick="copyValue('dCounty')"><i class="far fa-copy"></i></div></div></div>
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
-    <div class="input-group"><label>Stradă</label><div class="input-wrapper"><div class="details-value" id="dStreet"></div><i class="fas fa-road"></i><div class="copy-btn" onclick="copyValue('dStreet')"><i class="far fa-copy"></i></div></div></div>
-    <div class="input-group"><label>Nr.</label><div class="input-wrapper"><div class="details-value" id="dStreetNr"></div><i class="fas fa-home"></i><div class="copy-btn" onclick="copyValue('dStreetNr')"><i class="far fa-copy"></i></div></div></div>
-</div>
+                    
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+                        <div class="input-group"><label>Stradă</label><div class="input-wrapper"><div class="details-value" id="dStreet"></div><i class="fas fa-road"></i><div class="copy-btn" onclick="copyValue('dStreet')"><i class="far fa-copy"></i></div></div></div>
+                        <div class="input-group"><label>Nr.</label><div class="input-wrapper"><div class="details-value" id="dStreetNr"></div><i class="fas fa-home"></i><div class="copy-btn" onclick="copyValue('dStreetNr')"><i class="far fa-copy"></i></div></div></div>
+                    </div>
 
-                    <!-- 5 SEPARATE BOXES FOR BUILDING -->
                     <div class="grid-5-row">
                         <div class="input-group"><label>Bloc</label><div class="input-wrapper"><div class="details-value compact-input" id="dBl"></div><i class="fas fa-building"></i><div class="copy-btn" onclick="copyValue('dBl')"><i class="far fa-copy"></i></div></div></div>
                         <div class="input-group"><label>Scara</label><div class="input-wrapper"><div class="details-value compact-input" id="dSc"></div><i class="fas fa-list-ol"></i><div class="copy-btn" onclick="copyValue('dSc')"><i class="far fa-copy"></i></div></div></div>
@@ -1732,10 +1824,10 @@ body.hide-prices-mode #dPrice::after {
                     <div class="input-group" style="grid-column: 1 / -1;"><label>Repere / Informații</label><div class="input-wrapper"><div class="details-value" id="dNotes"></div><i class="fas fa-info-circle"></i><div class="copy-btn" onclick="copyValue('dNotes')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group" style="grid-column: 1 / -1;"><label>Dovadă Plată</label><div class="input-wrapper"><div class="details-value"><a href="#" id="dProof" target="_blank" class="proof-link">Deschide Imaginea</a></div><i class="fas fa-file-invoice-dollar"></i></div></div>
                 </div>
-            </div>
-            </div>
-        </div>
+            </div> <!-- End Privacy Wrapper -->
+        </div> <!-- End Modal Body -->
     </div>
+</div>
 
 <!-- MONTHLY GALLERY MODAL -->
 <div id="monthGalleryModal" class="custom-modal-overlay">
@@ -2780,6 +2872,22 @@ window.addEventListener('DOMContentLoaded', () => {
         togglePrices.checked = false;
         document.body.classList.add('hide-prices-mode');
     }
+});
+
+
+// Function to hide the overlay and show data
+window.revealConfidentialData = function() {
+    document.getElementById('privacyOverlay').classList.add('hidden');
+};
+
+// IMPORTANT: We want the overlay to come back every time the modal is closed
+// so the next time you open a card, it's locked again.
+// Modify your modal close function or just add this:
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const overlay = document.getElementById('privacyOverlay');
+        if(overlay) overlay.classList.remove('hidden');
+    });
 });
     </script>
 </body>
