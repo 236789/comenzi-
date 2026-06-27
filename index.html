@@ -1428,9 +1428,22 @@
                 <h2 class="modal-title"><i class="fas fa-box-open"></i> Fișă Comandă</h2>
             </div>
             
-            <div class="modal-body-container">
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <img id="dImage" src="" style="max-width: 100%; max-height: 350px; border-radius: 16px; border: 2px solid var(--primary); box-shadow: 0 0 30px var(--primary-dim);">
+<div class="modal-body-container">
+                <!-- IMAGES CONTAINER (BEFORE & AFTER) -->
+                <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap;">
+                    
+                    <!-- 1. Imagine Referință -->
+                    <div style="text-align: center; flex: 1; min-width: 250px;">
+                        <div style="font-size: 14px; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;"><i class="fas fa-image"></i> Referință</div>
+                        <img id="dImage" src="" style="max-width: 100%; max-height: 350px; border-radius: 16px; border: 2px solid var(--primary); box-shadow: 0 0 30px var(--primary-dim); object-fit: contain;">
+                    </div>
+
+                    <!-- 2. Imagine Finalizată (Ascunsă by default) -->
+                    <div id="dFinalImageWrapper" style="text-align: center; flex: 1; min-width: 250px; display: none;">
+                        <div style="font-size: 14px; color: #00ff88; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;"><i class="fas fa-check-double"></i> Lucrare Finalizată</div>
+                        <img id="dFinalImage" src="" style="max-width: 100%; max-height: 350px; border-radius: 16px; border: 2px solid #00ff88; box-shadow: 0 0 30px rgba(0, 255, 136, 0.3); object-fit: contain;">
+                    </div>
+                    
                 </div>
 
 <div class="form-grid">
@@ -1466,6 +1479,7 @@
                     <div class="input-group" style="grid-column: 1 / -1;"><label>Repere / Informații</label><div class="input-wrapper"><div class="details-value" id="dNotes"></div><i class="fas fa-info-circle"></i><div class="copy-btn" onclick="copyValue('dNotes')"><i class="far fa-copy"></i></div></div></div>
                     <div class="input-group" style="grid-column: 1 / -1;"><label>Dovadă Plată</label><div class="input-wrapper"><div class="details-value"><a href="#" id="dProof" target="_blank" class="proof-link">Deschide Imaginea</a></div><i class="fas fa-file-invoice-dollar"></i></div></div>
                 </div>
+            </div>
             </div>
         </div>
     </div>
@@ -1942,8 +1956,21 @@ window.openOrderDetails = function(orderId) {
           const order = currentOrders.find(o => o.id === orderId);
           if(!order) return;
 
+// Setare Imagine Referință
           document.getElementById('dImage').src = order.imageUrl;
-          document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
+
+          // Setare Imagine Finalizată (Dacă există)
+          const finalImageWrapper = document.getElementById('dFinalImageWrapper');
+          const finalImageElement = document.getElementById('dFinalImage');
+          
+          if (order.finalImageUrl) {
+              finalImageElement.src = order.finalImageUrl;
+              finalImageWrapper.style.display = 'block';
+          } else {
+              finalImageElement.src = '';
+              finalImageWrapper.style.display = 'none';
+          }          
+document.getElementById('dDate').innerText = order.orderDate || "Nesetată";
           document.getElementById('dPrice').innerText = formatPrice(order.price, order.currency || 'RON');
 document.getElementById('dType').innerText = order.portraitType || "-";
 document.getElementById('dSize').innerText = order.portraitSize || "-";
