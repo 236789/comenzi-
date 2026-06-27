@@ -1430,18 +1430,22 @@
             
 <div class="modal-body-container">
                 <!-- IMAGES CONTAINER (BEFORE & AFTER) -->
-                <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 30px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap;">
                     
                     <!-- 1. Imagine Referință -->
-                    <div style="text-align: center; flex: 1; min-width: 250px;">
-                        <div style="font-size: 14px; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;"><i class="fas fa-image"></i> Referință</div>
-                        <img id="dImage" src="" style="max-width: 100%; max-height: 350px; border-radius: 16px; border: 2px solid var(--primary); box-shadow: 0 0 30px var(--primary-dim); object-fit: contain;">
+                    <div style="flex: 1; min-width: 250px; max-width: 350px; display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 14px; color: var(--primary); margin-bottom: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 2px;">
+                            <i class="fas fa-image"></i> Referință
+                        </div>
+                        <img id="dImage" src="" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 16px; border: 2px solid var(--primary); box-shadow: 0 0 30px var(--primary-dim); display: block;">
                     </div>
 
                     <!-- 2. Imagine Finalizată (Ascunsă by default) -->
-                    <div id="dFinalImageWrapper" style="text-align: center; flex: 1; min-width: 250px; display: none;">
-                        <div style="font-size: 14px; color: #00ff88; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;"><i class="fas fa-check-double"></i> Lucrare Finalizată</div>
-                        <img id="dFinalImage" src="" style="max-width: 100%; max-height: 350px; border-radius: 16px; border: 2px solid #00ff88; box-shadow: 0 0 30px rgba(0, 255, 136, 0.3); object-fit: contain;">
+                    <div id="dFinalImageWrapper" style="flex: 1; min-width: 250px; max-width: 350px; display: none; flex-direction: column; align-items: center;">
+                        <div style="font-size: 14px; color: #00ff88; margin-bottom: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 2px;">
+                            <i class="fas fa-check-double"></i> Lucrare Finalizată
+                        </div>
+                        <img id="dFinalImage" src="" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 16px; border: 2px solid #00ff88; box-shadow: 0 0 30px rgba(0, 255, 136, 0.3); display: block;">
                     </div>
                     
                 </div>
