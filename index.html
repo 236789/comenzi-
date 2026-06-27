@@ -1400,6 +1400,19 @@
         </div>
     </div>
 
+<!-- LUCRARE FINALIZATA SECTION (APARE DOAR LA EDITARE) -->
+    <div class="form-section-title edit-only-field" style="display: none;">Imagine Lucrare Finalizată</div>
+    <div class="image-drop-area edit-only-field" id="finalImageDropArea" style="display: none; height: 200px;">
+        <input type="file" id="oFinalImageFile" accept="image/*">
+        <div class="image-drop-placeholder" id="finalImageDropPlaceholder">
+            <i class="fas fa-camera"></i>
+            <span>Încarcă Lucrarea Finalizată</span>
+            <span style="font-size: 12px; color: #888;">(Opțional)</span>
+        </div>
+        <img id="finalImageDropPreview" class="image-drop-preview" src="" alt="Preview">
+        <button type="button" id="finalImageRemoveBtn" class="image-remove-btn"><i class="fas fa-times"></i></button>
+    </div>
+
     <button type="submit" class="btn-submit-order"><i class="fas fa-save"></i> ADAUGĂ COMANDĂ</button>
 </form>
             </div>
@@ -1622,6 +1635,36 @@ onAuthStateChanged(auth, async (user) => {
           imageDropPlaceholder.style.display = 'block';
       });
 
+// --- FINAL IMAGE PREVIEW LOGIC (LUCRARE FINALIZATA) ---
+      const oFinalImageFile = document.getElementById('oFinalImageFile');
+      const finalImageDropPreview = document.getElementById('finalImageDropPreview');
+      const finalImageRemoveBtn = document.getElementById('finalImageRemoveBtn');
+      const finalImageDropPlaceholder = document.getElementById('finalImageDropPlaceholder');
+
+      oFinalImageFile.addEventListener('change', function() {
+          const file = this.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  finalImageDropPreview.src = e.target.result;
+                  finalImageDropPreview.style.display = 'block';
+                  finalImageRemoveBtn.style.display = 'flex';
+                  finalImageDropPlaceholder.style.display = 'none';
+              }
+              reader.readAsDataURL(file);
+          }
+      });
+
+      finalImageRemoveBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          oFinalImageFile.value = ''; 
+          finalImageDropPreview.src = '';
+          finalImageDropPreview.style.display = 'none';
+          finalImageRemoveBtn.style.display = 'none';
+          finalImageDropPlaceholder.style.display = 'block';
+      });
+
 
       // --- ADD ORDER LOGIC ---
       document.getElementById('openAddModalBtn').onclick = () => {
@@ -1638,18 +1681,21 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
     submitBtn.disabled = true;
 
     try {
-        let finalImageUrl = null;
+let finalImageUrl = null;
         let finalProofUrl = null;
+        let finalFinishedImageUrl = null; // <- VARIABILA NOUĂ
 
         // Dacă suntem în modul EDITARE, luăm link-urile vechi ca bază
         if (editingOrderId) {
             const oldOrder = currentOrders.find(o => o.id === editingOrderId);
             finalImageUrl = oldOrder.imageUrl;
             finalProofUrl = oldOrder.paymentProof;
+            finalFinishedImageUrl = oldOrder.finalImageUrl || null; // <- Păstrăm poza veche
         }
 
         const imageFile = document.getElementById('oImageFile').files[0];
         const proofFile = document.getElementById('oProofFile').files[0];
+        const finishedImageFile = document.getElementById('oFinalImageFile').files[0]; // <- FIȘIERUL NOU
 
         // Încărcăm poze noi DOAR dacă au fost selectate fișiere
         if (imageFile) {
@@ -1662,8 +1708,10 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
             finalProofUrl = await uploadToImgBB(proofFile);
         }
 
-        if (!finalImageUrl) throw new Error("Imaginea portretului lipsește!");
-
+if (finishedImageFile) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÎNCĂRCARE LUCRARE...';
+            finalFinishedImageUrl = await uploadToImgBB(finishedImageFile);
+        }
         // Construim string-ul pentru bloc/adresă
         const bl = document.getElementById('oBl').value.trim();
         const sc = document.getElementById('oSc').value.trim();
@@ -1682,6 +1730,7 @@ document.getElementById('addOrderForm').addEventListener('submit', async (e) => 
         const orderData = {
             imageUrl: finalImageUrl,
             paymentProof: finalProofUrl,
+            finalImageUrl: finalFinishedImageUrl, // <- ADAUGĂ ACEASTĂ LINIE
             orderDate: document.getElementById('oDate').value,
             price: parseFloat(document.getElementById('oPrice').value),
             portraitType: document.getElementById('oType').value.trim(),
@@ -1977,16 +2026,16 @@ function notify(message, isError = false) {
           if(!order) return;
           editingOrderId = id;
 
-const currentSymbol = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' }[order.currency || 'RON'];
-selectCurrency(currentSymbol, order.currency || 'RON');
+          const currentSymbol = { 'RON': 'RON', 'EUR': '€', 'GBP': '£', 'USD': '$' }[order.currency || 'RON'];
+          selectCurrency(currentSymbol, order.currency || 'RON');
 
           // Fill all fields
           document.getElementById('oDate').value = order.orderDate;
           document.getElementById('oPrice').value = order.price;
-document.getElementById('oType').value = order.portraitType || "";
-document.getElementById('oSize').value = order.portraitSize || "";
-document.getElementById('oPaper').value = order.paperType || "";
-document.getElementById('oHours').value = order.workHours || "";
+          document.getElementById('oType').value = order.portraitType || "";
+          document.getElementById('oSize').value = order.portraitSize || "";
+          document.getElementById('oPaper').value = order.paperType || "";
+          document.getElementById('oHours').value = order.workHours || "";
           document.getElementById('oName').value = order.name;
           document.getElementById('oPhone').value = order.phone;
           document.getElementById('oZip').value = order.zipCode;
@@ -1994,30 +2043,72 @@ document.getElementById('oHours').value = order.workHours || "";
           document.getElementById('oCounty').value = order.county;
           document.getElementById('oStreet').value = order.street;
           document.getElementById('oStreetNr').value = order.streetNumber || "";
-
           document.getElementById('oNotes').value = order.notes;
 
-          // Show Preview
-          imageDropPreview.src = order.imageUrl;
-          imageDropPreview.style.display = 'block';
-          imageDropPlaceholder.style.display = 'none';
+          // Show Main Image Preview
+          const mainImagePreview = document.getElementById('imageDropPreview');
+          const mainImagePlaceholder = document.getElementById('imageDropPlaceholder');
+          mainImagePreview.src = order.imageUrl;
+          mainImagePreview.style.display = 'block';
+          mainImagePlaceholder.style.display = 'none';
+
+          // --- LUCRARE FINALIZATĂ LOGIC ---
+          // Arată secțiunea de Lucrare Finalizată pentru Editare
+          document.querySelectorAll('.edit-only-field').forEach(el => {
+              if (el.classList.contains('image-drop-area')) el.style.display = 'flex';
+              else el.style.display = 'block';
+          });
+
+          const finalImagePreview = document.getElementById('finalImageDropPreview');
+          const finalImagePlaceholder = document.getElementById('finalImageDropPlaceholder');
+          const finalImageRemoveBtn = document.getElementById('finalImageRemoveBtn');
+          const oFinalImageFile = document.getElementById('oFinalImageFile');
+
+          // Dacă există deja o imagine finală salvată, afișeaz-o
+          if (order.finalImageUrl) {
+              finalImagePreview.src = order.finalImageUrl;
+              finalImagePreview.style.display = 'block';
+              finalImagePlaceholder.style.display = 'none';
+              finalImageRemoveBtn.style.display = 'flex';
+          } else {
+              oFinalImageFile.value = '';
+              finalImagePreview.src = '';
+              finalImagePreview.style.display = 'none';
+              finalImagePlaceholder.style.display = 'block';
+              finalImageRemoveBtn.style.display = 'none';
+          }
 
           // Update Button UI
-          document.querySelector('.btn-submit-order').innerText = "SALVEAZĂ MODIFICĂRILE";
+          document.querySelector('.btn-submit-order').innerHTML = "<i class='fas fa-save'></i> SALVEAZĂ MODIFICĂRILE";
           document.getElementById('oImageFile').required = false;
           document.getElementById('oProofFile').required = false;
+          
           document.getElementById('addOrderModal').classList.add('active');
       };
 
-      // --- UPDATE THE SUBMIT HANDLER ---
+// --- UPDATE THE SUBMIT HANDLER ---
       // Re-map the open modal button to reset the "Edit Mode"
       document.getElementById('openAddModalBtn').addEventListener('click', () => {
           editingOrderId = null;
           document.getElementById('addOrderForm').reset();
-          document.querySelector('.btn-submit-order').innerText = "ADAUGĂ COMANDĂ";
+          document.querySelector('.btn-submit-order').innerHTML = "<i class='fas fa-save'></i> ADAUGĂ COMANDĂ";
           document.getElementById('oImageFile').required = true;
           document.getElementById('oProofFile').required = true;
+
+          // Ascunde secțiunea de Lucrare Finalizată la adăugare
+          document.querySelectorAll('.edit-only-field').forEach(el => el.style.display = 'none');
+          
+          // Reset Preview-uri
+          document.getElementById('imageDropPreview').style.display = 'none';
+          document.getElementById('imageDropPlaceholder').style.display = 'block';
+          
+          document.getElementById('oFinalImageFile').value = '';
+          document.getElementById('finalImageDropPreview').src = '';
+          document.getElementById('finalImageDropPreview').style.display = 'none';
+          document.getElementById('finalImageDropPlaceholder').style.display = 'block';
+          document.getElementById('finalImageRemoveBtn').style.display = 'none';
       });
+
 
       // Modify the existing 'addOrderForm' submit listener to use editingOrderId
       // Find your 'addOrderForm' listener and wrap the Firestore call in an IF/ELSE:
@@ -2312,6 +2403,9 @@ window.openMonthlyGallery = (monthKey) => {
       const oProofFileInput = document.getElementById('oProofFile');
       setupDragAndDrop(proofInputWrapper, oProofFileInput);
 
+// Initialize Drag & Drop for Final Finished Image
+      const finalImageDropArea = document.getElementById('finalImageDropArea');
+      setupDragAndDrop(finalImageDropArea, oFinalImageFile);
 
       // 2. Setup Paste (Ctrl+V) from Clipboard
       document.addEventListener('paste', function(e) {
