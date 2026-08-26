@@ -1638,14 +1638,14 @@ body.hide-prices-mode #dPrice::after {
     <div class="container">
         <div class="cyber-line" style="margin: 40px auto;"></div>
         
-        <!-- Custom Red Header for Time Wasters -->
-        <h2 class="page-main-title" style="font-size: 40px; background: linear-gradient(180deg, #ffffff 0%, #ff4757 100%); filter: drop-shadow(0 0 25px rgba(255, 71, 87, 0.4)); -webkit-text-fill-color: transparent;">
-            Blacklist (Time Wasters)
+        <!-- FIXED: No more ugly red box, just perfectly glowing text -->
+        <h2 class="page-main-title" style="font-size: 40px; background: linear-gradient(180deg, #ffffff 0%, #ff4757 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 25px rgba(255, 71, 87, 0.4));">
+            Clienți Neserioși
         </h2>
         
         <div class="admin-action-bar" style="display: flex; margin-bottom: 30px;">
             <button id="openAddWasterBtn" class="btn-admin-add" style="background: rgba(255, 71, 87, 0.1);">
-                <i class="fas fa-skull"></i> Raportează Waster
+                <i class="fas fa-user-minus"></i> Adaugă Client
             </button>
         </div>
 
@@ -1665,7 +1665,7 @@ body.hide-prices-mode #dPrice::after {
         <div class="modal-header-container">
             <button class="close-modal-btn" onclick="document.getElementById('addWasterModal').classList.remove('active')" style="background: rgba(255,255,255,0.05); border-color: var(--admin-red);"><i class="fas fa-times"></i></button>
             <h2 class="modal-title" style="color: var(--admin-red); text-shadow: 0 0 20px var(--admin-red-dim); border-bottom-color: rgba(255, 71, 87, 0.3);">
-                <i class="fas fa-user-times"></i> Adaugă Time Waster
+                <i class="fas fa-user-times"></i> Salvează Client Neserios
             </h2>
         </div>
         
@@ -1673,7 +1673,7 @@ body.hide-prices-mode #dPrice::after {
             <form id="addWasterForm" class="form-grid">
                 
                 <div class="input-group full-row">
-                    <label style="color: var(--admin-red);">Numele Wasterului</label>
+                    <label style="color: var(--admin-red);">Numele Persoanei</label>
                     <div class="input-wrapper">
                         <input type="text" id="wName" class="styled-input waster-input" required>
                         <i class="fas fa-user" style="color: var(--admin-red); text-shadow: 0 0 15px var(--admin-red);"></i>
@@ -1692,35 +1692,31 @@ body.hide-prices-mode #dPrice::after {
                     <label style="color: var(--admin-red);">Timp Pierdut</label>
                     <div class="input-wrapper">
                         <input type="text" id="wTime" class="styled-input waster-input" placeholder="Ex: 30 minute, 2 ore..." required>
-                        <i class="fas fa-hourglass-half" style="color: var(--admin-red); text-shadow: 0 0 15px var(--admin-red);"></i>
+                        <i class="fas fa-clock" style="color: var(--admin-red); text-shadow: 0 0 15px var(--admin-red);"></i>
                     </div>
                 </div>
 
-<!-- MULTIPLE IMAGE DROP AREA -->
+                <!-- MULTIPLE IMAGE DROP AREA -->
                 <div class="image-drop-area full-row waster-drop-area" id="wasterImageDropArea" style="height: auto; min-height: 200px; padding: 20px;">
                     <input type="file" id="wImages" accept="image/*" multiple required>
                     <div class="image-drop-placeholder" id="wImagePlaceholder" style="color: var(--admin-red);">
                         <i class="fas fa-images" style="text-shadow: 0 0 20px var(--admin-red);"></i>
                         <span>Selectează sau trage imaginile dorite</span>
-                        <span style="font-size: 12px; margin-top: 5px;">(Se pot selecta mai multe simultan)</span>
+                        <span style="font-size: 12px; margin-top: 5px;">(Puteți selecta mai multe simultan)</span>
                     </div>
                     
                     <div id="wImagePreviewContainer" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%; margin-top: 15px;"></div>
                     
                     <button type="button" id="wImageRemoveBtn" class="image-remove-btn" style="top: 10px; right: 10px; background: #fff; color: var(--admin-red);"><i class="fas fa-times"></i></button>
-                </div> 
+                </div>
 
                 <button type="submit" class="btn-submit-order full-row" style="background: var(--admin-red); box-shadow: 0 0 30px var(--admin-red-dim); color: #fff;">
-                    <i class="fas fa-ban"></i> RAPORTEAZĂ WASTER
+                    <i class="fas fa-save"></i> SALVEAZĂ ÎN ARHIVĂ
                 </button>
-            </form> 
+            </form>
         </div>
     </div>
 </div>
-
-    <!-- ==========================================
-         1. ADD ORDER MODAL (REVAMPED)
-    ========================================== -->
 
 
     <!-- ==========================================
@@ -3157,10 +3153,11 @@ document.getElementById('addWasterForm').addEventListener('submit', async (e) =>
             dateAdded: autoDateTime, // Saved automatically
             timestamp: serverTimestamp() // Official firebase timestamp for sorting later
         };
-// Save to a completely separate Firestore Collection named "time_wasters"
+// Save to a completely separate Firestore Collection
         await addDoc(collection(db, "time_wasters"), wasterData);
- 
-        notify("Time Waster raportat cu succes!");
+
+        // Fixed terminology
+        notify("Client neserios salvat în arhivă!");
         
         // Reset Form
         document.getElementById('addWasterForm').reset();
@@ -3174,7 +3171,8 @@ document.getElementById('addWasterForm').addEventListener('submit', async (e) =>
         notify("Eroare: " + err.message, true);
     } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-ban"></i> RAPORTEAZĂ WASTER';
+        // Fixed terminology on button reset
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> SALVEAZĂ ÎN ARHIVĂ';
     }
 });
     </script>
