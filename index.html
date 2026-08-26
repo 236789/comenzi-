@@ -1466,56 +1466,6 @@ body.hide-prices-mode #dPrice::after {
 }
 
 
-/* Update the background grid to use the GPU */
-.bg-grid-engine {
-    position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
-    background-image: linear-gradient(rgba(0, 242, 254, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.1) 1px, transparent 1px);
-    background-size: 60px 60px; 
-    /* ADDED: translateZ(0) and will-change to force hardware acceleration */
-    transform: perspective(600px) rotateX(55deg) translateZ(0);
-    will-change: background-position, transform;
-    animation: gridSlowScroll 20s linear infinite;
-    mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
-    z-index: 0; pointer-events: none;
-}
-
-/* Optimize the Crossfade Animation */
-.crossfade-top {
-    z-index: 2;
-    animation: pulseFade 8s ease-in-out infinite;
-    /* ADDED: Forces GPU to handle the opacity fade */
-    will-change: opacity;
-    backface-visibility: hidden;
-}
-
-/* Optimize the Order Cards */
-.order-card {
-    background: #0b1120 !important;
-    border-radius: 20px !important;
-    overflow: visible !important;
-    border: 2px solid transparent !important;
-    display: flex;
-    flex-direction: column;
-    transition: 0.3s ease;
-    /* ADDED: Hardware accelerate the cards so hover effects don't lag */
-    transform: translateZ(0);
-    will-change: transform;
-}
-
-
-/* Performance Fallbacks for Low-End Devices / Mobile */
-@media (max-width: 768px) {
-    .bg-grid-engine {
-        animation: none !important; /* Stop animating the background on phones */
-    }
-    .custom-modal-overlay, .custom-modal-card {
-        backdrop-filter: blur(5px) !important; /* Reduce blur intensity */
-    }
-    .privacy-overlay {
-        backdrop-filter: blur(10px) !important;
-        background: rgba(3, 7, 18, 0.95);
-    }
-}
 
 
 /* --- TIME WASTER MODAL OVERRIDES --- */
@@ -1545,6 +1495,67 @@ body.hide-prices-mode #dPrice::after {
     border: 2px solid var(--admin-red);
     box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
 }
+
+
+
+/* --- WASTERS LEADERBOARD STYLES --- */
+.waster-list-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 71, 87, 0.05);
+    border: 1px solid rgba(255, 71, 87, 0.2);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    gap: 20px;
+    transition: 0.3s;
+}
+.waster-list-item:hover {
+    background: rgba(255, 71, 87, 0.1);
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.1);
+    border-color: var(--admin-red);
+}
+.waster-avatar {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--admin-red);
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+    object-fit: cover;
+}
+.waster-info {
+    flex-grow: 1;
+    text-align: left;
+}
+.waster-name-text {
+    font-weight: 700; font-size: 16px; color: #fff;
+    text-transform: uppercase; margin-bottom: 3px; display: block;
+}
+.waster-phone-text {
+    font-size: 13px; color: var(--admin-red); font-weight: 600;
+}
+.waster-time-badge {
+    background: rgba(255, 71, 87, 0.1);
+    padding: 6px 15px;
+    border-radius: 50px;
+    font-size: 13px; font-weight: bold;
+    color: var(--admin-red);
+    border: 1px solid var(--admin-red);
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.2);
+    white-space: nowrap;
+}
+
+.btn-view-wasters {
+    background: rgba(255, 71, 87, 0.1);
+    border: 1px solid var(--admin-red);
+    color: var(--admin-red);
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Oswald'; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; transition: 0.3s;
+    margin-left: 10px;
+}
+.btn-view-wasters:hover { background: var(--admin-red); color: #fff; box-shadow: 0 0 15px var(--admin-red-dim); }
   </style>
 </head>
 <body>
@@ -2017,6 +2028,24 @@ body.hide-prices-mode #dPrice::after {
 </div>
 
 
+<!-- ==========================================
+     MONTHLY WASTERS (LEADERBOARD) MODAL
+========================================== -->
+<div id="monthWastersModal" class="custom-modal-overlay">
+    <div class="custom-modal-card" style="max-width: 650px; border-color: var(--admin-red); box-shadow: 0 0 50px rgba(255, 71, 87, 0.2);">
+        <div class="modal-header-container">
+            <button class="close-modal-btn" onclick="document.getElementById('monthWastersModal').classList.remove('active')" style="border-color: var(--admin-red);"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title" id="wastersModalTitle" style="color: var(--admin-red); border-bottom-color: rgba(255, 71, 87, 0.3); text-shadow: 0 0 20px var(--admin-red-dim);">
+                <i class="fas fa-skull"></i> Clienți Neserioși
+            </h2>
+        </div>
+        <div class="modal-body-container" id="wastersListContainer">
+            <!-- List will be injected here -->
+        </div>
+    </div>
+</div>
+
+
 <!-- SETTINGS FLOATING BUTTON (LEFT SIDE) -->
 <button id="settingsFab" class="settings-fab">
     <i class="fas fa-cog"></i>
@@ -2141,6 +2170,7 @@ onAuthStateChanged(auth, async (user) => {
             welcomeContainer.style.opacity = '1';
 
             loadOrdersRealtime(); 
+            loadWastersRealtime();
         } else {
             // --- REGULAR USER: SHOW ABSOLUTELY NOTHING ---
             mainAppContainer.style.display = 'none';
@@ -2362,6 +2392,22 @@ window.setFilter = (status) => {
     // Reîncărcăm grila
     loadOrdersRealtime();
 };
+
+
+let currentWasters = [];
+
+function loadWastersRealtime() {
+    const q = query(collection(db, "time_wasters"));
+    onSnapshot(q, (snapshot) => {
+        currentWasters = [];
+        snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            data.id = docSnap.id;
+            currentWasters.push(data);
+        });
+        updateStatistics(); // Refresh stats to include them!
+    });
+}
 
 function loadOrdersRealtime() {
     const q = query(collection(db, "comenzi"), orderBy("orderDate", "desc"), orderBy("createdAt", "desc"));    
@@ -2754,63 +2800,70 @@ function updateStatistics() {
 
     const groups = {};
 
+    // 1. Process Normal Orders
     currentOrders.forEach(order => {
         if (!order.orderDate) return;
-        
-        // Split YYYY-MM-DD
         const dateParts = order.orderDate.split('-');
         if (dateParts.length !== 3) return;
         
-        const year = dateParts[0];
-        const monthNum = parseInt(dateParts[1]) - 1;
-        const tempDate = new Date(year, monthNum, 1);
-        
-        const monthName = tempDate.toLocaleString('ro-RO', { month: 'long' });
-        const key = `${monthName} ${year}`;
+        const tempDate = new Date(dateParts[0], parseInt(dateParts[1]) - 1, 1);
+        const key = `${tempDate.toLocaleString('ro-RO', { month: 'long' })} ${dateParts[0]}`;
 
         if (!groups[key]) {
             groups[key] = {
-                name: key,
-                totalOrders: 0,
-                hours: 0,
-                delivered: 0,
-                rejected: 0,
-                incomeRON: 0,
-                rawDate: tempDate // for sorting
+                name: key, totalOrders: 0, hours: 0, delivered: 0, rejected: 0, incomeRON: 0,
+                wasterCount: 0, wasterMinutes: 0, wastersArray: [], rawDate: tempDate
             };
         }
 
         const g = groups[key];
         const status = order.status || "In Curs";
 
-        // 1. Increment Total Orders for the month
         g.totalOrders++;
-        
-        // 2. Sum Work Hours
         const hrMatch = order.workHours ? order.workHours.match(/\d+/) : null;
         if (hrMatch) g.hours += parseInt(hrMatch[0]);
 
-        // 3. Status Counters
         if (status === "Livrat") g.delivered++;
         if (status === "Respins") g.rejected++;
 
-        // 4. INCOME CALCULATION (The 50% Rule)
         const price = parseFloat(order.price) || 0;
         const rate = EXCHANGE_RATES[order.currency] || 1;
         let calculatedValue = price * rate;
 
-        if (status === "Anulat") {
-            // Canceled orders bring in 0 RON
-            calculatedValue = 0;
-        } else if (status === "Respins") {
-            // Rejected orders count for only 50% (half goes back to client)
-            calculatedValue = calculatedValue / 2;
-        }
-
+        if (status === "Anulat") calculatedValue = 0;
+        else if (status === "Respins") calculatedValue = calculatedValue / 2;
         g.incomeRON += calculatedValue;
     });
 
-    // Sort months by date descending (Newest first)
+    // 2. Process Time Wasters
+    currentWasters.forEach(w => {
+        if (!w.dateAdded) return;
+        // Parse "DD.MM.YYYY" from "DD.MM.YYYY - HH:MM"
+        const dateOnly = w.dateAdded.split(' - ')[0];
+        const parts = dateOnly.split(/[./-]/);
+        if (parts.length < 3) return;
+
+        const tempDate = new Date(parts[2], parseInt(parts[1]) - 1, 1);
+        const key = `${tempDate.toLocaleString('ro-RO', { month: 'long' })} ${parts[2]}`;
+
+        // If month exists in groups, add data to it
+        if (groups[key]) {
+            groups[key].wasterCount++;
+            groups[key].wastersArray.push(w);
+
+            // Smart Time Parser: Extracts numbers and converts "or" / "h" to minutes
+            const timeStr = w.timeWasted ? w.timeWasted.toLowerCase() : "";
+            const num = parseInt(timeStr.match(/\d+/) || [0]);
+            
+            if (timeStr.includes("or") || timeStr.includes("h")) {
+                groups[key].wasterMinutes += (num * 60); // convert hours to mins
+            } else {
+                groups[key].wasterMinutes += num; // default to mins
+            }
+        }
+    });
+
+    // Sort months by date descending
     const sortedKeys = Object.keys(groups).sort((a, b) => groups[b].rawDate - groups[a].rawDate);
 
     monthListEl.innerHTML = "";
@@ -2826,15 +2879,28 @@ window.showMonthDetails = (data, btn) => {
     document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
+    // Convert total waster minutes back to "Xh Ym"
+    let wastedTimeFormat = "0h";
+    if (data.wasterMinutes > 0) {
+        const h = Math.floor(data.wasterMinutes / 60);
+        const m = data.wasterMinutes % 60;
+        wastedTimeFormat = h > 0 ? `${h}h ${m}m` : `${m} min`;
+    }
+
     const display = document.getElementById('statsDetails');
     display.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;">
             <h3 style="font-size: 30px; color: var(--primary); text-transform: uppercase; margin: 0;">
                 Rezumat ${data.name}
             </h3>
-            <button class="btn-view-month" onclick="openMonthlyGallery('${data.name}')">
-                <i class="fas fa-images"></i> VEZI TOATE PORTRETELE
-            </button>
+            <div>
+                <button class="btn-view-month" onclick="openMonthlyGallery('${data.name}')">
+                    <i class="fas fa-images"></i> VEZI TOATE PORTRETELE
+                </button>
+                <button class="btn-view-wasters" onclick="openMonthlyWasters('${data.name}')">
+                    <i class="fas fa-skull"></i> VEZI NESERIOȘII
+                </button>
+            </div>
         </div>
         <div class="stats-grid">
             <div class="stat-card">
@@ -2847,15 +2913,15 @@ window.showMonthDetails = (data, btn) => {
                 <div class="stat-value">${data.hours}h</div>
                 <i class="fas fa-clock card-icon"></i>
             </div>
-            <div class="stat-card" style="border-color: #00ff88;">
-                <div class="stat-label">Portrete Livrate</div>
-                <div class="stat-value">${data.delivered}</div>
-                <i class="fas fa-check-double card-icon" style="color: #00ff88;"></i>
+            <div class="stat-card" style="border-color: var(--admin-red);">
+                <div class="stat-label" style="color: var(--admin-red);">Clienți Neserioși</div>
+                <div class="stat-value">${data.wasterCount}</div>
+                <i class="fas fa-user-times card-icon" style="color: var(--admin-red);"></i>
             </div>
-            <div class="stat-card" style="border-color: #ff4757;">
-                <div class="stat-label">Portrete Respinse</div>
-                <div class="stat-value">${data.rejected}</div>
-                <i class="fas fa-times-circle card-icon" style="color: #ff4757;"></i>
+            <div class="stat-card" style="border-color: var(--admin-red);">
+                <div class="stat-label" style="color: var(--admin-red);">Timp Pierdut</div>
+                <div class="stat-value">${wastedTimeFormat}</div>
+                <i class="fas fa-hourglass-half card-icon" style="color: var(--admin-red);"></i>
             </div>
             <div class="stat-card" style="grid-column: 1 / -1; border-color: #00ff88; background: rgba(0, 255, 136, 0.05);">
                 <div class="stat-label">Venit Total (Calculat în LEI)</div>
@@ -2865,6 +2931,42 @@ window.showMonthDetails = (data, btn) => {
             </div>
         </div>
     `;
+    
+    // Bind data to the global scope so the modal can access it easily
+    window.currentMonthWasters = data.wastersArray;
+};
+
+// Modal Trigger for Wasters Leaderboard
+window.openMonthlyWasters = (monthKey) => {
+    document.getElementById('wastersModalTitle').innerHTML = `<i class="fas fa-skull"></i> Neserioși: ${monthKey}`;
+    const listContainer = document.getElementById('wastersListContainer');
+    listContainer.innerHTML = ''; // clear old
+
+    if (!window.currentMonthWasters || window.currentMonthWasters.length === 0) {
+        listContainer.innerHTML = `<p style="text-align:center; color: #888; font-size: 18px; margin-top: 20px;">Niciun client neserios în această lună. 🎉</p>`;
+    } else {
+        window.currentMonthWasters.forEach(waster => {
+            const item = document.createElement('div');
+            item.className = 'waster-list-item';
+            
+            // Generate generic empty avatar image
+            const avatarUrl = "https://i.ibb.co/4pGm9S2/user-placeholder.png"; 
+
+            item.innerHTML = `
+                <img src="${avatarUrl}" class="waster-avatar">
+                <div class="waster-info">
+                    <span class="waster-name-text">${waster.name}</span>
+                    <span class="waster-phone-text"><i class="fas fa-phone-alt"></i> ${waster.phone}</span>
+                </div>
+                <div class="waster-time-badge">
+                    <i class="fas fa-clock"></i> ${waster.timeWasted}
+                </div>
+            `;
+            listContainer.appendChild(item);
+        });
+    }
+
+    document.getElementById('monthWastersModal').classList.add('active');
 };
 
 // Hook into the existing data loader 
