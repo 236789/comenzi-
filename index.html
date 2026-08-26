@@ -1645,6 +1645,58 @@ body.hide-prices-mode #dPrice::after {
     }
     .waster-time-badge { grid-column: 2; width: fit-content; }
 }
+
+
+/* --- UNIFIED SYMMETRICAL BUTTONS --- */
+.btn-view-month, .btn-view-wasters {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    
+    /* Dimensiuni Fixe pentru Simetrie */
+    height: 45px !important; 
+    min-width: 180px !important; 
+    padding: 0 20px !important;
+    margin: 0 !important;
+    
+    /* Font & Aspect */
+    font-family: 'Oswald', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    border-radius: 12px !important; /* Margini ușor rotunjite cyber */
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    white-space: nowrap !important;
+}
+
+/* Stil Specific Portrete (Cyan) */
+.btn-view-month {
+    background: rgba(0, 242, 254, 0.05) !important;
+    border: 1px solid var(--primary) !important;
+    color: var(--primary) !important;
+}
+.btn-view-month:hover {
+    background: var(--primary) !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px var(--primary-dim) !important;
+    transform: translateY(-2px);
+}
+
+/* Stil Specific Neserioși (Red) */
+.btn-view-wasters {
+    background: rgba(255, 71, 87, 0.05) !important;
+    border: 1px solid var(--admin-red) !important;
+    color: var(--admin-red) !important;
+}
+.btn-view-wasters:hover {
+    background: var(--admin-red) !important;
+    color: #fff !important;
+    box-shadow: 0 0 20px var(--admin-red-dim) !important;
+    transform: translateY(-2px);
+}
   </style>
 </head>
 <body>
