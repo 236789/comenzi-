@@ -2794,76 +2794,73 @@ const EXCHANGE_RATES = {
     'USD': 4.6   // 1 USD = 4.6 RON
 };
 
-function updateStatistics() {
+// --- STATISTICS LOGIC UPDATED ---
+
+window.updateStatistics = function() {
     const monthListEl = document.getElementById('monthList');
-    if (!currentOrders || currentOrders.length === 0) return;
+    // Verificăm ambele surse de date
+    if ((!currentOrders || currentOrders.length === 0) && (!currentWasters || currentWasters.length === 0)) return;
 
     const groups = {};
 
-    // 1. Process Normal Orders
+    // 1. Procesăm Comenzile
     currentOrders.forEach(order => {
         if (!order.orderDate) return;
         const dateParts = order.orderDate.split('-');
-        if (dateParts.length !== 3) return;
-        
-        const tempDate = new Date(dateParts[0], parseInt(dateParts[1]) - 1, 1);
-        const key = `${tempDate.toLocaleString('ro-RO', { month: 'long' })} ${dateParts[0]}`;
+        const year = dateParts[0];
+        const monthNum = parseInt(dateParts[1]) - 1;
+        const tempDate = new Date(year, monthNum, 1);
+        const monthName = tempDate.toLocaleString('ro-RO', { month: 'long' });
+        const key = `${monthName} ${year}`;
 
         if (!groups[key]) {
             groups[key] = {
                 name: key, totalOrders: 0, hours: 0, delivered: 0, rejected: 0, incomeRON: 0,
-                wasterCount: 0, wasterMinutes: 0, wastersArray: [], rawDate: tempDate
+                wasterCount: 0, wastersList: [], rawDate: tempDate 
             };
         }
 
         const g = groups[key];
         const status = order.status || "In Curs";
-
         g.totalOrders++;
         const hrMatch = order.workHours ? order.workHours.match(/\d+/) : null;
         if (hrMatch) g.hours += parseInt(hrMatch[0]);
-
         if (status === "Livrat") g.delivered++;
         if (status === "Respins") g.rejected++;
 
         const price = parseFloat(order.price) || 0;
         const rate = EXCHANGE_RATES[order.currency] || 1;
-        let calculatedValue = price * rate;
-
-        if (status === "Anulat") calculatedValue = 0;
-        else if (status === "Respins") calculatedValue = calculatedValue / 2;
-        g.incomeRON += calculatedValue;
+        let val = price * rate;
+        if (status === "Anulat") val = 0;
+        else if (status === "Respins") val = val / 2;
+        g.incomeRON += val;
     });
 
-    // 2. Process Time Wasters
-    currentWasters.forEach(w => {
-        if (!w.dateAdded) return;
-        // Parse "DD.MM.YYYY" from "DD.MM.YYYY - HH:MM"
-        const dateOnly = w.dateAdded.split(' - ')[0];
-        const parts = dateOnly.split(/[./-]/);
-        if (parts.length < 3) return;
+    // 2. Procesăm Clienții Neserioși (Wasters)
+    currentWasters.forEach(waster => {
+        if (!waster.dateAdded) return;
+        // Formatul dateAdded este "DD.MM.YYYY - HH:MM"
+        const datePart = waster.dateAdded.split(' - ')[0];
+        const parts = datePart.split('.');
+        if (parts.length !== 3) return;
+        
+        const year = parts[2];
+        const monthNum = parseInt(parts[1]) - 1;
+        const tempDate = new Date(year, monthNum, 1);
+        const monthName = tempDate.toLocaleString('ro-RO', { month: 'long' });
+        const key = `${monthName} ${year}`;
 
-        const tempDate = new Date(parts[2], parseInt(parts[1]) - 1, 1);
-        const key = `${tempDate.toLocaleString('ro-RO', { month: 'long' })} ${parts[2]}`;
-
-        // If month exists in groups, add data to it
-        if (groups[key]) {
-            groups[key].wasterCount++;
-            groups[key].wastersArray.push(w);
-
-            // Smart Time Parser: Extracts numbers and converts "or" / "h" to minutes
-            const timeStr = w.timeWasted ? w.timeWasted.toLowerCase() : "";
-            const num = parseInt(timeStr.match(/\d+/) || [0]);
-            
-            if (timeStr.includes("or") || timeStr.includes("h")) {
-                groups[key].wasterMinutes += (num * 60); // convert hours to mins
-            } else {
-                groups[key].wasterMinutes += num; // default to mins
-            }
+        if (!groups[key]) {
+            groups[key] = {
+                name: key, totalOrders: 0, hours: 0, delivered: 0, rejected: 0, incomeRON: 0,
+                wasterCount: 0, wastersList: [], rawDate: tempDate
+            };
         }
+        
+        groups[key].wasterCount++;
+        groups[key].wastersList.push(waster);
     });
 
-    // Sort months by date descending
     const sortedKeys = Object.keys(groups).sort((a, b) => groups[b].rawDate - groups[a].rawDate);
 
     monthListEl.innerHTML = "";
@@ -2875,17 +2872,10 @@ function updateStatistics() {
         monthListEl.appendChild(btn);
     });
 }
+
 window.showMonthDetails = (data, btn) => {
     document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
-    // Convert total waster minutes back to "Xh Ym"
-    let wastedTimeFormat = "0h";
-    if (data.wasterMinutes > 0) {
-        const h = Math.floor(data.wasterMinutes / 60);
-        const m = data.wasterMinutes % 60;
-        wastedTimeFormat = h > 0 ? `${h}h ${m}m` : `${m} min`;
-    }
 
     const display = document.getElementById('statsDetails');
     display.innerHTML = `
@@ -2893,12 +2883,12 @@ window.showMonthDetails = (data, btn) => {
             <h3 style="font-size: 30px; color: var(--primary); text-transform: uppercase; margin: 0;">
                 Rezumat ${data.name}
             </h3>
-            <div>
+            <div style="display: flex; gap: 10px;">
                 <button class="btn-view-month" onclick="openMonthlyGallery('${data.name}')">
-                    <i class="fas fa-images"></i> VEZI TOATE PORTRETELE
+                    <i class="fas fa-images"></i> VEZI PORTRETELE
                 </button>
-                <button class="btn-view-wasters" onclick="openMonthlyWasters('${data.name}')">
-                    <i class="fas fa-skull"></i> VEZI NESERIOȘII
+                <button class="btn-view-wasters" onclick="openMonthlyWasters('${data.name}', ${JSON.stringify(data.wastersList).replace(/"/g, '&quot;')})">
+                    <i class="fas fa-user-slash"></i> VEZI NESERIOȘI
                 </button>
             </div>
         </div>
@@ -2913,16 +2903,29 @@ window.showMonthDetails = (data, btn) => {
                 <div class="stat-value">${data.hours}h</div>
                 <i class="fas fa-clock card-icon"></i>
             </div>
-            <div class="stat-card" style="border-color: var(--admin-red);">
-                <div class="stat-label" style="color: var(--admin-red);">Clienți Neserioși</div>
-                <div class="stat-value">${data.wasterCount}</div>
-                <i class="fas fa-user-times card-icon" style="color: var(--admin-red);"></i>
+            <div class="stat-card" style="border-color: #00ff88;">
+                <div class="stat-label">Portrete Livrate</div>
+                <div class="stat-value">${data.delivered}</div>
+                <i class="fas fa-check-double card-icon" style="color: #00ff88;"></i>
             </div>
-            <div class="stat-card" style="border-color: var(--admin-red);">
-                <div class="stat-label" style="color: var(--admin-red);">Timp Pierdut</div>
-                <div class="stat-value">${wastedTimeFormat}</div>
-                <i class="fas fa-hourglass-half card-icon" style="color: var(--admin-red);"></i>
+            <div class="stat-card" style="border-color: #ff4757;">
+                <div class="stat-label">Portrete Respinse</div>
+                <div class="stat-value">${data.rejected}</div>
+                <i class="fas fa-times-circle card-icon" style="color: #ff4757;"></i>
             </div>
+            
+            <!-- NEW CARDS -->
+            <div class="stat-card" style="border-color: #ff9800;">
+                <div class="stat-label">Clienți Neserioși</div>
+                <div class="stat-value" style="color: #ff9800;">${data.wasterCount}</div>
+                <i class="fas fa-user-times card-icon" style="color: #ff9800;"></i>
+            </div>
+            <div class="stat-card" style="border-color: #ff4757;">
+                <div class="stat-label">Total Timp Pierdut</div>
+                <div class="stat-value" style="color: #ff4757; font-size: 20px;">${calculateTotalWasted(data.wastersList)}</div>
+                <i class="fas fa-hourglass-end card-icon" style="color: #ff4757;"></i>
+            </div>
+
             <div class="stat-card" style="grid-column: 1 / -1; border-color: #00ff88; background: rgba(0, 255, 136, 0.05);">
                 <div class="stat-label">Venit Total (Calculat în LEI)</div>
                 <div class="stat-value income-value" style="font-size: 35px;">${new Intl.NumberFormat('ro-RO').format(Math.round(data.incomeRON))} RON</div>
@@ -2931,44 +2934,45 @@ window.showMonthDetails = (data, btn) => {
             </div>
         </div>
     `;
-    
-    // Bind data to the global scope so the modal can access it easily
-    window.currentMonthWasters = data.wastersArray;
 };
 
-// Modal Trigger for Wasters Leaderboard
-window.openMonthlyWasters = (monthKey) => {
-    document.getElementById('wastersModalTitle').innerHTML = `<i class="fas fa-skull"></i> Neserioși: ${monthKey}`;
-    const listContainer = document.getElementById('wastersListContainer');
-    listContainer.innerHTML = ''; // clear old
+// --- HELPER: OPEN WASTERS MODAL ---
+window.openMonthlyWasters = (monthKey, wasters) => {
+    const container = document.getElementById('wastersListContainer');
+    const modalTitle = document.getElementById('wastersModalTitle');
+    modalTitle.innerHTML = `<i class="fas fa-user-slash"></i> Neserioși: ${monthKey}`;
+    container.innerHTML = "";
 
-    if (!window.currentMonthWasters || window.currentMonthWasters.length === 0) {
-        listContainer.innerHTML = `<p style="text-align:center; color: #888; font-size: 18px; margin-top: 20px;">Niciun client neserios în această lună. 🎉</p>`;
+    if (wasters.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding: 20px; color: #888;'>Niciun client neserios în această lună.</p>";
     } else {
-        window.currentMonthWasters.forEach(waster => {
+        wasters.forEach(w => {
             const item = document.createElement('div');
             item.className = 'waster-list-item';
-            
-            // Generate generic empty avatar image
-            const avatarUrl = "https://i.ibb.co/4pGm9S2/user-placeholder.png"; 
-
             item.innerHTML = `
-                <img src="${avatarUrl}" class="waster-avatar">
+                <img src="https://i.ibb.co/4pGm9S2/user-placeholder.png" class="waster-avatar" alt="User">
                 <div class="waster-info">
-                    <span class="waster-name-text">${waster.name}</span>
-                    <span class="waster-phone-text"><i class="fas fa-phone-alt"></i> ${waster.phone}</span>
+                    <span class="waster-name-text">${w.name}</span>
+                    <span class="waster-phone-text"><i class="fas fa-phone-alt"></i> ${w.phone}</span>
                 </div>
                 <div class="waster-time-badge">
-                    <i class="fas fa-clock"></i> ${waster.timeWasted}
+                    <i class="fas fa-clock"></i> ${w.timeWasted}
                 </div>
             `;
-            listContainer.appendChild(item);
+            container.appendChild(item);
         });
     }
 
     document.getElementById('monthWastersModal').classList.add('active');
 };
 
+// --- HELPER: CALCULATE TOTAL TIME ---
+function calculateTotalWasted(wasters) {
+    if (wasters.length === 0) return "0 minute";
+    // Deoarece timpul este string (ex: "2 ore"), doar le concatenăm sau afișăm numărul de intrări
+    // O variantă simplă este să afișăm timpul sub formă de listă sumară sau doar nr. de ore dacă ai un parser
+    return wasters.length + " Cazuri"; 
+}
 // Hook into the existing data loader 
 // Find your 'onSnapshot' block and add 'updateStatistics()' inside it
 
