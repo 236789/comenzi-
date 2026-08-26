@@ -1556,6 +1556,95 @@ body.hide-prices-mode #dPrice::after {
     margin-left: 10px;
 }
 .btn-view-wasters:hover { background: var(--admin-red); color: #fff; box-shadow: 0 0 15px var(--admin-red-dim); }
+
+
+/* --- REVAMPED WASTER MODAL STYLES --- */
+.waster-header-labels {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr 120px;
+    padding: 10px 25px;
+    color: var(--admin-red);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(255, 71, 87, 0.2);
+    margin-bottom: 10px;
+}
+
+.waster-list-item {
+    display: grid !important;
+    grid-template-columns: 80px 1fr 1fr 120px; /* Profile | Name | Phone | Time */
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: 4px solid var(--admin-red);
+    padding: 12px 20px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    gap: 15px;
+    transition: 0.3s;
+}
+
+.waster-list-item:hover {
+    background: rgba(255, 71, 87, 0.08);
+    transform: translateX(5px);
+    border-color: var(--admin-red);
+}
+
+.waster-avatar {
+    width: 45px; height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--admin-red);
+    box-shadow: 0 0 10px var(--admin-red-dim);
+    object-fit: cover;
+}
+
+.waster-name-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.waster-phone-col {
+    color: #aaa;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.waster-phone-col i { color: var(--admin-red); font-size: 12px; }
+
+.waster-time-badge {
+    background: rgba(255, 71, 87, 0.1) !important;
+    color: var(--admin-red) !important;
+    border: 1px solid var(--admin-red) !important;
+    padding: 5px 12px !important;
+    border-radius: 50px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    text-align: center;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px var(--admin-red-dim);
+}
+
+/* Scrollbar pentru Modal */
+#wastersListContainer::-webkit-scrollbar { width: 6px; }
+#wastersListContainer::-webkit-scrollbar-thumb { background: var(--admin-red); border-radius: 10px; }
+
+@media (max-width: 600px) {
+    .waster-header-labels { display: none; }
+    .waster-list-item { 
+        grid-template-columns: 60px 1fr; 
+        grid-template-rows: auto auto;
+    }
+    .waster-time-badge { grid-column: 2; width: fit-content; }
+}
   </style>
 </head>
 <body>
@@ -2945,27 +3034,45 @@ window.showMonthDetails = (data, btn) => {
 window.openMonthlyWasters = (monthKey, wasters) => {
     const container = document.getElementById('wastersListContainer');
     const modalTitle = document.getElementById('wastersModalTitle');
-    modalTitle.innerHTML = `<i class="fas fa-user-slash"></i> Neserioși: ${monthKey}`;
+    
+    modalTitle.innerHTML = `<i class="fas fa-skull-crossbones"></i> LISTĂ NESERIOȘI: ${monthKey}`;
     container.innerHTML = "";
 
-    if (wasters.length === 0) {
-        container.innerHTML = "<p style='text-align:center; padding: 20px; color: #888;'>Niciun client neserios în această lună.</p>";
+    if (!wasters || wasters.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding: 40px; color: #555; text-transform: uppercase; letter-spacing: 2px;'>Niciun neserios detectat.</p>";
     } else {
+        // ADAUGĂM CAPUL DE TABEL
+        const header = document.createElement('div');
+        header.className = 'waster-header-labels';
+        header.innerHTML = `
+            <span>Avatar</span>
+            <span>Nume Client</span>
+            <span>Contact</span>
+            <span>Timp Pierdut</span>
+        `;
+        container.appendChild(header);
+
         wasters.forEach(w => {
             const item = document.createElement('div');
             item.className = 'waster-list-item';
             
-            // LINK NOU PENTRU AVATAR (Silueta standard)
-            const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            // Imagine stabilă (Siluetă standard)
+            const defaultAvatar = "https://www.PNGitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png";
             
+            // Formatare timp (Ex: "2 Minute")
+            const timeVal = parseInt(w.timeWasted) || 0;
+            const timeString = timeVal >= 60 
+                ? `${Math.floor(timeVal / 60)}h ${timeVal % 60}m` 
+                : `${timeVal} MINUTE`;
+
             item.innerHTML = `
                 <img src="${defaultAvatar}" class="waster-avatar" alt="User">
-                <div class="waster-info">
-                    <span class="waster-name-text">${w.name}</span>
-                    <span class="waster-phone-text"><i class="fas fa-phone-alt"></i> ${w.phone}</span>
+                <div class="waster-name-text">${w.name}</div>
+                <div class="waster-phone-col">
+                    <i class="fas fa-phone-alt"></i> ${w.phone}
                 </div>
                 <div class="waster-time-badge">
-                    <i class="fas fa-clock"></i> ${calculateTotalWasted([w])}
+                    <i class="fas fa-clock"></i> ${timeString}
                 </div>
             `;
             container.appendChild(item);
