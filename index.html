@@ -1696,8 +1696,31 @@ body.hide-prices-mode #dPrice::after {
                     </div>
                 </div>
 
-                <!-- MULTIPLE IMAGE DROP AREA -->
+<!-- MULTIPLE IMAGE DROP AREA -->
                 <div class="image-drop-area full-row waster-drop-area" id="wasterImageDropArea" style="height: auto; min-height: 200px; padding: 20px;">
+                    <input type="file" id="wImages" accept="image/*" multiple required>
+                    <div class="image-drop-placeholder" id="wImagePlaceholder" style="color: var(--admin-red);">
+                        <i class="fas fa-images" style="text-shadow: 0 0 20px var(--admin-red);"></i>
+                        <span>Selectează sau trage imaginile dorite</span>
+                        <span style="font-size: 12px; margin-top: 5px;">(Se pot selecta mai multe simultan)</span>
+                    </div>
+                    
+                    <div id="wImagePreviewContainer" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%; margin-top: 15px;"></div>
+                    
+                    <button type="button" id="wImageRemoveBtn" class="image-remove-btn" style="top: 10px; right: 10px; background: #fff; color: var(--admin-red);"><i class="fas fa-times"></i></button>
+                </div> 
+
+                <button type="submit" class="btn-submit-order full-row" style="background: var(--admin-red); box-shadow: 0 0 30px var(--admin-red-dim); color: #fff;">
+                    <i class="fas fa-ban"></i> RAPORTEAZĂ WASTER
+                </button>
+            </form> 
+        </div>
+    </div>
+</div>
+
+    <!-- ==========================================
+         1. ADD ORDER MODAL (REVAMPED)
+    ========================================== -->
 
 
     <!-- ==========================================
@@ -2144,7 +2167,7 @@ onAuthStateChanged(auth, async (user) => {
         setTimeout(() => { welcomeContainer.innerHTML = ''; }, 500);
     }
 });
-
+ 
       // --- NEW IMAGE PREVIEW LOGIC ---
       const oImageFile = document.getElementById('oImageFile');
       const imageDropPreview = document.getElementById('imageDropPreview');
@@ -3134,11 +3157,9 @@ document.getElementById('addWasterForm').addEventListener('submit', async (e) =>
             dateAdded: autoDateTime, // Saved automatically
             timestamp: serverTimestamp() // Official firebase timestamp for sorting later
         };
-
-        // Save to a completely separate Firestore Collection named "time_wasters"
-        import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js"; // Ensure imports are available
+// Save to a completely separate Firestore Collection named "time_wasters"
         await addDoc(collection(db, "time_wasters"), wasterData);
-
+ 
         notify("Time Waster raportat cu succes!");
         
         // Reset Form
