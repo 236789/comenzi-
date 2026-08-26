@@ -1516,6 +1516,35 @@ body.hide-prices-mode #dPrice::after {
         background: rgba(3, 7, 18, 0.95);
     }
 }
+
+
+/* --- TIME WASTER MODAL OVERRIDES --- */
+.waster-input {
+    border-color: var(--admin-red) !important;
+    background: rgba(255, 71, 87, 0.05) !important;
+    box-shadow: 0 0 15px rgba(255, 71, 87, 0.2), inset 0 2px 5px rgba(0,0,0,0.5) !important;
+}
+.waster-input:focus {
+    background: rgba(255, 71, 87, 0.15) !important;
+    box-shadow: 0 0 25px var(--admin-red), inset 0 2px 10px rgba(0,0,0,0.5) !important;
+}
+.waster-drop-area {
+    border-color: var(--admin-red) !important;
+    background: rgba(255, 71, 87, 0.05) !important;
+    box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.1) !important;
+}
+.waster-drop-area:hover {
+    background: rgba(255, 71, 87, 0.1) !important;
+    box-shadow: inset 0 0 30px rgba(255, 71, 87, 0.3) !important;
+}
+.waster-preview-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid var(--admin-red);
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+}
   </style>
 </head>
 <body>
@@ -1600,6 +1629,77 @@ body.hide-prices-mode #dPrice::after {
         </div>
     </div>
 </section>
+
+
+<!-- ==========================================
+     TIME WASTERS SECTION
+========================================== -->
+<section class="stats-section" id="wastersSection" style="display: none; padding-top: 0;">
+    <div class="container">
+        <div class="cyber-line" style="margin: 40px auto;"></div>
+        
+        <!-- Custom Red Header for Time Wasters -->
+        <h2 class="page-main-title" style="font-size: 40px; background: linear-gradient(180deg, #ffffff 0%, #ff4757 100%); filter: drop-shadow(0 0 25px rgba(255, 71, 87, 0.4)); -webkit-text-fill-color: transparent;">
+            Blacklist (Time Wasters)
+        </h2>
+        
+        <div class="admin-action-bar" style="display: flex; margin-bottom: 30px;">
+            <button id="openAddWasterBtn" class="btn-admin-add" style="background: rgba(255, 71, 87, 0.1);">
+                <i class="fas fa-skull"></i> Raportează Waster
+            </button>
+        </div>
+
+        <!-- Grid for showing wasters later -->
+        <div id="wastersGrid" class="orders-grid" style="display: grid; padding-bottom: 50px;">
+            <!-- Rendered wasters will go here in the next step -->
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================
+     TIME WASTER MODAL
+========================================== -->
+<div id="addWasterModal" class="custom-modal-overlay">
+    <div class="custom-modal-card" style="max-width: 600px; border-color: var(--admin-red); box-shadow: 0 0 50px rgba(255, 71, 87, 0.2), inset 0 0 30px rgba(255, 71, 87, 0.1);">
+        
+        <div class="modal-header-container">
+            <button class="close-modal-btn" onclick="document.getElementById('addWasterModal').classList.remove('active')" style="background: rgba(255,255,255,0.05); border-color: var(--admin-red);"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title" style="color: var(--admin-red); text-shadow: 0 0 20px var(--admin-red-dim); border-bottom-color: rgba(255, 71, 87, 0.3);">
+                <i class="fas fa-user-times"></i> Adaugă Time Waster
+            </h2>
+        </div>
+        
+        <div class="modal-body-container">
+            <form id="addWasterForm" class="form-grid">
+                
+                <div class="input-group full-row">
+                    <label style="color: var(--admin-red);">Numele Wasterului</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="wName" class="styled-input waster-input" required>
+                        <i class="fas fa-user" style="color: var(--admin-red); text-shadow: 0 0 15px var(--admin-red);"></i>
+                    </div>
+                </div>
+
+                <div class="input-group full-row">
+                    <label style="color: var(--admin-red);">Număr de Telefon</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="wPhone" class="styled-input waster-input" required>
+                        <i class="fas fa-phone" style="color: var(--admin-red); text-shadow: 0 0 15px var(--admin-red);"></i>
+                    </div>
+                </div>
+
+                <div class="input-group full-row">
+                    <label style="color: var(--admin-red);">Timp Pierdut</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="wTime" class="styled-input waster-input" placeholder="Ex: 30 minute, 2 ore..." required>
+                        <i class="fas fa-hourglass-half" style="color: var(--admin-red); text-shadow: 0 0 15px var(--admin-red);"></i>
+                    </div>
+                </div>
+
+                <!-- MULTIPLE IMAGE DROP AREA -->
+                <div class="image-drop-area full-row waster-drop-area" id="wasterImageDropArea" style="height: auto; min-height: 200px; padding: 20px;">
+
+
     <!-- ==========================================
          1. ADD ORDER MODAL (REVAMPED)
     ========================================== -->
@@ -1987,57 +2087,63 @@ let editingOrderId = null;
       logoutBtn.addEventListener('click', () => { signOut(auth); });
 
 onAuthStateChanged(auth, async (user) => {
-          // Select the main app containers that we want to hide from regular users
-          const mainAppContainer = document.querySelector('.cyber-page-section .container');
-          const statsSection = document.querySelector('.stats-section');
+    // Select the main app containers that we want to hide from regular users
+    const mainAppContainer = document.querySelector('.cyber-page-section .container');
+    const statsSection = document.querySelector('.stats-section');
+    
+    // ADDED: Select the new Time Wasters section
+    const wastersSection = document.getElementById('wastersSection');
 
-          if (user) {
-              loginBtn.style.display = 'none';
-              userProfileUI.style.display = 'flex';
-              userAvatarImg.src = user.photoURL || 'https://i.ibb.co/4pGm9S2/user-placeholder.png';
+    if (user) {
+        loginBtn.style.display = 'none';
+        userProfileUI.style.display = 'flex';
+        userAvatarImg.src = user.photoURL || 'https://i.ibb.co/4pGm9S2/user-placeholder.png';
 
-              // Admin Check
-              globalIsAdmin = false;
-              try {
-                  const adminQuery = query(collection(db, "admin_emails"), where("email", "==", user.email));
-                  const adminSnapshot = await getDocs(adminQuery);
-                  globalIsAdmin = !adminSnapshot.empty;
-              } catch (error) { console.warn("Blocked by rules or error.", error); }
+        // Admin Check
+        globalIsAdmin = false;
+        try {
+            const adminQuery = query(collection(db, "admin_emails"), where("email", "==", user.email));
+            const adminSnapshot = await getDocs(adminQuery);
+            globalIsAdmin = !adminSnapshot.empty;
+        } catch (error) { console.warn("Blocked by rules or error.", error); }
 
-              if (globalIsAdmin) {
-                  // --- ADMIN USER: SHOW EVERYTHING ---
-                  mainAppContainer.style.display = 'block';
-                  statsSection.style.display = 'block';
-                  adminActionBar.style.display = 'flex';
-                  ordersGrid.style.display = 'grid';
-                  
-                  let badgeHtml = `<span class="badge badge-admin"><i class="fas fa-hammer"></i> ADMIN</span>`;
-                  let nameStyle = "color: #ff4757; text-shadow: 0 0 15px rgba(255, 71, 87, 0.4);";
-                  welcomeContainer.innerHTML = `BINE AI VENIT, <span style="${nameStyle}">${user.displayName}</span> ${badgeHtml}`;              
-                  welcomeContainer.style.opacity = '1';
+        if (globalIsAdmin) {
+            // --- ADMIN USER: SHOW EVERYTHING ---
+            mainAppContainer.style.display = 'block';
+            statsSection.style.display = 'block';
+            if (wastersSection) wastersSection.style.display = 'block'; // SHOW WASTERS
+            
+            adminActionBar.style.display = 'flex';
+            ordersGrid.style.display = 'grid';
+            
+            let badgeHtml = `<span class="badge badge-admin"><i class="fas fa-hammer"></i> ADMIN</span>`;
+            let nameStyle = "color: #ff4757; text-shadow: 0 0 15px rgba(255, 71, 87, 0.4);";
+            welcomeContainer.innerHTML = `BINE AI VENIT, <span style="${nameStyle}">${user.displayName}</span> ${badgeHtml}`;              
+            welcomeContainer.style.opacity = '1';
 
-                  loadOrdersRealtime(); 
-              } else {
-                  // --- REGULAR USER: SHOW ABSOLUTELY NOTHING ---
-                  // We hide the containers completely. They will only see the background and the "Logout" button.
-                  mainAppContainer.style.display = 'none';
-                  statsSection.style.display = 'none';
-                  
-                  notify("Acces interzis! Pagina este doar pentru administratori.", true);
-              }
+            loadOrdersRealtime(); 
+        } else {
+            // --- REGULAR USER: SHOW ABSOLUTELY NOTHING ---
+            mainAppContainer.style.display = 'none';
+            statsSection.style.display = 'none';
+            if (wastersSection) wastersSection.style.display = 'none'; // HIDE WASTERS
+            
+            notify("Acces interzis! Pagina este doar pentru administratori.", true);
+        }
 
-          } else {
-              // --- LOGGED OUT VISITOR: SHOW NOTHING BUT LOGIN BUTTON ---
-              loginBtn.style.display = 'flex';
-              userProfileUI.style.display = 'none';
-              
-              mainAppContainer.style.display = 'none';
-              statsSection.style.display = 'none';
-              
-              welcomeContainer.style.opacity = '0';
-              setTimeout(() => { welcomeContainer.innerHTML = ''; }, 500);
-          }
-      });
+    } else {
+        // --- LOGGED OUT VISITOR: SHOW NOTHING BUT LOGIN BUTTON ---
+        loginBtn.style.display = 'flex';
+        userProfileUI.style.display = 'none';
+        
+        mainAppContainer.style.display = 'none';
+        statsSection.style.display = 'none';
+        if (wastersSection) wastersSection.style.display = 'none'; // HIDE WASTERS
+        
+        welcomeContainer.style.opacity = '0';
+        setTimeout(() => { welcomeContainer.innerHTML = ''; }, 500);
+    }
+});
 
       // --- NEW IMAGE PREVIEW LOGIC ---
       const oImageFile = document.getElementById('oImageFile');
@@ -2942,6 +3048,113 @@ document.querySelectorAll('.close-modal-btn').forEach(btn => {
         const overlay = document.getElementById('privacyOverlay');
         if(overlay) overlay.classList.remove('hidden');
     });
+});
+
+
+
+// ==========================================
+// TIME WASTER LOGIC (MULTIPLE IMAGES)
+// ==========================================
+
+const openAddWasterBtn = document.getElementById('openAddWasterBtn');
+const addWasterModal = document.getElementById('addWasterModal');
+const wImagesInput = document.getElementById('wImages');
+const wImagePreviewContainer = document.getElementById('wImagePreviewContainer');
+const wImagePlaceholder = document.getElementById('wImagePlaceholder');
+const wImageRemoveBtn = document.getElementById('wImageRemoveBtn');
+
+// Open Modal
+openAddWasterBtn.addEventListener('click', () => {
+    addWasterModal.classList.add('active');
+});
+
+// Handle Multiple Image Previews
+wImagesInput.addEventListener('change', function() {
+    wImagePreviewContainer.innerHTML = ''; // Clear old previews
+    const files = Array.from(this.files);
+    
+    if (files.length > 0) {
+        wImagePlaceholder.style.display = 'none';
+        wImageRemoveBtn.style.display = 'flex';
+        
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'waster-preview-img';
+                wImagePreviewContainer.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+});
+
+// Remove Images
+wImageRemoveBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    wImagesInput.value = ''; // clear input
+    wImagePreviewContainer.innerHTML = '';
+    wImagePlaceholder.style.display = 'flex';
+    wImageRemoveBtn.style.display = 'none';
+});
+
+// Handle Waster Submit
+document.getElementById('addWasterForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!globalIsAdmin) return notify("Acces restricționat!", true);
+
+    const submitBtn = e.target.querySelector('.btn-submit-order');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE ÎNCARCĂ...';
+    submitBtn.disabled = true;
+
+    try {
+        const files = Array.from(document.getElementById('wImages').files);
+        let uploadedUrls = [];
+
+        // Upload all selected images to ImgBB concurrently
+        if (files.length > 0) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SE ÎNCARCĂ IMAGINILE...';
+            // Promise.all runs multiple uploads at the exact same time
+            const uploadPromises = files.map(file => uploadToImgBB(file));
+            uploadedUrls = await Promise.all(uploadPromises);
+        }
+
+        // Get Current Date & Time for exact logging
+        const now = new Date();
+        const autoDateTime = now.toLocaleDateString('ro-RO') + ' - ' + now.toLocaleTimeString('ro-RO', {hour: '2-digit', minute: '2-digit'});
+
+        // Construct Database Object
+        const wasterData = {
+            name: document.getElementById('wName').value.trim(),
+            phone: document.getElementById('wPhone').value.trim(),
+            timeWasted: document.getElementById('wTime').value.trim(),
+            images: uploadedUrls, // Array of ImgBB links
+            dateAdded: autoDateTime, // Saved automatically
+            timestamp: serverTimestamp() // Official firebase timestamp for sorting later
+        };
+
+        // Save to a completely separate Firestore Collection named "time_wasters"
+        import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js"; // Ensure imports are available
+        await addDoc(collection(db, "time_wasters"), wasterData);
+
+        notify("Time Waster raportat cu succes!");
+        
+        // Reset Form
+        document.getElementById('addWasterForm').reset();
+        wImagePreviewContainer.innerHTML = '';
+        wImagePlaceholder.style.display = 'flex';
+        wImageRemoveBtn.style.display = 'none';
+        addWasterModal.classList.remove('active');
+
+    } catch (err) {
+        console.error(err);
+        notify("Eroare: " + err.message, true);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-ban"></i> RAPORTEAZĂ WASTER';
+    }
 });
     </script>
 </body>
