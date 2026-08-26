@@ -1464,6 +1464,58 @@ body.hide-prices-mode #dPrice::after {
 .privacy-overlay.hidden {
     display: none !important; /* Elimină complet elementul când este deblocat */
 }
+
+
+/* Update the background grid to use the GPU */
+.bg-grid-engine {
+    position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+    background-image: linear-gradient(rgba(0, 242, 254, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.1) 1px, transparent 1px);
+    background-size: 60px 60px; 
+    /* ADDED: translateZ(0) and will-change to force hardware acceleration */
+    transform: perspective(600px) rotateX(55deg) translateZ(0);
+    will-change: background-position, transform;
+    animation: gridSlowScroll 20s linear infinite;
+    mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
+    z-index: 0; pointer-events: none;
+}
+
+/* Optimize the Crossfade Animation */
+.crossfade-top {
+    z-index: 2;
+    animation: pulseFade 8s ease-in-out infinite;
+    /* ADDED: Forces GPU to handle the opacity fade */
+    will-change: opacity;
+    backface-visibility: hidden;
+}
+
+/* Optimize the Order Cards */
+.order-card {
+    background: #0b1120 !important;
+    border-radius: 20px !important;
+    overflow: visible !important;
+    border: 2px solid transparent !important;
+    display: flex;
+    flex-direction: column;
+    transition: 0.3s ease;
+    /* ADDED: Hardware accelerate the cards so hover effects don't lag */
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+
+/* Performance Fallbacks for Low-End Devices / Mobile */
+@media (max-width: 768px) {
+    .bg-grid-engine {
+        animation: none !important; /* Stop animating the background on phones */
+    }
+    .custom-modal-overlay, .custom-modal-card {
+        backdrop-filter: blur(5px) !important; /* Reduce blur intensity */
+    }
+    .privacy-overlay {
+        backdrop-filter: blur(10px) !important;
+        background: rgba(3, 7, 18, 0.95);
+    }
+}
   </style>
 </head>
 <body>
@@ -2248,10 +2300,11 @@ function renderCard(data) {
     // DD-MM-YYYY format
     const formattedDate = data.orderDate ? data.orderDate.split('-').reverse().join('-') : '00-00-0000';
 
-    // --- ANIMATION LOGIC: Check for final image ---
-    let imagesHtml = `<img src="${data.imageUrl}" class="order-img">`;
+// --- ANIMATION LOGIC: Check for final image ---
+    // ADDED: loading="lazy" and decoding="async" to prevent scrolling lag
+    let imagesHtml = `<img src="${data.imageUrl}" class="order-img" loading="lazy" decoding="async">`;
     if (data.finalImageUrl) {
-        imagesHtml += `<img src="${data.finalImageUrl}" class="order-img crossfade-top">`;
+        imagesHtml += `<img src="${data.finalImageUrl}" class="order-img crossfade-top" loading="lazy" decoding="async">`;
     }
 
     const card = document.createElement('div');
@@ -2723,9 +2776,9 @@ window.openMonthlyGallery = (monthKey) => {
         const card = document.createElement('div');
         card.className = `order-card ${sClass}`; // Matching main styles
         card.innerHTML = `
-            <div class="order-img-container">
-                <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')">
-            </div>
+<div class="order-img-container">
+        <img src="${data.imageUrl}" class="order-img" onclick="openOrderDetails('${data.id}')" loading="lazy" decoding="async">
+    </div>
             
             <div class="card-footer">
                 <div class="footer-left-side">
