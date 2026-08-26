@@ -2942,7 +2942,6 @@ window.showMonthDetails = (data, btn) => {
     `;
 };
 
-// --- HELPER: OPEN WASTERS MODAL ---
 window.openMonthlyWasters = (monthKey, wasters) => {
     const container = document.getElementById('wastersListContainer');
     const modalTitle = document.getElementById('wastersModalTitle');
@@ -2955,14 +2954,18 @@ window.openMonthlyWasters = (monthKey, wasters) => {
         wasters.forEach(w => {
             const item = document.createElement('div');
             item.className = 'waster-list-item';
+            
+            // LINK NOU PENTRU AVATAR (Silueta standard)
+            const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            
             item.innerHTML = `
-                <img src="https://i.ibb.co/4pGm9S2/user-placeholder.png" class="waster-avatar" alt="User">
+                <img src="${defaultAvatar}" class="waster-avatar" alt="User">
                 <div class="waster-info">
                     <span class="waster-name-text">${w.name}</span>
                     <span class="waster-phone-text"><i class="fas fa-phone-alt"></i> ${w.phone}</span>
                 </div>
                 <div class="waster-time-badge">
-                    <i class="fas fa-clock"></i> ${w.timeWasted}
+                    <i class="fas fa-clock"></i> ${calculateTotalWasted([w])}
                 </div>
             `;
             container.appendChild(item);
