@@ -1699,13 +1699,19 @@ body.hide-prices-mode #dPrice::after {
                     </div>
                 </div>
 
-                <div class="input-group full-row">
-                    <label style="color: var(--admin-red);">Timp Pierdut</label>
-                    <div class="input-wrapper">
-                        <input type="text" id="wTime" class="styled-input waster-input" placeholder="Ex: 30 minute, 2 ore..." required>
-                        <i class="fas fa-clock" style="color: var(--admin-red); text-shadow: 0 0 15px var(--admin-red);"></i>
-                    </div>
-                </div>
+<div class="input-group full-row">
+    <label style="color: var(--admin-red);">Timp Pierdut</label>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="input-wrapper">
+            <input type="number" id="wHours" class="styled-input waster-input" placeholder="Ore" min="0" value="0">
+            <i class="fas fa-hourglass-start" style="color: var(--admin-red);"></i>
+        </div>
+        <div class="input-wrapper">
+            <input type="number" id="wMinutes" class="styled-input waster-input" placeholder="Min" min="0" max="59" value="0">
+            <i class="fas fa-stopwatch" style="color: var(--admin-red);"></i>
+        </div>
+    </div>
+</div>
 
                 <!-- MULTIPLE IMAGE DROP AREA -->
                 <div class="image-drop-area full-row waster-drop-area" id="wasterImageDropArea" style="height: auto; min-height: 200px; padding: 20px;">
@@ -2966,12 +2972,17 @@ window.openMonthlyWasters = (monthKey, wasters) => {
     document.getElementById('monthWastersModal').classList.add('active');
 };
 
-// --- HELPER: CALCULATE TOTAL TIME ---
 function calculateTotalWasted(wasters) {
-    if (wasters.length === 0) return "0 minute";
-    // Deoarece timpul este string (ex: "2 ore"), doar le concatenăm sau afișăm numărul de intrări
-    // O variantă simplă este să afișăm timpul sub formă de listă sumară sau doar nr. de ore dacă ai un parser
-    return wasters.length + " Cazuri"; 
+    if (!wasters || wasters.length === 0) return "0 min";
+    
+    // Sumăm toate minutele
+    const totalMin = wasters.reduce((sum, w) => sum + (parseInt(w.timeWasted) || 0), 0);
+    
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    
+    if (h > 0) return `${h}h ${m}min`;
+    return `${m}min`;
 }
 // Hook into the existing data loader 
 // Find your 'onSnapshot' block and add 'updateStatistics()' inside it
@@ -3261,14 +3272,18 @@ document.getElementById('addWasterForm').addEventListener('submit', async (e) =>
         const now = new Date();
         const autoDateTime = now.toLocaleDateString('ro-RO') + ' - ' + now.toLocaleTimeString('ro-RO', {hour: '2-digit', minute: '2-digit'});
 
-        const wasterData = {
-            name: document.getElementById('wName').value.trim(),
-            phone: document.getElementById('wPhone').value.trim(),
-            timeWasted: document.getElementById('wTime').value.trim(),
-            images: uploadedUrls,
-            dateAdded: autoDateTime,
-            timestamp: serverTimestamp()
-        };
+const h = parseInt(document.getElementById('wHours').value) || 0;
+const m = parseInt(document.getElementById('wMinutes').value) || 0;
+const totalMinutes = (h * 60) + m;
+
+const wasterData = {
+    name: document.getElementById('wName').value.trim(),
+    phone: document.getElementById('wPhone').value.trim(),
+    timeWasted: totalMinutes, // Salvăm ca număr (minute)
+    images: uploadedUrls,
+    dateAdded: autoDateTime,
+    timestamp: serverTimestamp()
+};
 
         await addDoc(collection(db, "time_wasters"), wasterData);
 
