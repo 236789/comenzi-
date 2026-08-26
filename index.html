@@ -2995,11 +2995,16 @@ window.showMonthDetails = (data, btn) => {
 
     const display = document.getElementById('statsDetails');
     display.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;">
-            <h3 style="font-size: 30px; color: var(--primary); text-transform: uppercase; margin: 0;">
+        <!-- FIX: Am schimbat flex-wrap în nowrap și am adăugat aliniere forțată -->
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px; width: 100%; flex-wrap: nowrap !important;">
+            
+            <!-- Titlu: flex: 1 și min-width: 0 îi permit să ocupe spațiul rămas fără să împingă butoanele -->
+            <h3 style="flex: 1; min-width: 0; font-size: clamp(20px, 3.5vw, 30px); color: var(--primary); text-transform: uppercase; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 1px;">
                 Rezumat ${data.name}
             </h3>
-            <div style="display: flex; gap: 10px;">
+
+            <!-- Container butoane: flex-shrink: 0 le forțează să rămână la mărimea lor originală pe un singur rând -->
+            <div style="display: flex; gap: 12px; align-items: center; flex-shrink: 0;">
                 <button class="btn-view-month" onclick="openMonthlyGallery('${data.name}')">
                     <i class="fas fa-images"></i> VEZI PORTRETELE
                 </button>
@@ -3008,6 +3013,7 @@ window.showMonthDetails = (data, btn) => {
                 </button>
             </div>
         </div>
+
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Portrete Totale</div>
@@ -3030,7 +3036,6 @@ window.showMonthDetails = (data, btn) => {
                 <i class="fas fa-times-circle card-icon" style="color: #ff4757;"></i>
             </div>
             
-            <!-- NEW CARDS -->
             <div class="stat-card" style="border-color: #ff9800;">
                 <div class="stat-label">Clienți Neserioși</div>
                 <div class="stat-value" style="color: #ff9800;">${data.wasterCount}</div>
@@ -3056,7 +3061,7 @@ window.openMonthlyWasters = (monthKey, wasters) => {
     const container = document.getElementById('wastersListContainer');
     const modalTitle = document.getElementById('wastersModalTitle');
     
-    modalTitle.innerHTML = `<i class="fas fa-skull-crossbones"></i> LEADERBOARD NESERIOȘI: ${monthKey}`;
+    modalTitle.innerHTML = `<i class="fas fa-skull-crossbones"></i> NESERIOȘI: ${monthKey}`;
     container.innerHTML = "";
 
     if (!wasters || wasters.length === 0) {
