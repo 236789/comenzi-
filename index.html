@@ -1812,30 +1812,34 @@ body.hide-prices-mode #dPrice::after {
 <div class="input-group full-row">
     <label style="color: var(--admin-red);">Timp Pierdut</label>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <!-- Ore (HRS) -->
         <div class="input-wrapper">
-            <input type="number" id="wHours" class="styled-input waster-input" placeholder="Ore" min="0" value="0">
-            <i class="fas fa-hourglass-start" style="color: var(--admin-red);"></i>
+            <input type="number" id="wHours" class="styled-input waster-input" min="0" value="0" style="padding-left: 55px;">
+            <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--admin-red); font-weight: bold; font-size: 13px; letter-spacing: 1px; pointer-events: none; text-shadow: 0 0 10px var(--admin-red);">HRS</span>
         </div>
+        <!-- Minute (MINS) -->
         <div class="input-wrapper">
-            <input type="number" id="wMinutes" class="styled-input waster-input" placeholder="Min" min="0" max="59" value="0">
-            <i class="fas fa-stopwatch" style="color: var(--admin-red);"></i>
+            <input type="number" id="wMinutes" class="styled-input waster-input" min="0" max="59" value="0" style="padding-left: 55px;">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--admin-red); font-weight: bold; font-size: 13px; letter-spacing: 1px; pointer-events: none; text-shadow: 0 0 10px var(--admin-red);">MINS</span>
         </div>
     </div>
 </div>
 
-                <!-- MULTIPLE IMAGE DROP AREA -->
-                <div class="image-drop-area full-row waster-drop-area" id="wasterImageDropArea" style="height: auto; min-height: 200px; padding: 20px;">
-                    <input type="file" id="wImages" accept="image/*" multiple required>
-                    <div class="image-drop-placeholder" id="wImagePlaceholder" style="color: var(--admin-red);">
-                        <i class="fas fa-images" style="text-shadow: 0 0 20px var(--admin-red);"></i>
-                        <span>Selectează sau trage imaginile dorite</span>
-                        <span style="font-size: 12px; margin-top: 5px;">(Puteți selecta mai multe simultan)</span>
-                    </div>
-                    
-                    <div id="wImagePreviewContainer" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%; margin-top: 15px;"></div>
-                    
-                    <button type="button" id="wImageRemoveBtn" class="image-remove-btn" style="top: 10px; right: 10px; background: #fff; color: var(--admin-red);"><i class="fas fa-times"></i></button>
-                </div>
+<!-- MULTIPLE IMAGE DROP AREA (Acum este OPȚIONAL) -->
+<div class="image-drop-area full-row waster-drop-area" id="wasterImageDropArea" style="height: auto; min-height: 200px; padding: 20px;">
+    <!-- AM SCOS "required" DE AICI -->
+    <input type="file" id="wImages" accept="image/*" multiple>
+    
+    <div class="image-drop-placeholder" id="wImagePlaceholder" style="color: var(--admin-red);">
+        <i class="fas fa-images" style="text-shadow: 0 0 20px var(--admin-red);"></i>
+        <span>Selectează sau trage imaginile dorite</span>
+        <span style="font-size: 12px; margin-top: 5px;">(Opțional - Puteți salva și fără imagine)</span>
+    </div>
+    
+    <div id="wImagePreviewContainer" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%; margin-top: 15px;"></div>
+    
+    <button type="button" id="wImageRemoveBtn" class="image-remove-btn" style="top: 10px; right: 10px; background: #fff; color: var(--admin-red);"><i class="fas fa-times"></i></button>
+</div>
 
                 <button type="submit" class="btn-submit-order full-row" style="background: var(--admin-red); box-shadow: 0 0 30px var(--admin-red-dim); color: #fff;">
                     <i class="fas fa-save"></i> SALVEAZĂ ÎN ARHIVĂ
